@@ -24,8 +24,36 @@ spring :
                   enable : true
    config :
       import : config.properties 
-      
+        
+   ai:
+      openai:
+         api-key: ${OPENAI_API_KEY:}
+         chat:
+            options:
+               model: gpt-4o-mini  
+     
+   datasource:
+      driver-class-name: oracle.jdbc.driver.OracleDriver
+      url: jdbc:oracle:thin:@localhost:1521:xe
+      username: project
+      password: project1234
+      hikari:
+         connection-timeout: 30000
+         maximum-pool-size: 20
+         idle-timeout: 600000
+         pool-name: MyHikariCP
+         auto-commit: false
+
+   servlet:
+      multipart:
+         file-size-threshold: 52428800
+         max-file-size: 10485760
+         max-request-size: 52428800     
+     
 logging:
   level:
      org.elasticsearch.client : TRACE # Elasticsearch 쿼리 로그 출력 
      edu.og.es.common.filter.LoggingFilter : Trace # 필터 로그     
+     
+server:
+   port: 8880
