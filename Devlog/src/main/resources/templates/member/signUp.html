@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+
+    <link rel="stylesheet" th:href="@{/css/member/signUp.css}">
+    <link rel="stylesheet" th:href="@{/css/common/font.css}">
+</head>
+
+<body>
+
+    <div class="container-wrapper"> 
+        <h2 class="title fw-800">회원가입</h2>
+        <div class="container">
+            <div class="signup-box">
+
+                <!-- <h2 class="title">회원가입</h2> -->
+
+                <form>
+
+                    <!-- 이메일 -->
+                    <label class="label">아이디(이메일) <span class="required">*</span></label>
+                    <div class="row">
+                        <input type="email" class="input" placeholder="이메일을 입력해 주세요">
+                        <button type="button" class="btn-gray">인증 번호 받기</button>
+                    </div>
+                    <p class="desc">메일을 받을 수 있는 이메일을 입력해 주세요.</p>
+
+                    <!-- 인증번호 -->
+                    <label class="label">인증번호 <span class="required">*</span></label>
+                    <div class="row">
+                        <input type="text" class="input" placeholder="이메일로 받으신 인증번호를 입력하시고 인증하기 버튼을 누르세요">
+                        <button type="button" class="btn-gray">인증 하기</button>
+                    </div>
+
+                    <div class="spaceholder"><p><br></p></div>
+
+                    <!-- 비밀번호 -->
+                    <label class="label">비밀번호 <span class="required">*</span></label>
+                    <input type="password" class="input" placeholder="비밀번호를 입력해주세요">
+                    <p class="desc">영어,숫자,특수문자(!,@,#,-,_) 6~20자로 사이로 입력해주세요.</p>
+
+                    <!-- 비밀번호 확인 -->
+                    <label class="label">비밀번호 확인 <span class="required">*</span></label>
+                    <input type="password" class="input" placeholder="비밀번호 확인을 입력해주세요">
+                    <p class="desc">위에서 입력하신 비밀번호와 동일하게 입력해주세요.</p>
+
+                    <!-- 이름 -->
+                    <label class="label">이름 <span class="required">*</span></label>
+                    <input type="text" class="input" placeholder="이름을 입력해주세요">
+                    <p class="desc">유효한 이름을 입력해주세요 (예시: 홍길동)</p>
+
+                    <!-- 닉네임 -->
+                    <label class="label">닉네임 <span class="required">*</span></label>
+                    <input type="text" class="input" placeholder="닉네임을 입력해주세요">
+                    <p class="desc">한글, 영어, 숫자로만 2~10자</p>
+
+                    <!-- 전화번호 -->
+                    <label class="label">전화번호 <span class="required">*</span></label>
+                    <input type="text" class="input" placeholder="(- 없이 숫자만 입력)">
+                    <p class="desc">전화번호를 입력해주세요 (- 제외)</p>
+
+                    <!-- 경력사항 -->
+                    <label class="label">경력사항 <span class="required">*</span></label>
+                    <input type="text" class="input" placeholder="개발 경력(개발년차)를 입력해주세요">
+                    <p class="desc">유효한 경력사항을 입력해주세요 (예시: 백엔드 3년차)</p>
+
+
+                    <!-- 이메일 수신 -->
+                    <label class="check fw-600">
+                        <input type="checkbox">
+                        이메일 수신동의 (회원 전용 정보 제공 메일 수신에 동의합니다)
+                    </label>
+
+                    <!-- 관리자 신청 -->
+                    <div class="row">
+                        <label class="check fw-600">
+                            <input type="checkbox">
+                            관리자 계정 신청
+                        </label>
+                        <div class="input-admin-code-wrapper">
+                            <input type="text" class="input admin-code" placeholder="관리자 계정 승인코드를 입력해주세요">
+                        </div>    
+                    </div>
+
+                    <div class="spaceholder"><p><br></p></div>
+
+                    <!-- 가입 버튼 -->
+                    <div class="btn-join-wrapper">
+                        <button type="submit" class="btn-join">가입 하기</button>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

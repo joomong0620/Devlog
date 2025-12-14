@@ -4,14 +4,39 @@
 <meta charset="UTF-8">
 <title>AI Chat Launcher</title>
 <style>
-body { display:flex; justify-content:center; align-items:center; height:100vh; background:#f4f4f4; font-family:sans-serif; }
-button { padding:16px 30px; font-size:18px; border:none; background:#BD83CE; color:white; border-radius:8px; cursor:pointer; }
+/* body { display:flex; 
+            justify-content:center; align-items:center; height:100vh; background:#f4f4f4; font-family:sans-serif; } */
+
+body { display:flex; flex-direction:column; 
+        justify-content:center; align-items:center; height:100vh; background:#f4f4f4; font-family:sans-serif; }
+
+button { padding:16px 30px; font-size:18px; 
+        border:none; background:#BD83CE; 
+        color:white; border-radius:8px; cursor:pointer; }
 button:hover { background:#E5B0EA; }
+.login-page-link { font-size: 24;}
+.logout-page-link { font-size: 24;}
+
+/* 버튼 아래 한 줄 띄우기 */
+.chatbotTemplate-btn { 
+    margin-bottom: 20px;
+}
 </style>
 </head>
 <body>
 
-<button onclick="openChat()">AI 채팅 시작하기</button>
+<section class="chatbotTemplate-btn">
+    <button onclick="openChat()">AI 채팅 시작하기</button>
+</section>
+
+
+<section class="loginPage-link">
+    <a th:href="@{/member/login}" class="login-page-link">로그인화면</a>
+</section>
+
+<section class="logoutPage-link">
+    <a th:href="@{/member/logout}" class="logout-page-link">로그아웃(메인화면)</a>
+</section>
 
 <script>
 function openChat(){
