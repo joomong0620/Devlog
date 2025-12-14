@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+
+    <link rel="stylesheet" th:href="@{/css/member/login.css}">
+    <link rel="stylesheet" th:href="@{/css/common/font.css}">
+</head>
+
+<body>
+
+
+    <main>
+        <!-- 헤더 -->
+        <header class="main-header">header</header>
+        <!-- header.html (fragment) 추가 -->
+        <!-- <th:block th:replace="~{/common/header}">header.html</th:block> -->
+        <!-- 또는 -->
+        <!-- <div th:replace="common/header :: header"></div> -->
+
+        <!-- 네비게이션 -->
+        <nav class="main-nav"></nav>
+        <!--  ###################################################### -->
+
+
+        <div class="container">
+    
+            <!-- 로고 영역 -->
+            <img th:src="@{/images/member/DevLog_logo.png}" class="logo" alt="logo">
+    
+            <div class="login-box">
+    
+                <!-- 아이디 -->
+                <input type="text" class="input" placeholder="아이디">
+    
+                <!-- 비밀번호 -->
+                <input type="password" class="input" placeholder="비밀번호">
+    
+                <!-- 로그인 버튼 -->
+                <button class="btn-login">로그인</button>
+    
+                <div class="options">
+                    <label class="checkbox">
+                        <input type="checkbox" id="inputCheckboxSaveId">
+                        아이디 저장
+                    </label>
+    
+                    <a th:href="@{/member/signUp}" class="signUp">회원가입</a>
+                </div>
+    
+                <!-- OR 구분선 -->
+                <div class="divider">OR</div>
+    
+                <!-- 카카오 로그인 -->
+                <button class="btn-kakao">
+                    <img th:src="@{/images/member/kakao_balloon_simul.png}" class="kakao-icon" alt="">
+                    카카오 계정으로 로그인
+                </button>
+    
+            </div>
+        </div>
+
+
+        <!--  ###################################################### -->
+        <footer class="main-footer">footer</footer>
+        <!-- footer.html 추가 -->
+        <!-- <th:block th:replace="~{common/footer}">footer.html</th:block> -->
+        <!-- 또는 -->
+        <!-- <div th:replace="common/footer :: footer"></div> -->
+
+    </main>
+
+
+</body>
+</html>
