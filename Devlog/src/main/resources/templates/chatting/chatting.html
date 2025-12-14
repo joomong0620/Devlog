@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevTalk</title>
+    <link rel="stylesheet" href="../../static/css/common/font.css">
+
+    <link rel="stylesheet" href="../../static/css/chatting/chatting.css">
+    
+</head>
+<body>
+    
+
+    <!-- 채팅 -->
+    <main style="margin-top: 150px;" class="flex" id="chatting">
+        
+        <!-- 채팅방 리스트 -->
+        <aside class="left flex-col gap-24" id="chatting-room-list">
+            <div class="room-list-header flex">
+                <input type="search" id="chatting-search-area" placeholder="Search">
+                <img id="chat-add-btn" src="../../static/images/chatting/chat-add.svg" >
+            </div>
+
+            <div class="room-list-body">
+                <!-- 방이 없을 경우 -->
+                <!-- 
+                <div class="flex-center room-empty">
+                    <h1 class="fw-800" style="opacity: 0.5;">room == null</h1>
+                </div> 
+                -->
+
+                <!-- 방이 있을 경우 -->
+                <ul class="room-list flex-col gap-16">
+                    <!-- 채팅방 한 칸 -->
+                    <li class="room-item flex gap-12 is-selected">
+                        <div class="room-img">
+                            <!-- 프로필 이미지 -->
+                            <img src="../../static/images/logo.png"  >
+                        </div> 
+
+                        <div class="room-info flex">
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">Zero-Boost</span>
+                                <span class="ellipsis ">html 지옥</span>
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span style="padding-left: 8px;">12:30</span>
+                                <div class="count-pin">
+                                    <span class="unread-count fw-600 fs-14">5</span>
+                                    <img class="pinned" src="../../static/images/chatting/pin.svg">
+                                </div>
+                            </div>
+                        </div> 
+                    </li>
+
+                    <li class="room-item flex gap-12">
+                        <div class="room-img">
+                            <!-- 프로필 이미지 -->
+                            <img src="../../static/images/logo.png"  >
+                        </div> 
+
+                        <div class="room-info flex">
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">이규식</span>
+                                <span class="ellipsis ">html 지옥</span>
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span style="padding-left: 8px;">12:30</span>
+                                <div class="count-pin">
+                                    <!-- <span class="unread-count fw-600 fs-14">5</span> -->
+                                    <img class="pinned" src="../../static/images/chatting/pin.svg">
+                                </div>
+                            </div>
+                        </div> 
+                    </li>
+
+
+                    <li class="room-item flex gap-12">
+                        <div class="room-img">
+                            <!-- 프로필 이미지 -->
+                            <img src="../../static/images/logo.png"  >
+                        </div> 
+
+                        <div class="room-info flex">
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">이규식</span>
+                                <span class="ellipsis ">너는나를존중해야한다나는발롱도르5개와수많은개인트로피를들어올렸으며2016유로에서포르투갈을이끌고우승을차지했고동시에A매치역대최다득점자이다또한챔스역대최다득점자</span>
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span style="padding-left: 8px;">2025-12-10</span>
+                                <div class="count-pin">
+                                    <span class="unread-count fw-600 fs-14">30</span>
+                                    <!-- <img class="pinned" src="../../static/images/chatting/pin.svg">/ -->
+                                </div>
+                            </div>
+                        </div> 
+                    </li>
+
+                <li class="room-item flex gap-12">
+                        <div class="room-img">
+                            <!-- 프로필 이미지 -->
+                            <img src="../../static/images/logo.png"  >
+                        </div> 
+
+                        <div class="room-info flex">
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">이규식</span>
+                                <span class="ellipsis ">너는나를존중해야한다나는발롱도르5개와수많은개인트로피를들어올렸으며2016유로에서포르투갈을이끌고우승을차지했고동시에A매치역대최다득점자이다또한챔스역대최다득점자</span>
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span style="padding-left: 8px;">2025-12-10</span>
+                                <div class="count-pin">
+                                    <!-- <span class="unread-count fw-600 fs-14">30</span> -->
+                                    <!-- <img class="pinned" src="../../static/images/chatting/pin.svg">/ -->
+                                </div>
+                            </div>
+                        </div> 
+                    </li>
+                
+                </ul>
+
+            </div>
+            
+        </aside>
+ 
+
+        <!-- 채팅 영역 -->
+        <section class="right" id = "chatting-space">
+
+            <div class="chatting-area">
+                <!-- 방이 없을 경우 -->
+                <!-- <div class="flex-col flex-center room-empty">
+                    <img src="../../static/images/logo.png" >
+                    <h1>첫 채팅을 만들고 대화를 시작해보세요 !</h1>
+                </div> -->
+
+                <!-- 방이 있을 경우 -->
+                <div class="flex-col">
+                    <!-- 채팅방 정보 -->
+                    <div class="flex chat-info">
+                        <div class="flex gap-12">
+                            <div class="group-profile">
+                                <img src="../../static/images/logo.png" >
+                                <img src="../../static/images/logo.png" >
+                                <img src="../../static/images/logo.png" >
+                            </div>
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">Zero-Boost</span>
+                                <span class="member-counting flex gap-12 fw-600">
+                                    <img src="../../static/images/chatting/member.svg"> 6
+                                </span>
+                            </div>
+                        </div>
+                        <div class="search-menu flex-center gap-8">
+                            <img id="text-search-btn" src="../../static/images/chatting/Search.svg" >
+                            <img id="menu-btn" src="../../static/images/chatting/clarity_menu-line.svg">
+                        </div>
+                    </div>
+
+                    <!-- 메세지 -->
+                    <ul class="message-list flex-col gap-24">
+                        <li class="flex message-item other gap-12">
+                            <img class="profile-img" src="../../static/images/logo.png" >
+
+                            <div class="message-content flex-col gap-12">
+                                <span class="fw-600">소연님</span>
+                                <div class="bubble">한 줄 길이 </div>
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12">2025-12-10</span>
+                                
+                            </div>
+
+                        </li>
+                        <li class="flex message-item other gap-12">
+                            <img class="profile-img" src="../../static/images/logo.png" >
+
+                            <div class="message-content flex-col gap-12">
+                                <span class="fw-600">종구님</span>
+                                <div class="bubble">적당한 길이 메세지 테스트입니다. 줄바꿈이 잘 되는지</div>
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12">2025-12-10</span>
+                            </div>
+
+                        </li>
+                        <li class="flex message-item other gap-12">
+                            <img class="profile-img" src="../../static/images/logo.png" >
+
+                            <div class="message-content flex-col gap-12">
+                                <span class="fw-600">주연님</span>
+                                <div class="bubble">
+                                    장문 테스트 
+                                    너는나를존중해야한다나는발롱도르5개와수많은개인트로피를들어올렸으며2016유로에서포르투갈을이끌고우승을차지했고동시에A매치역대최다득점자이다또한챔스역대최다득점자이자5번이나우승을차지한레알마드리드의상징이다또한36세의나이에도프리미어리그에서18골을기록하고챔스에서5경기연속골을기록하며내가세계최고임을증명해냈다은혜를모르는맨유보드진과팬들은내가맨유의골칫덩이라며쫒아냈지만내가세계최고이고내가팀보다위대하다는사실은바뀌지않는더내가사우디에간이유는메시에대한자격지심이아니라유럽에서이룰수있는모든것을이루었기에아시아를정복하기위해간것이지단지돈을위해서간것이아니다
+                                </div>
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12">2025-12-10</span>
+                            </div>
+
+                            
+                        </li>
+                        
+                        <!-- 본인이 보낸 메세지 -->
+                        <li class="message-item flex my gap-12">
+
+                            <div class="message-content flex-col gap-12">
+                                <div class="bubble ">
+                                        ㄴㄴㄴㄴㄴㄴㄴㄴssssssss
+                                </div>
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12">00:26</span>
+
+                            </div>
+
+
+                            
+                        </li>
+
+                        <li class="message-item flex my gap-12">
+
+                            <div class="message-content flex-col gap-12">
+                                <div class="bubble image">
+                                    <img src="../../static/images/chatting/테스트 이미지.jpg" >
+                                </div>
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12">00:35</span>
+
+                            </div>
+
+                            
+                        </li>
+
+                        <li class="flex message-item other gap-12">
+                            <img class="profile-img" src="../../static/images/logo.png" >
+
+                            <div class="message-content flex-col gap-12">
+                                <span class="fw-600">주연님</span>
+                                <div class="bubble image">
+                                    <img src="../../static/images/chatting/테스트 이미지.jpg" >
+                                    
+                                </div>
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12">00:59</span>
+                            </div>
+
+                        </li>
+
+                    </ul>
+
+                    <!-- 입력창 -->
+                    <div class="send-area flex">
+                        <textarea id="send-message" name="messageContent" rows="1" placeholder="메시지를 입력하세요"></textarea>
+
+                        <div class="flex gap-12">
+                            <img id="send-btn" src="../../static/images/chatting/send.svg" >
+                            <label for="chatImg">
+                                <img id="file-btn" src="../../static/images/chatting/image-upload.svg" >
+    
+                            </label>
+                            <input type="file" name="chatImg" id="chatImg" accept="image/*" hidden>
+                        </div>
+
+                    </div>
+
+                    
+
+                </div>
+            </div>
+          
+
+
+        </section>
+        
+        
+    </main>
+
+
+
+
+
+    <link rel="stylesheet" href="../../static/js/chatting/chatting.js">
+</body>
+</html>
