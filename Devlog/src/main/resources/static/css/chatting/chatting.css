@@ -226,6 +226,7 @@ input[name="memberName"] {
     border: 1px solid #8C8C8C;
     width: 80%;
     padding-left: 10px;
+    height: 40px;
     
 
 }
@@ -252,6 +253,13 @@ input[name="memberName"] {
 
 .follow-item > div {
     align-items: center;
+}
+
+.user-item {
+    border: 1px solid #868686;
+    border-radius: 10px;
+    padding: 5px;
+    color: #868686;
 }
 /* -------------------------------------------------------------------- */
 

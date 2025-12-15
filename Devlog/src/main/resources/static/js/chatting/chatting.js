@@ -21,11 +21,13 @@ document.addEventListener('DOMContentLoaded', e => {
 
 
 
-/* 메세지 하단 함수 */
+/* 메세지 하단 고정 함수 */
 const messageArea = document.getElementsByClassName('message-list')[0]
 
 function scrollToBottom() {
     messageArea.scrollTop = messageArea.scrollHeight
 }
+
+
 
 
