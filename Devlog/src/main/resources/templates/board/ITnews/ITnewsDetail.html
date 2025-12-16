@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ITnews상세페이지</title>
+  <link rel="stylesheet" href="../../../static/css/board/ITnews/ITnewsDetail.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+</head>
+
+<body>
+  <main>
+    <!-- header -->
+
+    <div class="news-header">
+      <img src="https://t1.daumcdn.net/news/202512/11/ZDNetKorea/20251211174314543vjbe.gif" alt="뉴스 헤더 이미지">
+    </div>
+
+    <!-- 헤더 이미지 연결 참고 -->
+    <!--<div class="news-header"
+            th:if="${headerImage}"
+            th:style="|background-image: url('${headerImage}')|">
+        </div> -->
+
+
+    <!--  <h1 th:text="${board.boardTypeName}">자유게시판</h1> -->
+
+    <div class="news-area">
+      <div class="news-title">
+        <h2>[오늘의 천체사진] 美셧다운 끝, NASA가 올린 오리온과 런닝맨</h2>
+      </div>
+      <div class="news-info">
+        <p>
+          <span> 장유미 기자 </span>
+          <!-- <span th:text="${board.memberNickname}">joomong</span> -->
+        </p>
+        <p>
+          <span>2025. 12. 11. 17:43</span>
+          <!-- <span th:text="${board.boardCreateDate}">2025-09-29</span> -->
+        </p>
+        <p>
+          <span>조회수 2789회</span>
+          <!-- <span th:text="${board.boardCount}">2789</span> -->
+        </p>
+        <p>
+          <span class="like-area">❤️</span>
+        </p>
+        <p>
+          <span class="scrap-area">📂</span>
+        </p>
+        <p>
+          <span class="report-area">👮</span>
+        </p>
+        <!-- 좋아요 하트 -->
+
+        <!-- <span class="like-area"> 
+                <i class="fa-heart" th:classappend="${likeCheck} ? fa-solid : fa-regular" id="boardLike"></i>
+            
+                <span th:text="${board.likeCount}">0</span>
+             </span> -->
+
+        <!-- 스크랩하기 -->
+
+        <!-- <span class="scrap-area">
+                <i class="fa-bookmark" th:classappend="${scrapCheck} ? fa-solid : fa-regular" id="boardScrap"></i>
+            
+                <span th:text="${board.scrapCount}">0</span>
+             </span> -->
+
+        <!-- 신고하기 -->
+
+        <!-- <span class="report-area">
+                <i class="fa-flag" id="boardReport"></i>
+             </span> -->
+      </div>
+      <div class="news-content">
+        <div class="news-content-image">
+          <img src="https://t1.daumcdn.net/news/202512/11/ZDNetKorea/20251211174314543vjbe.gif" alt="뉴스 컨텐츠 이미지">
+        </div>
+        <div class="news-content-text">(지디넷코리아=장유미 기자)글로벌 시장에서 오픈AI '챗GPT'의 왕좌를 위협 중인 구글이 유독 점유율 확대에 어려움을 겪고 있는
+          한국 시장을 겨냥해 '제미나이' 광고를 앞세워 기회를 노리고 있다. 최근생성형 인공지능(AI) '제미나이3'를 출시한 후 오픈AI 'GPT-5.1'의 성능을 앞지르고 있다는 평가를
+          받고 있는 데다 '챗GPT'의 잦은 오류로 소비자 이탈 가능성이 높아진 만큼 이번에 국내 점유율을 대폭 높일 수 있을지 주목된다.</div>
+        <!-- 나중에 여기 본문 내용 단락 나눈 거  들어올 것임 -->
+      </div>
+
+
+
+    </div>
+
+
+
+
+  </main>
+
+
+</body>
+
+</html>
