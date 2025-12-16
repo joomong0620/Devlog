@@ -37,6 +37,13 @@ const createRoom = document.querySelector('.create-room');
 
 chatAddBtn.addEventListener('click', () => {
     createRoom.classList.toggle('hide');
+    userList.innerHTML = '';
+
+    for (let check of radioCheck) {
+            check.checked = false;
+        }
+    
+    
 });
 
 
@@ -50,6 +57,7 @@ const group = document.querySelector('.group');
 const roomNameARea = document.querySelector('.roomNameArea')
 
 
+let chatType = 'private'
 
 
 private.addEventListener('click', e=>{
@@ -58,6 +66,14 @@ private.addEventListener('click', e=>{
     }
 
     private.classList.add('type-select')
+    roomNameARea.classList.add('display-none')
+
+    chatType = 'private'
+    userList.innerHTML = '';
+
+    for (let check of radioCheck) {
+            check.checked = false;
+        }
 })
 
 
@@ -66,9 +82,12 @@ group.addEventListener('click', e=>{
         private.classList.remove('type-select')
     }
 
-    group.classList.add('type-select')
+    group.classList.add('type-select');
     
-    roomNameARea.classList.remove('display-none')
+    roomNameARea.classList.remove('display-none');
+
+    chatType = 'group';
+
     
 
 
@@ -76,45 +95,113 @@ group.addEventListener('click', e=>{
 
 
 for (let item of radioCheck) {
-    if(private.classList.contains('type-select')){
-    
-        item.addEventListener("change", e => {
-    
-            for (let check of radioCheck) {
-                check.checked = false;
-            }
-    
-            item.checked = true
-            const followItem =  e.target.closest('.follow-item');
-            const userName = followItem.querySelector('.name').innerText;
-            console.log(userName)
-            
-            const div = document.createElement('div')
-            const span = document.createElement('span')
-            const deleteBtn = document.createElement('span')
-            div.classList.add('user-item')
-            span.innerHTML = userName
-            deleteBtn.classList.add('list-delete-btn')
-            deleteBtn.innerText = ' x'
-    
-            userList.innerHTML = "";
-    
-            div.append(span, deleteBtn);
-            userList.appendChild(div);
     
     
-            deleteBtn.addEventListener('click', e => {
-                item.checked = false;
-                userList.innerHTML = "";
-            })
-    
-        })
+    item.addEventListener("change", e => {
+
         
-    }
-    
+
+        const followItem =  e.target.closest('.follow-item');
+        const userName = followItem.querySelector('.name').innerText;
+
+        if(chatType == 'private') {
+            for (let check of radioCheck) {
+            check.checked = false;
+            }
+
+            item.checked = true
+            userList.innerHTML = '';
+
+            addUser(userName, item);
+        }
+
+
+        if(chatType == 'group') {
+            
+            if(item.checked) {
+
+                if(!exist(userName)) {
+                    addUser(userName, item);
+                }
+            } else {
+
+                deleteUser(userName);
+            }
+
+
+        }
+        
+        
+        
+        
+        
+        
+        
+
+
+        
+
+
+        deleteBtn.addEventListener('click', e => {
+            item.checked = false;
+            userList.innerHTML = "";
+        })
+    })
 
 }    
 
 
+/* 유저 추가 함수 */
+function addUser(userName, checkbox) {
+
+    const div = document.createElement('div');
+    div.classList.add('user-item');
+
+    const span = document.createElement('span');
+    span.innerHTML = userName;
+
+    const deleteBtn = document.createElement('span');
+    deleteBtn.classList.add('list-delete-btn');
+    deleteBtn.innerText = ' x';
+
+    deleteBtn.addEventListener('click', () => {
+    checkbox.checked = false;
+    div.remove();
+    });
+
+    div.append(span, deleteBtn);
+    userList.appendChild(div);
+}
 
 
+
+/* 유저 존재 하는지 */
+function exist(userName) {
+    const items = userList.getElementsByClassName('user-item');
+
+    for (let item of items) {
+        if (item.innerText.includes(userName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/* 삭제 */
+function deleteUser(userName) {
+    const items = userList.getElementsByClassName('user-item');
+
+    for (let item of items) {
+        if(item.innerText.includes(userName)) {
+            item.remove();
+            return;
+        }
+    }
+}
+
+
+document.getElementById('room-cancle-btn')?.addEventListener('click', e => {
+    
+    document.querySelector('.create-room').classList.add('hide')
+})

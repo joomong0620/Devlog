@@ -199,6 +199,7 @@ input[type="search"]::-webkit-search-cancel-button {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.5s ease;
+    padding-top: 20px;
 }
 
 .create-room.hide {
@@ -290,7 +291,7 @@ input[name="memberName"] {
     height: 40px;
     width: 100px;
     text-align: center;
-    background-color: #C2BDBD;
+    background-color: #F7E8F6;
 }
 
 #room-create-btn:hover, #room-cancle-btn:hover {
@@ -304,6 +305,15 @@ input[name="memberName"] {
     justify-content: space-between;
     margin-bottom: 10px;
 }
+
+
+.select-user-list {
+    width: 80%;
+    display: flex;
+    flex-wrap: wrap;
+
+}
+
 /* -------------------------------------------------------------------- */
 
 
