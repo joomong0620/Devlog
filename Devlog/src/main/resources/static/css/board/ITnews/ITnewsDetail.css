@@ -45,3 +45,16 @@ p {
   margin-top: 20px;
   padding: 0 20px;
 }
+
+#goToListBtn {
+  display: flex;
+  margin-top: 10px;
+  background-color: #9C9C9C;
+  border-radius: 20px;
+  color: white;
+  border: none;
+  width: 80px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+}

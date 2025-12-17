@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ITnews상세페이지</title>
   <link rel="stylesheet" href="../../../static/css/board/ITnews/ITnewsDetail.css">
+  <link rel="stylesheet" href="../../../static/css/board/ITnews/ITnewsComment.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
 
@@ -23,6 +24,10 @@
             th:style="|background-image: url('${headerImage}')|">
         </div> -->
 
+    <!-- <button id="goToListBtn" type="button" th:onclick="|location.href='@{/board/{boardCode}(boardCode=${boardCode})}'|"> -->
+    <button id="goToListBtn" type="button">
+      목록으로
+    </button>
 
     <!--  <h1 th:text="${board.boardTypeName}">자유게시판</h1> -->
 
@@ -83,12 +88,10 @@
           받고 있는 데다 '챗GPT'의 잦은 오류로 소비자 이탈 가능성이 높아진 만큼 이번에 국내 점유율을 대폭 높일 수 있을지 주목된다.</div>
         <!-- 나중에 여기 본문 내용 단락 나눈 거  들어올 것임 -->
       </div>
-
-
-
     </div>
 
-
+    <!-- <div id="commentContainer" th:replace="~{board/ITnews/ITnewsComment}">
+</div> -->
 
 
   </main>
