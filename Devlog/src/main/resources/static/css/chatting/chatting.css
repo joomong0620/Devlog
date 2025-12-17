@@ -319,6 +319,7 @@ input[name="memberName"] {
 
 .chatting-area {
     height: 100%;
+    position: relative;
 }
 
 
@@ -492,6 +493,7 @@ input[name="memberName"] {
     overflow-y: hidden; 
 }
 
+/* ----------------------------------------------- */
 /* 메세지 수정 */
 
 .message-edit{
@@ -542,7 +544,8 @@ input[name="memberName"] {
 
 }
 
-/* 메세지 입력창 전환 용도 */
+/* ------------------------------------------- */
+
 .display-none {
 
     display: none;
@@ -550,6 +553,8 @@ input[name="memberName"] {
 
 
 
+/* ------------------------------------------- */
+/* 메세지 옵션 수정 삭제 공감 등 */
 .list-none {
     list-style: none;
     border: 1px solid #F7E8F6;
@@ -603,6 +608,7 @@ input[name="memberName"] {
 
 
 
+/* --------------------------------------------- */
 /* 이모지 영역 */
 .other .emoji-area {
     border: 1px solid #E5B0EA;
@@ -647,4 +653,180 @@ input[name="memberName"] {
     40%  { transform: translateY(-4px); }
     70%  { transform: translateY(1px); }
     100% { transform: translateY(0); }
+}
+
+
+/* ----------------------------------- */
+/* 검색, 메뉴 */
+
+.room-exist {
+    position: relative;
+    height: 100%;
+}
+
+.chat-search-panel {
+    width: 45%;
+    border: 1px solid #E0CAFF;
+    position: absolute;
+    top :70px;
+    right: 0;
+    height: 80%;
+    background-color: white;
+    z-index: 100;
+    align-items: center;
+    box-shadow: -6px 0 16px rgba(0,0,0,0.08);
+
+    opacity: 0;
+    transform: translateX(100%);
+    pointer-events: none;
+
+    transition: transform 0.5s ease, opacity 0.2s ease;
+}
+
+.chat-search-panel.is-open {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.search-msg-input{
+    width: 80%;
+    border: 1px solid #F1C6E7;
+    height: 40px;
+    margin-top: 30px;
+    border-radius: 10px;
+    align-items: center;
+    padding-left: 5px;
+    background-color: #F7E8F6;
+}
+
+input[name='msgSearch'] {
+    padding-left: 5px;
+    background-color: #F7E8F6
+}
+
+.search-msg-input > img {
+    width: 30px;
+    height: 30px;
+    opacity: 0.7;
+}
+
+.search-msg-area {
+    list-style: none;
+    width: 100%;
+    align-items: center;
+    overflow-y: auto;
+    
+}
+
+.search-msg-item {
+    width: 80%;
+    height: 60px;
+    border: 1px solid #F7E8F6;
+    border-radius: 10px;
+    align-items: center;
+    padding-left: 5px;
+}
+
+.search-msg-item>div:last-child {
+    padding-left: 10px;
+    width: 100%;
+}
+
+.msg-info {
+    width: 80%;
+}
+
+.chat-menu-panel {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    width: 45%;
+    height: calc(100% - 70px);
+
+    background: #fff;
+    border-left: 1px solid #E0CAFF;
+    box-shadow: -6px 0 16px rgba(0,0,0,0.08);
+    z-index: 1000;
+
+    opacity: 0;
+    transform: translateX(100%);
+    pointer-events: none;
+
+    transition: transform .3s ease, opacity .2s ease;
+}
+
+/* 열렸을 때 */
+.chat-menu-panel.is-open {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.member-panel-title {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    font-size: 22px;
+    font-weight: 700;
+    border-bottom: 1px solid #F1C6E7;
+}
+
+.team-name {
+    cursor: default;
+}
+
+.edit-icon {
+    width: 18px;
+    height: 18px;
+    opacity: .6;
+    cursor: pointer;
+}
+
+
+.member-section {
+    padding: 20px;
+    margin-top: 30px;
+}
+
+.member-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+}
+
+.member-list {
+    margin-top: 16px;
+}
+
+.member-item {
+    align-items: center;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.member-item:hover {
+    background-color: #F7E8F6;
+}
+
+#invite-btn {
+    width: 25px;
+    height: 20px;
+}
+
+#invite-btn:hover, #exit-btn:hover, #pinned-btn:hover {
+    cursor: pointer;
+}
+
+#exit-pin {
+    margin-top: 70px;
+    padding-left: 30px;
+}
+
+#exit-pin > img {
+    width: 25px;
+    height: 25px;
 }

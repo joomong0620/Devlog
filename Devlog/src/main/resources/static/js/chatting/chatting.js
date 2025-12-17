@@ -297,9 +297,33 @@ function emojiClickClose(emojiArea) {
 
             e.stopPropagation();
 
-
+            
             emojiArea.classList.add('display-none');
         };
     }
 }
 
+
+/* ---------------------------------------- */
+const searchPanel = document.querySelector('.chat-search-panel');
+const searchBtn = document.getElementById('text-search-btn');
+const chatMenuBtn = document.getElementById('chat-menu-btn')
+const menuPanel = document.querySelector('.chat-menu-panel');
+
+searchBtn.addEventListener('click', e => {
+    e.stopPropagation();
+
+    menuPanel?.classList.remove('is-open');
+    searchPanel.classList.toggle('is-open')
+})
+
+
+
+chatMenuBtn.addEventListener('click', e => {
+    e.stopPropagation()
+    // 다른 패널 닫기
+    searchPanel?.classList.remove('is-open');
+    
+    // 멤버 패널 토글
+    menuPanel.classList.toggle('is-open');
+})

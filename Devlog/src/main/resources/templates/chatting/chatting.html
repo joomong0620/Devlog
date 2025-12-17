@@ -336,7 +336,7 @@
             </div>
             
         </aside>
- 
+
 
         <!-- 채팅 영역 -->
         <section class="right" id = "chatting-space">
@@ -349,7 +349,7 @@
                 </div> -->
 
                 <!-- 방이 있을 경우 -->
-                <div class="flex-col">
+                <div class="flex-col room-exist">
                     <!-- 채팅방 정보 -->
                     <div class="flex chat-info">
                         <div class="flex gap-12">
@@ -367,8 +367,86 @@
                         </div>
                         <div class="search-menu flex-center gap-8">
                             <img id="text-search-btn" src="../../static/images/chatting/Search.svg" >
-                            <img id="menu-btn" src="../../static/images/chatting/clarity_menu-line.svg">
+                            <img id="chat-menu-btn" src="../../static/images/chatting/clarity_menu-line.svg">
                         </div>
+                    </div>
+
+                    <!-- 검색 패널 -->
+                    <div class="flex-col gap-16 chat-search-panel">
+                        <div class="search-msg-input flex">
+                            <img src="../../static/images/chatting/돋보기.svg">
+                            <input type="search" name="msgSearch" placeholder="검색어를 입력해주세요">
+                        </div>
+
+                        <ul class="search-msg-area flex-col gap-16">
+                            <li class="search-msg-item flex">
+                                <div>
+                                    <img class="profile-img" src="../../static/images/chatting/박보검.png">
+                                </div>
+                                <div class="flex-col gap-8">
+                                    <div class="user-info flex gap-12">
+                                        <span class="fw-600">박보검</span>
+                                        <span class="fs-12">2025-12-18</span>
+                                    </div>
+                                    <div class="msg-info ellipsis">애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 채팅방 정보 메뉴 -->
+                    <div class="chat-menu-panel">
+
+                        <div class="member-panel-title">
+                            <span class="team-name">Zero-Boost</span>
+                            <img class="edit-icon" src="../../static/images/chatting/edit.svg">
+                        </div>
+
+                        <div class="member-section">
+                            <div class="flex-between">
+                                <span class="member-label">멤버</span>
+                                <img id="invite-btn" src="../../static/images/chatting/invite-user.svg" >
+                            </div>
+
+                            <ul class="member-list flex-col gap-16">
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img" src="../../static/images/chatting/박보검.png">
+                                    <span class="fw-600">소연님</span>
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img" src="../../static/images/chatting/박보검.png">
+                                    <span class="fw-600">종구님</span>
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img" src="../../static/images/chatting/박보검.png">
+                                    <span class="fw-600">주연님</span> <img src="../../static/images/chatting/crown.svg">
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img" src="../../static/images/chatting/박보검.png">
+                                    <span class="fw-600">율영님</span>
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img" src="../../static/images/chatting/박보검.png">
+                                    <span class="fw-600">희준님</span>
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img" src="../../static/images/chatting/박보검.png">
+                                    <span class="fw-600">홀리식</span>
+                                </li>
+                            </ul>
+                        </div>
+
+
+                        <div class="flex gap-24" id="exit-pin">
+                            <img id="exit-btn" src="../../static/images/chatting/exit.svg">
+                            <img id="pinned-btn" src="../../static/images/chatting/pin.svg" >
+                        </div>
+
                     </div>
 
                     <!-- 메세지 -->
@@ -485,7 +563,7 @@
                                 <div class="bubble image">
                                     <img src="../../static/images/chatting/테스트 이미지.jpg" >
                                 </div>
-                                 <ul class="list-none msg-option display-none">
+                                <ul class="list-none msg-option display-none">
                                     <!-- 메세지 타입이 이미지면 수정하기 안보이게 -->
                                     <li class="msg-delete-btn">삭제하기</li>
                                     <li class="msg-reaction-btn">공감하기</li>
@@ -531,14 +609,11 @@
                                 <span class="unread-people fs-12">1</span>
                                 <span class="fs-12 send-time">00:59</span>
                             </div>
-
                         </li>
-
                     </ul>
 
 
-                    <!-- 입력창 -->
-                     
+                    <!-- 입력창 -->                    
                     <div class="send-area flex display-none">
 
                         <textarea id="send-message" name="messageContent" rows="1" placeholder="메시지를 입력하세요"></textarea>
@@ -574,7 +649,7 @@
 
                 </div>
             </div>
-          
+            
 
         </section>
         
@@ -582,43 +657,43 @@
     </main>
 
 
-     <!-- ===== Footer ===== -->
+    <!-- ===== Footer ===== -->
     <footer class="ft">
-      <div class="ft-in">
-        <!-- 상단 로고/소개 -->
-        <div class="ft-top">
-          <div class="ft-logo">
-            <img src="../../static/images/common/devlog.svg" alt="DevLog Logo" class="ft-logo-img" />
-            <p class="ft-desc">
-              개발자의 감성과 지식을 잇는 새로운 블로그 커뮤니티<br />
-              <strong>Devlog</strong> 가 만들어갑니다.
-            </p>
-          </div>
-  
-          <ul class="ft-menu">
-            <li><a href="#">SHOP</a></li>
-            <li><a href="#">REVIEW</a></li>
-            <li><a href="#">COMMUNITY</a></li>
-            <li><a href="#">ABOUT</a></li>
-          </ul>
+        <div class="ft-in">
+            <!-- 상단 로고/소개 -->
+            <div class="ft-top">
+                <div class="ft-logo">
+                <img src="../../static/images/common/devlog.svg" alt="DevLog Logo" class="ft-logo-img" />
+                <p class="ft-desc">
+                    개발자의 감성과 지식을 잇는 새로운 블로그 커뮤니티<br />
+                    <strong>Devlog</strong> 가 만들어갑니다.
+                </p>
+            </div>
+            
+                <ul class="ft-menu">
+                    <li><a href="#">SHOP</a></li>
+                    <li><a href="#">REVIEW</a></li>
+                    <li><a href="#">COMMUNITY</a></li>
+                    <li><a href="#">ABOUT</a></li>
+                </ul>
+            </div>
+            
+            <!-- 하단 정보 -->
+            <div class="ft-bottom">
+                <p>
+                    상호 : (주)디블로그 | 대표 팀 : ZeroBoost<br />
+                    사업자등록번호 : 000-00-00000 | 문의처 : dev-logs2@gmail.com<br />
+                    주소 : 서울특별시 용산구 우정국로21 9층 903호
+                </p>
+    
+                <p class="ft-links">
+                    <a href="#">이용약관</a> |
+                    <a href="#">개인정보처리방침</a>
+                </p>
+    
+                <p class="ft-copy">Copyright © 제로부스트</p>
+                </div>
         </div>
-  
-        <!-- 하단 정보 -->
-        <div class="ft-bottom">
-          <p>
-            상호 : (주)디블로그 | 대표 팀 : ZeroBoost<br />
-            사업자등록번호 : 000-00-00000 | 문의처 : dev-logs2@gmail.com<br />
-            주소 : 서울특별시 용산구 우정국로21 9층 903호
-          </p>
-  
-          <p class="ft-links">
-            <a href="#">이용약관</a> |
-            <a href="#">개인정보처리방침</a>
-          </p>
-  
-          <p class="ft-copy">Copyright © 제로부스트</p>
-        </div>
-      </div>
     </footer>
 
     <script src="../../static/js/chatting/chatting.js"></script>
