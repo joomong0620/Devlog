@@ -404,7 +404,7 @@ input[name="memberName"] {
 
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
-.message-item.other>div> span:last-child {
+.message-item.other>div>.send-time {
     width: 100%;
     text-align: end;
 }
@@ -548,3 +548,103 @@ input[name="memberName"] {
     display: none;
 }
 
+
+
+.list-none {
+    list-style: none;
+    border: 1px solid #F7E8F6;
+    border-radius: 10px;
+}
+
+/* 다른 사람 메세지 옵션 */
+.other .msg-option {
+    position: absolute;
+    right: 0;
+    bottom: -30px;
+    background-color: white;
+    z-index: 10;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.other .msg-option > li {
+    border-bottom: 1px solid #F7E8F6;
+    padding: 3px;
+}
+
+.other .msg-option > li:hover {
+    background-color: #BD83CE;
+    color: white;
+    transition: all 0.5s;
+}
+
+
+/* 내 메세지 옵션 */
+.my .msg-option {
+    position: absolute;
+    left: 0;
+    top: 70%;
+    background-color: white;
+    z-index: 10;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.my .msg-option > li {
+    border-bottom: 1px solid #F7E8F6;
+    padding: 3px;
+}
+
+.my .msg-option > li:hover {
+    background-color: #BD83CE;
+    color: white;
+    transition: all 0.5s;
+}
+
+
+
+/* 이모지 영역 */
+.other .emoji-area {
+    border: 1px solid #E5B0EA;
+    padding: 5px;
+    background-color: #F7E8F6;
+    position: absolute;
+    bottom: -20px;
+}
+
+.my .emoji-area {
+    border: 1px solid #E5B0EA;
+    padding: 5px;
+    background-color: #F7E8F6;
+    position: absolute;
+    bottom: -20px;
+    right: 0;
+}
+
+.emoji-area > span {
+    padding: 5px;
+}
+
+
+.emoji-area > span:hover {
+    cursor: pointer;
+}
+
+.emoji-area span {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+/* 마우스 올렸을 때 */
+.emoji-area span:hover {
+    animation: soft-bounce 0.7s ease-in-out infinite;
+    
+}
+
+/* 살짝만 튀는 애니메이션 */
+@keyframes soft-bounce {
+    0%   { transform: translateY(0); }
+    40%  { transform: translateY(-4px); }
+    70%  { transform: translateY(1px); }
+    100% { transform: translateY(0); }
+}

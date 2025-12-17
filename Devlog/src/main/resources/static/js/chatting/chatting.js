@@ -17,8 +17,11 @@ for (let item of listItem) {
 }
 
 document.addEventListener('DOMContentLoaded', e => {
-    scrollToBottom()
 })
+
+window.addEventListener('load', () => {
+    scrollToBottom();
+});
 
 
 
@@ -60,6 +63,7 @@ const roomNameARea = document.querySelector('.roomNameArea')
 let chatType = 'private'
 
 
+/* 개인 버튼 클릭 시 */
 private.addEventListener('click', e=>{
     if(group.classList.contains('type-select')){
         group.classList.remove('type-select')
@@ -77,6 +81,7 @@ private.addEventListener('click', e=>{
 })
 
 
+/* 그룹 버튼 클릭 시 */
 group.addEventListener('click', e=>{
     if(private.classList.contains('type-select')){
         private.classList.remove('type-select')
@@ -88,6 +93,11 @@ group.addEventListener('click', e=>{
 
     chatType = 'group';
 
+    userList.innerHTML = '';
+
+    for (let check of radioCheck) {
+            check.checked = false;
+        }
     
 
 
@@ -131,21 +141,6 @@ for (let item of radioCheck) {
 
         }
         
-        
-        
-        
-        
-        
-        
-
-
-        
-
-
-        deleteBtn.addEventListener('click', e => {
-            item.checked = false;
-            userList.innerHTML = "";
-        })
     })
 
 }    
@@ -205,3 +200,106 @@ document.getElementById('room-cancle-btn')?.addEventListener('click', e => {
     
     document.querySelector('.create-room').classList.add('hide')
 })
+
+
+
+
+
+
+/* 메세지 수정 공감 삭제 드롭다운 */
+const messageOption = document.querySelectorAll('.message-option');
+const messageBox = document.querySelectorAll('.bubble')
+
+let openBox = null;
+
+for (let box  of messageBox) {
+
+    box.addEventListener('contextmenu', e => {
+
+        
+        e.preventDefault();   
+        e.stopPropagation(); 
+
+        const option = box.nextElementSibling;
+        const emojiArea = option.nextElementSibling;
+
+        /* 같은 요소 우클릭 시 제거 후 함수 종료 */
+        if (openBox === option) {
+            option.classList.add('display-none');
+            openBox = null;
+            return;
+        }
+
+        /* 다른 요소 클릭 시 기존에 열려있는 옵션창 제거 */
+        if (openBox) {
+        openBox.classList.add('display-none');
+        }
+
+
+        option.classList.toggle('display-none')
+
+        openBox = option
+        
+        /* 이모지 공감 버튼 클릭 시 */
+        const reactionBtn = option.querySelector('.msg-reaction-btn');
+        reactionBtn.onclick = e => {
+
+            e.stopPropagation();
+
+            option.classList.add('display-none');
+            openBox = null;
+
+            emojiArea.classList.remove('display-none');
+
+            
+
+            emojiAreaClose(emojiArea)
+
+            emojiClickClose(emojiArea)
+        };
+
+        
+
+    })
+    
+}
+
+
+/* 이모지 영역 바깥을 클릭 했을 떄 닫히게 하는 함수 */
+function emojiAreaClose(emojiArea) {
+
+    if (emojiArea._outsideHandler) {
+        document.removeEventListener('click', emojiArea._outsideHandler);
+    }
+
+    /* 문서 전체 클릭 감지해서 이모지 영역 밖을 클릭하면 이모지 영역 닫음 */
+    function outsideClick(e) {
+
+        /* 이모지 영역 본인 클릭 시 함수 종료 */
+        if (emojiArea.contains(e.target)) return;
+
+        emojiArea.classList.add('display-none');
+        document.removeEventListener('click', outsideClick);
+    }
+
+    setTimeout(() => {
+        document.addEventListener('click', outsideClick);
+    });
+}
+
+/* 이모지 클릭 시 닫히게 하는 함수 */
+function emojiClickClose(emojiArea) {
+
+    const emojis = emojiArea.querySelectorAll('span');
+
+    for (let emoji of emojis) {
+        emoji.onclick = e => {
+
+            e.stopPropagation();
+
+
+            emojiArea.classList.add('display-none');
+        };
+    }
+}
+
