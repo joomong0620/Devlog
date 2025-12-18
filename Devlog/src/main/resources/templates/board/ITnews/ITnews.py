@@ -41,3 +41,19 @@ print("이미지 URL:", image_url)
 print("\n본문:")
 for i, p in enumerate(paragraphs, 1):
     print(f"{i}. {p}")
+
+
+import json
+
+# 데이터 구조화
+news_data = {
+    "title": title,
+    "reporter": reporter,
+    "date": num_date,
+    "image": image_url,
+    "content": "\n".join(paragraphs)
+}
+
+# JSON 파일로 저장
+with open('news_temp.json', 'w', encoding='utf-8') as f:
+    json.dump(news_data, f, ensure_ascii=False, indent=4)
