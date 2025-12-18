@@ -437,13 +437,14 @@
                         </ul>
                     </div>
 
+
                     <!-- 채팅방 정보 메뉴 -->
                     <div class="chat-menu-panel">
 
                         <div class="member-panel-title">
                             <span class="team-name">Zero-Boost</span>
                             <!-- 방장한테만 보이게 클릭 시 input창 전환 -->
-                            <img class="edit-icon" src="../../static/images/chatting/edit.svg">
+                            <img class="edit-icon" id="team-name-change" src="../../static/images/chatting/edit.svg">
                         </div>
 
                         <div class="member-section">
@@ -488,7 +489,8 @@
 
                         <div class="flex gap-24" id="exit-pin">
                             <img id="exit-btn" src="../../static/images/chatting/exit.svg">
-                            <img id="pinned-btn" src="../../static/images/chatting/pin.svg" >
+                            <!-- <img id="pinned-btn" class="pinned" src="../../static/images/chatting/pin.svg" > -->
+                            <img id="unpinned-btn" class="unpinned" src="../../static/images/chatting/pin-no.svg" >
                         </div>
 
                     </div>

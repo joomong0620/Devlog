@@ -359,6 +359,7 @@ document.getElementById('yes').addEventListener('click', e => {
 
 /* ------------------------------------------- */
 /* 수정하기 버튼 클릭 시 입력 폼 변화 */
+
 const sendArea = document.querySelector('.send-area');
 const editArea = document.querySelector('.edit-area');
 
@@ -372,6 +373,8 @@ for (let editBtn of msgEditBtn) {
 
         const opt = editBtn.closest('.msg-option')
         opt.classList.add('display-none')
+
+
         openEditMode();
     })
     
@@ -388,6 +391,7 @@ function openEditMode(originText) {
 
     // 기존 메시지 내용 세팅
     document.getElementById('edit-message').focus();
+    document.getElementById('edit-message').innerText = originText
 }
 
 editCancelBtn.addEventListener('click', () => {
@@ -442,6 +446,7 @@ inviteBtn?.addEventListener('click', e=> {
 
 
 
+/* 유저 리스트 체크박스 하나씩 */
 for (let checkbox of inviteList) {
     checkbox.addEventListener('change', e => {
 
@@ -463,6 +468,7 @@ for (let checkbox of inviteList) {
     });
 }
 
+/* 선택 되면 태그 형식으로 추가 */
 function inviteAddUser(userName, checkbox) {
     const div = document.createElement('div');
     div.classList.add('user-item');
@@ -483,6 +489,7 @@ function inviteAddUser(userName, checkbox) {
     selectedArea.appendChild(div);
 }
 
+/* 존재하면 false 반환 */
 function inviteExist(userName) {
     const items = selectedArea.getElementsByClassName('user-item');
     for (let item of items) {
@@ -493,6 +500,7 @@ function inviteExist(userName) {
     return false;
 }
 
+/* 유저 삭제 */
 function inviteDeleteUser(userName) {
     const items = selectedArea.getElementsByClassName('user-item');
     for (let item of items) {
@@ -504,16 +512,74 @@ function inviteDeleteUser(userName) {
 }
 
 
-
+/* 취소 클릭 시 초대창 닫기 */
 document.getElementById('invite-cancel').addEventListener('click', e => {
-  document.getElementsByClassName('user-invite-box')[0].classList.add('display-none')  
-  chatOverlay.classList.remove('active')
+    document.getElementsByClassName('user-invite-box')[0].classList.add('display-none')  
+    chatOverlay.classList.remove('active')
 })
 
+/* 초대 버튼 클릭 시  */
 document.getElementById('invite-user').addEventListener('click', e => {
     document.getElementsByClassName('user-invite-box')[0].classList.add('display-none');
     chatOverlay.classList.remove('active');
 
+    /* 비동기 요청 ------------------------------------ */
+
     alert("초대 되었습니다 ! ");
 })
 
+
+
+
+/* 방 이름 수정 버튼 클릭 시 */
+const editBtn = document.getElementById('team-name-change');
+const teamNameSpan = document.querySelector('.team-name');
+const panelTitle = document.querySelector('.member-panel-title');
+
+editBtn.addEventListener('click', () => {
+    // 이미 input 상태면 중복 생성 방지
+    if (panelTitle.querySelector('input')) return;
+
+    const currentName = teamNameSpan.innerText;
+
+    // span 숨김
+    teamNameSpan.classList.add('display-none');
+
+    // input 생성
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.classList.add('team-name-input');
+    input.value = currentName;
+
+    /* 
+        insertBefore 지정한 요소 앞에 삽입 
+        editBtn 요소 앞에 input 삽입
+    */
+    panelTitle.insertBefore(input, editBtn);
+    input.focus();
+
+    // 완료 처리 함수
+    const finishEdit = () => {
+        const newName = input.value.trim();
+        if (newName) {
+            teamNameSpan.innerText = newName;
+        }
+        
+        /* 팀 이름 변경 비동기 요청 추가 */
+
+
+        input.remove();
+        teamNameSpan.classList.remove('display-none');
+
+    };
+
+    // Enter로 완료
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            finishEdit();
+        }
+    });
+
+    // 포커스 잃으면 완료
+    input.addEventListener('blur', finishEdit);
+});

@@ -819,7 +819,7 @@ input[name='msgSearch'] {
     height: 20px;
 }
 
-#invite-btn:hover, #exit-btn:hover, #pinned-btn:hover {
+#invite-btn:hover, #exit-btn:hover, #pinned-btn:hover, #unpinned-btn:hover {
     cursor: pointer;
 }
 
