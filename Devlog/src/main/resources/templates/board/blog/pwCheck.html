@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비밀번호 확인</title>
+    <link rel="stylesheet" href="../../../static/css/board/blog/pwCheck.css">
+</head>
+
+<body>
+    <main class="password-verification-container">
+        <div class="content-wrapper">
+            <div class="logo-area">
+                <img src="../../../static/images/common/devlog.svg" alt="DevLog Logo" class="main-logo">
+            </div>
+
+            <h2 class="title">비밀번호 확인</h2>
+
+            <div class="input-group">
+                <input type="password" id="passwordInput" placeholder="비밀번호를 입력해 주세요" aria-label="Password">
+                <button type="button" id="confirmBtn">확인</button>
+            </div>
+
+            <div id="errorModal" class="error-modal hidden">
+                <div class="modal-content">
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                    <p>비밀번호가 일치하지 않습니다.</p>
+                    <button class="modal-ok-btn" onclick="closeModal()">확인</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="../../../static/js/blog/pwCheck.js"></script>
+</body>
+
+</html>
