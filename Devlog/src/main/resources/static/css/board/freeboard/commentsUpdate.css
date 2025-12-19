@@ -1,0 +1,163 @@
+/* section, div{ border : 1px solid black;}  */
+
+/* === 전체 초기화 및 공통 설정 === */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    font-family: 'Pretendard Variable', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+/* 기본 설정 */
+body {
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Pretendard Variable', Arial, Helvetica, sans-serif;
+}
+
+/* 전체 컨테이너 */
+.container {
+    max-width: 1440px; /* 내용 길이 1440px */
+    margin: 30px auto;
+    padding: 0 10px;
+}
+
+/* 상단 구분선 */
+.line {
+    border: none;
+    border-top: 4px solid #000;
+    margin: 20px 0;
+}
+
+/* 댓글 제목 */
+.title {
+    text-align: center;
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0;
+}
+
+/* 댓글 아이템 */
+.comment-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 15px 45px;
+    margin-bottom: 30px;
+}
+
+/* 프로필 이미지 */
+.profile-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+    margin-left: 40px
+}
+
+/* 댓글 내용 */
+.comment-content {
+    flex-grow: 1;
+}
+
+.comment-name {
+    font-weight: 700;
+    font-size: 32px;
+}
+
+.comment-text {
+    font-size: 32px;
+    color: #000;
+}
+
+/* 오른쪽 수정/삭제 버튼 */
+.comment-actions {
+    text-align: right;
+    min-width: 80px;
+}
+
+.action-btn {
+    margin-left: 60px;
+    font-size: 25px;
+    color: #777;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    color: #BD83CE;
+}
+
+
+/* textarea + 수정/취소 버튼*/
+.comment-update-area-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    justify-content: center;
+    padding: 0px 40px 0px 40px;
+}
+
+
+
+/* 수정 textarea */
+.edit-box {
+    width: 100%;
+    padding: 5px;
+    border: 2px solid #ccc;
+    font-size: 32px;
+    border-radius: 5px;
+    color: #000;
+    resize: none;
+    line-height: 1.7;
+}
+
+/* 버튼 영역 */
+.button-area {
+    text-align: right;
+    margin-top: 15px;
+}
+
+/* 댓글 수정 버튼 */
+.update-btn {
+    width: 180px;
+    background: #BD83CE;
+    color: white;
+    padding: 10px 22px;
+    font-size: 35px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 15px;    
+}
+
+.update-btn:hover {
+    background: #E5B0EA;
+}
+
+/* 댓글 수정 취소 버튼 */
+.cancel-btn {
+    width: 180px;
+    background: #BD83CE;
+    color: white;
+    padding: 10px 22px;
+    font-size: 35px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;  
+
+}
+
+.cancel-btn:hover {
+    background: #E5B0EA;
+}
