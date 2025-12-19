@@ -371,11 +371,23 @@ for (let editBtn of msgEditBtn) {
 
     editBtn.addEventListener('click', e => {
 
+        const messageContainer = editBtn.closest('.message-content');
+
+        const bubble = messageContainer.querySelector('.bubble');
+        
+        const originText = bubble.innerText;
+
+        console.log("원본 메세지 : ", originText)
+
+        openEditMode(originText);
+        
+        
+
         const opt = editBtn.closest('.msg-option')
+
         opt.classList.add('display-none')
 
 
-        openEditMode();
     })
     
 }
@@ -390,8 +402,8 @@ function openEditMode(originText) {
     editArea.classList.remove('display-none');
 
     // 기존 메시지 내용 세팅
+    document.getElementById('edit-message').value = originText
     document.getElementById('edit-message').focus();
-    document.getElementById('edit-message').innerText = originText
 }
 
 editCancelBtn.addEventListener('click', () => {
@@ -406,7 +418,7 @@ function closeEditMode() {
     // 기존 입력창 표시
     sendArea.classList.remove('display-none');
 
-    // 수정 textarea 초기화 (선택)
+    // 수정 textArea 초기화
     document.getElementById('edit-message').value = '';
 }
 
@@ -583,3 +595,65 @@ editBtn.addEventListener('click', () => {
     // 포커스 잃으면 완료
     input.addEventListener('blur', finishEdit);
 });
+
+
+/* 고정 핀 클릭 시 */
+const pinnedBtn = document.getElementById('pinned-btn');
+const unpinnedBtn = document.getElementById('unpinned-btn');
+
+
+/* 각각 db 상태값 변경 후 채팅방 목록 재정렬 해야함*/
+pinnedBtn.addEventListener('click', e => {
+    pinChange()
+})
+
+unpinnedBtn.addEventListener('click', e => {
+    pinChange()
+})
+
+function pinChange() {
+    pinnedBtn.classList.toggle('display-none')
+    unpinnedBtn.classList.toggle('display-none')
+}
+
+
+
+
+/* ------------------------------------------ */
+/* 메세지 삭제 버튼 클릭 시 */
+
+const msgDeleteBtn = document.querySelectorAll('.msg-delete-btn');
+const delCheck = document.querySelector('.del-check')
+
+for (let delBtn of msgDeleteBtn) {
+
+    delBtn.addEventListener('click', e => {
+
+        const opt = delBtn.closest('.msg-option');
+
+        opt.classList.add('display-none');
+
+        delCheck.classList.remove('display-none');
+
+        chatOverlay.classList.toggle('active')
+    })
+    
+}
+
+const msgDelYes = document.getElementById("msg-del-yes");
+const msgDelNo = document.getElementById("msg-del-no");
+
+msgDelYes.addEventListener('click', e => {
+    delCheck.classList.add('display-none');
+    chatOverlay.classList.toggle('active');
+
+    /* 비동기로 화면 삭제 로직 처리 */
+
+
+})
+
+msgDelNo.addEventListener('click', e => {
+    delCheck.classList.add('display-none');
+    chatOverlay.classList.toggle('active');
+
+})

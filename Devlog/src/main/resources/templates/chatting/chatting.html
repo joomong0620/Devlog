@@ -356,12 +356,26 @@
 
                     <!-- 나갈거니 ? 확인 화면 -->
                     <div class="exit-check flex-col gap-12 display-none">
-
-                        <span class="fw-600">채팅방을 나가시겠습니까 ?</span>
+                        <div class="flex gap-12">
+                            <span class="fw-600">채팅방을 나가시겠습니까 ?</span>
+                            <img src="../../static/images/chatting/free-icon-exit-12370353.svg" >
+                        </div>
                         <span class="fs-12">주의* 대화내용이 모두 삭제됩니다.</span>
                         <div class="flex gap-24">
                             <span id="yes">예</span>
                             <span id="no">아니오</span>
+                        </div>
+                    </div>
+                    
+                    <div class="del-check flex-col gap-12 display-none">
+                        <div class="flex gap-12">
+                            <span class="fw-600">해당 메세지를 삭제하시겠습니까 ?</span>
+                            <img src="../../static/images/chatting/trashtong.svg">
+
+                        </div>
+                        <div class="flex gap-24">
+                            <span id="msg-del-yes">예</span>
+                            <span id="msg-del-no">아니오</span>
                         </div>
                     </div>
 
@@ -489,7 +503,7 @@
 
                         <div class="flex gap-24" id="exit-pin">
                             <img id="exit-btn" src="../../static/images/chatting/exit.svg">
-                            <!-- <img id="pinned-btn" class="pinned" src="../../static/images/chatting/pin.svg" > -->
+                            <img id="pinned-btn" class="pinned display-none" src="../../static/images/chatting/pin.svg" >
                             <img id="unpinned-btn" class="unpinned" src="../../static/images/chatting/pin-no.svg" >
                         </div>
 
