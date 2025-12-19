@@ -984,3 +984,78 @@ input[name='msgSearch'] {
     cursor: pointer;
 }
 
+
+
+.profile-card {
+  width: 280px;
+  background-color: #f9f7ff; /* 연한 보라색 배경 */
+  border-radius: 20px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  position: absolute;
+  z-index: 1000;
+  top: 40px;
+  left: -100%;
+}
+
+/* 이름 및 레벨 줄 */
+.profile-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.name {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.level {
+  background-color: #c8c2f9; /* 보라색 레벨 태그 */
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* 직업 텍스트 */
+.job-title {
+  font-size: 16px;
+  color: #666;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+/* 버튼 스타일 */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn {
+  background-color: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.btn:hover {
+  background-color: #f3f3f3;
+  transform: translateY(-1px);
+}
+
+.message-item {
+    position: relative;
+}
