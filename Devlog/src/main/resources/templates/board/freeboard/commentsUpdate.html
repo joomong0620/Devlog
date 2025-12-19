@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>댓글 수정</title>
+
+    <link rel="stylesheet" href="../../../static/css/board/freeboard/commentsUpdate.css">
+    <link rel="stylesheet" href="../../static/css/common/font.css">
+</head>
+<body>
+
+
+    <div class="container">
+
+        <!-- 상단 라인 -->
+        <hr class="line">
+
+        <!-- 제목 -->
+        <h3 class="title">댓글</h3>
+
+        <hr class="line">
+
+        <!-- 댓글 영역 -->
+        <div class="comment-item">
+            <img src="../../../static/images/board/freeboard/fbComment_img1.png" class="profile-img" th:alt="#">
+
+            <div class="comment-content">
+                <div class="comment-name">묘소연</div>
+                <div class="comment-text">글 잘 봤습니다. ^^</div>
+            </div>
+
+            <div class="comment-actions">
+                <span class="action-btn">수정</span>
+                <span class="action-btn">삭제</span>
+            </div>
+        </div>
+
+
+        <div class="comment-update-area-wrapper">
+            <!-- 댓글 수정 textarea -->
+            <textarea class="edit-box" rows="4">글 잘 봤습니다. ^^
+댓글 수정도 부탁드려요</textarea>
+
+            <!-- 버튼 영역 -->
+            <div class="button-area">
+                <button class="update-btn">댓글 수정</button>
+                <button class="cancel-btn">취소</button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
