@@ -987,75 +987,125 @@ input[name='msgSearch'] {
 
 
 .profile-card {
-  width: 280px;
-  background-color: #f9f7ff; /* 연한 보라색 배경 */
-  border-radius: 20px;
-  padding: 30px 20px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  position: absolute;
-  z-index: 1000;
-  top: 40px;
-  left: -100%;
+    width: 280px;
+    background-color: #f9f7ff; /* 연한 보라색 배경 */
+    border-radius: 20px;
+    border: 1px solid #BD83CE;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    position: absolute;
+    z-index: 1000;
+    top: 40px;
+}
+
+.profile-card-img {
+    width: 40%;
+    height: 40%;
+    border-radius: 50%;
 }
 
 /* 이름 및 레벨 줄 */
 .profile-info {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
 }
 
 .name {
-  font-size: 22px;
-  font-weight: bold;
-  color: #333;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
 }
 
 .level {
-  background-color: #c8c2f9; /* 보라색 레벨 태그 */
-  color: white;
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-weight: bold;
+    background-color: #c8c2f9; /* 보라색 레벨 태그 */
+    color: white;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: bold;
 }
 
 /* 직업 텍스트 */
 .job-title {
-  font-size: 16px;
-  color: #666;
-  margin-top: 0;
-  margin-bottom: 25px;
+    font-size: 16px;
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 25px;
 }
 
 /* 버튼 스타일 */
 .button-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .btn {
-  background-color: white;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 12px 0;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    background-color: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 12px 0;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
 }
 
 .btn:hover {
-  background-color: #f3f3f3;
-  transform: translateY(-1px);
+    background-color: #E0CAFF;
+    color: white;
+    transform: translateY(-1px);
 }
 
 .message-item {
     position: relative;
+}
+
+
+
+
+
+.image-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+
+
+}
+
+/* 어두운 배경 */
+.image-viewer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+}
+
+/* ✅ 라이트박스 전용 이미지 */
+.viewer-img {
+    position: relative;
+    max-width: 95vw;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
+
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+
+    animation: zoom-in 0.25s ease;
+}
+
+/* 등장 애니메이션 */
+@keyframes zoom-in {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }

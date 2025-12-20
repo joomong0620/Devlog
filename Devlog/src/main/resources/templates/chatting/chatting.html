@@ -6,8 +6,10 @@
     <title>DevTalk</title>
     <link rel="stylesheet" href="../../static/css/common/font.css">
     <link rel="stylesheet" href="../../static/css/common/main.css" />
+    <link rel="stylesheet" href="../../static/css/common/notification.css">
     <link rel="stylesheet" href="../../static/css/chatting/chatting.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
 </head>
 <body>
     <header class="hd">
@@ -66,18 +68,151 @@
 
     <!-- 오른쪽 영역 -->
     <div class="hd-r">
-      <!-- 검색창 -->
-      <div class="search">
-        <input type="text" placeholder="여기에 검색어를 입력하세요." />
-        <button aria-label="search">
-          <img src="../../static/images/common/search.svg" alt="search" />
-        </button>
-      </div>
+        <!-- 검색창 -->
+        <div class="search">
+            <input type="text" placeholder="여기에 검색어를 입력하세요." />
+            <button aria-label="search">
+            <img src="../../static/images/common/search.svg" alt="search" />
+            </button>
+        </div>
 
-      <!-- 알림 -->
-      <button class="btn-ico" aria-label="notification">
-        <img src="../../static/images/common/notifications.svg" alt="notification" />
-      </button>
+        <!-- 알림 -->
+        <button class="btn-ico" id="noti-btn" aria-label="notification">
+            <img src="../../static/images/common/notifications.svg" alt="notification" />
+        </button>
+
+        <div class="alarm-panel display-none">
+
+            <!-- 헤더 -->
+            <div class="alarm-header flex-between">
+                <h2>알림</h2>
+
+                <div class="alarm-menu">
+                    <button class="noti-menu-btn">⋮</button>
+                    <ul class="noti-menu-dropdown display-none">
+                        <li id="allDeleteNoti" class="fw-600">전체 삭제</li>
+                        <li id="allReadNoti" class="fw-600">전체 읽음</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 필터 탭 -->
+            <div class="alarm-filters flex gap-8">
+                <button class="filter is-active fs-12 fw-600">⭐ 전체</button>
+                <button class="filter  flex-center gap-4">
+                    <img src="../../static/images/notification/like.svg">
+                    <span class="fs-12 fw-600">좋아요</span>
+                </button>
+                <button class="filter flex-center gap-4">
+                    <img src="../../static/images/notification/comment.svg" >    
+                    <span class="fs-12 fw-600">댓글</span>
+                    
+                </button>
+                <button class="filter flex-center gap-4">
+                    <img src="../../static/images/notification/follow.svg" alt="">    
+                    <span class="fs-12 fw-600">팔로우</span> 
+                </button>
+                <button class="filter flex-center gap-4">
+                    <img src="../../static/images/notification/@.svg">    
+                    <span class="fs-12 fw-600">언급</span>
+                </button>
+            </div>
+            
+            <!-- 알림 리스트 -->
+            <div>
+                <!-- 알람이 없을 경우 -->
+                <div class="noAlarm flex-center display-none">
+                    <span class="fw-600 fs-24">/notifications 응답: 204 No Content</span>
+                </div>
+                <!-- 알람이 있을 경우 -->
+                <ul class="alarm-list flex-col gap-12">
+    
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon comment">
+                                <img src="../../static/images/chatting/comment.svg" > 
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>소연님</b>이 회원님의 게시글에 댓글을 남겼습니다.</p>
+                            <span class="sub">파라요 ~</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">5분전</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon mention">
+                                <img src="../../static/images/chatting/@.svg"> 
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>종구님</b>이 회원님을 언급했습니다.</p>
+                            <span class="sub">@홀릭 언급이요 ~</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">7시간 전</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon like">
+                                <img src="../../static/images/chatting/like.svg">
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
+                            <span class="sub">게시글 제목</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">12-08</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+                    <li class="alarm-item flex-between read-noti">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon like">
+                                <img src="../../static/images/chatting/like.svg">
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
+                            <span class="sub">게시글 제목</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">12-08</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon like">
+                                <img src="../../static/images/chatting/like.svg">
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
+                            <span class="sub">게시글 제목</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">12-08</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+    
+    
+                </ul>
+
+            </div>
+        </div>
 
       <!-- 프로필 -->
       <div class="profile" id="profile">
@@ -95,7 +230,9 @@
     </div>
   </div>
     </header>
-</body>
+
+<script src="../../static/js/notification/noti.js"></script>
+
 <script>
   const profile = document.getElementById('profile');
   const menuBtn = document.getElementById('menuBtn');
@@ -123,6 +260,11 @@
   });
 </script>
     
+<!-- 이미지 라이트박스 -->
+<div id="imageViewer" class="image-viewer display-none flex-center">
+    <div class="image-viewer-backdrop"></div>
+    <img id="imageViewerImg" class="viewer-img">
+</div>
 
     <!-- 채팅 -->
     <main style="margin-top: 150px;" class="flex" id="chatting">
@@ -309,7 +451,7 @@
                         </div> 
                     </li>
 
-                <li class="room-item flex gap-12">
+                    <li class="room-item flex gap-12">
                         <div class="room-img">
                             <!-- 프로필 이미지 -->
                             <img src="../../static/images/logo.png"  >
@@ -405,6 +547,7 @@
                             <div id="invite-cancel" class="flex-center fw-600">취소</div>
                         </div>
                     </div>
+
 
 
                     <!-- 채팅방 정보 -->
@@ -513,9 +656,13 @@
                     <ul class="message-list flex-col gap-24">
                         <li class="flex message-item other gap-12">
                             <img class="profile-img" src="../../static/images/logo.png" >
-                            <div class="profile-card">
-                                <div class="profile-img">
-                                <img src="https://via.placeholder.com/100" alt="profile"> </div>
+                            
+                            <!-- 유저 프로필 카드 -->
+                            <div class="profile-card flex-col display-none">
+                                <div class="flex-center">
+
+                                    <img class="profile-card-img" src="../../static/images/chatting/박보검.png" alt="profile"> 
+                                </div>
 
                                 <div class="profile-info">
                                     <span class="name">소연님</span>
@@ -525,9 +672,9 @@
                                 <p class="job-title">프론트엔드 개발자</p>
 
                                 <div class="button-group">
-                                    <button class="btn">프로필 보기</button>
-                                    <button class="btn">1:1 채팅 시작</button>
-                                    <button class="btn">팔로우 하기</button>
+                                    <button class="btn fw-600 fs-14">프로필 보기</button>
+                                    <button class="btn fw-600 fs-14">1:1 채팅 시작</button>
+                                    <button class="btn fw-600 fs-14">팔로우 하기</button>
                                 </div>
 
                             </div>
@@ -555,7 +702,26 @@
                         </li>
                         <li class="flex message-item other gap-12">
                             <img class="profile-img" src="../../static/images/logo.png" >
+                            <div class="profile-card flex-col display-none">
+                                <div class="flex-center">
 
+                                    <img class="profile-card-img" src="../../static/images/chatting/박보검.png" alt="profile"> 
+                                </div>
+
+                                <div class="profile-info">
+                                    <span class="name">종구님</span>
+                                    <span class="level">LV4</span>
+                                </div>
+
+                                <p class="job-title">프론트엔드 개발자</p>
+
+                                <div class="button-group">
+                                    <button class="btn fw-600 fs-14">프로필 보기</button>
+                                    <button class="btn fw-600 fs-14">1:1 채팅 시작</button>
+                                    <button class="btn fw-600 fs-14">팔로우 하기</button>
+                                </div>
+
+                            </div>
                             <div class="message-content flex-col gap-12">
                                 <span class="fw-600">종구님</span>
                                 <div class="bubble">적당한 길이 메세지 테스트입니다. 줄바꿈이 잘 되는지</div>
@@ -578,7 +744,26 @@
                         </li>
                         <li class="flex message-item other gap-12">
                             <img class="profile-img" src="../../static/images/logo.png" >
+                            <div class="profile-card flex-col display-none">
+                                <div class="flex-center">
 
+                                    <img class="profile-card-img" src="../../static/images/chatting/박보검.png" alt="profile"> 
+                                </div>
+
+                                <div class="profile-info">
+                                    <span class="name">주연님</span>
+                                    <span class="level">LV4</span>
+                                </div>
+
+                                <p class="job-title">프론트엔드 개발자</p>
+
+                                <div class="button-group">
+                                    <button class="btn fw-600 fs-14">프로필 보기</button>
+                                    <button class="btn fw-600 fs-14">1:1 채팅 시작</button>
+                                    <button class="btn fw-600 fs-14">팔로우 하기</button>
+                                </div>
+
+                            </div>
                             <div class="message-content flex-col gap-12">
                                 <span class="fw-600">주연님</span>
                                 <div class="bubble">
@@ -663,7 +848,26 @@
 
                         <li class="flex message-item other gap-12">
                             <img class="profile-img" src="../../static/images/logo.png" >
+                            <div class="profile-card flex-col display-none">
+                                <div class="flex-center">
 
+                                    <img class="profile-card-img" src="../../static/images/chatting/박보검.png" alt="profile"> 
+                                </div>
+
+                                <div class="profile-info">
+                                    <span class="name">주연님</span>
+                                    <span class="level">LV4</span>
+                                </div>
+
+                                <p class="job-title">프론트엔드 개발자</p>
+
+                                <div class="button-group">
+                                    <button class="btn fw-600 fs-14">프로필 보기</button>
+                                    <button class="btn fw-600 fs-14">1:1 채팅 시작</button>
+                                    <button class="btn fw-600 fs-14">팔로우 하기</button>
+                                </div>
+
+                            </div>
                             <div class="message-content flex-col gap-12">
                                 <span class="fw-600">주연님</span>
                                 <div class="bubble image">

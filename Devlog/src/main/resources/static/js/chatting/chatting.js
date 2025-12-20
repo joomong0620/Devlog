@@ -640,6 +640,7 @@ for (let delBtn of msgDeleteBtn) {
     
 }
 
+
 const msgDelYes = document.getElementById("msg-del-yes");
 const msgDelNo = document.getElementById("msg-del-no");
 
@@ -657,3 +658,66 @@ msgDelNo.addEventListener('click', e => {
     chatOverlay.classList.toggle('active');
 
 })
+
+
+
+
+const profileImgs = document.querySelectorAll('.profile-img');
+
+profileImgs.forEach(img => {
+    img.addEventListener('click', e => {
+        e.stopPropagation();
+
+        const messageItem = img.closest('.message-item');
+        const profileCard = messageItem.querySelector('.profile-card');
+
+        // 다른 카드 전부 닫기
+        document.querySelectorAll('.profile-card').forEach(card => {
+            if (card !== profileCard) {
+                card.classList.add('display-none');
+            }
+        });
+
+        profileCard.classList.toggle('display-none');
+    });
+});
+
+document.addEventListener('click', () => {
+    document.querySelectorAll('.profile-card')
+        .forEach(card => card.classList.add('display-none'));
+});
+
+document.querySelectorAll('.profile-card').forEach(card => {
+    card.addEventListener('click', e => e.stopPropagation());
+});
+
+
+
+
+
+
+const viewer = document.getElementById('imageViewer');
+const viewerImg = document.getElementById('imageViewerImg');
+
+document.querySelectorAll('.bubble.image img').forEach(img => {
+    img.addEventListener('click', e => {
+        e.stopPropagation();
+
+        viewerImg.src = img.src;
+        viewer.classList.remove('display-none');
+    });
+});
+
+
+viewer.addEventListener('click', () => {
+    viewer.classList.add('display-none');
+    viewerImg.src = '';
+});
+
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        viewer.classList.add('display-none');
+        viewerImg.src = '';
+    }
+});
