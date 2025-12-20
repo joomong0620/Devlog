@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mybeans</title>
+  <link rel="stylesheet" href="../../static/css/coffeebeans/mybeans.css">
+</head>
+
+<body>
+  <div class="mybeans-container">
+    <div class="main-beans">
+      <div class="title-group">
+        <img src="../../static/images/common/coffebean.png" alt="커피콩">
+        <h2 class="mybeans">내 커피콩</h2>
+      </div>
+      <div class="beans-count">
+        <!-- <span th:text="${memberBeanCount}">0</span> -->
+        <span>12,450 콩</span>
+        <!-- <span th:text="${memberBeanCount}">0</span> -->
+        <span>약 12,450 상당</span>
+
+        <div class="btn-group">
+          <button class="charge-btn" id="charge-btn">
+            충전하기
+          </button>
+          <button class="exchange-btn" id="exchange-btn">
+            환전하기
+          </button>
+        </div>
+      </div>
+
+
+      <div class="info-cards">
+        <div class="beans-info">
+          <div class="info-title-group">
+            <img src="../../static/images/common/1bean.png" alt="단가">
+            <h3 class="info-title">커피콩 단가 안내</h3>
+          </div>
+          <ul class="info-list">
+            <li>1 커피콩 = 1원</li>
+            <li>1,000 커피콩 = 1,000원</li>
+            <li>10,000 커피콩 = 10,000원</li>
+          </ul>
+        </div>
+
+        <div class="beans-info">
+          <div class="info-title-group">
+            <img src="../../static/images/common/2bean.png" alt="환전">
+            <h3 class="info-title">커피콩 환전 정책</h3>
+          </div>
+          <ul class="info-list">
+            <li>최소 환전 가능 : 5,000 커피콩 이상</li>
+            <li>환전 시 10% 수수료가 부과됩니다.</li>
+            <li>커피콩을 사용하지 않았을 시 결제 취소 요청이 가능합니다.</li>
+          </ul>
+          <p class="example-text"><strong>예시)</strong><br>환전 요청 : 10,000 커피콩 → 수수료: 1,000</p>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+    <div class="history-section">
+      <h3 class="history-title">내 커피콩 내역</h3>
+
+      <div class="filter-tab-container">
+        <button class="filter-btn active" data-type="all">전체</button>
+        <button class="filter-btn" data-type="charge">충전</button>
+        <button class="filter-btn" data-type="use">사용</button>
+        <button class="filter-btn" data-type="exchange">환전</button>
+        <button class="filter-btn" data-type="cancel">취소</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>유형</th>
+              <th>내역</th>
+              <th>금액</th>
+              <th>일시</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody">
+            <tr data-type="use">
+              <td>사용</td>
+              <td>블로그 글 구매</td>
+              <td class="minus">-3,000</td>
+              <td>2025.12.09</td>
+            </tr>
+
+            <tr data-type="charge">
+              <td>충전</td>
+              <td>커피콩 충전</td>
+              <td class="plus">+30,000</td>
+              <td>2025.12.08</td>
+            </tr>
+
+            <tr data-type="use">
+              <td>사용</td>
+              <td>유료 구독</td>
+              <td class="minus">-30,000</td>
+              <td>2025.12.01</td>
+            </tr>
+
+
+            <!-- <tr data-type="cancel">
+              <td>취소</td>
+              <td>결제 취소</td>
+              <td class="plus">+10,000</td>
+              <td>2025.12.01</td>
+            </tr> -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="charge-modal">
+    <div class="charge-modal-content">
+      <img src="../../static/images/common/coffebean.png" alt="커피콩" class="modal-icon">
+      <h2>커피콩 충전</h2>
+      <div class="input-wrapper">
+        <input type="text" placeholder="금액을 입력하세요">
+        <span>원</span>
+      </div>
+      <div class="amount-options">
+        <button>1,000</button>
+        <button class="selected">10,000</button>
+        <button>30,000</button>
+        <button>50,000</button>
+      </div>
+      <button class="charge-submit-btn">충전하기</button>
+    </div>
+  </div>
+
+  <div class="modal" id="exchange-modal">
+    <div class="exchange-modal-content">
+      <div class="modal-header-section">
+        <img src="../../static/images/common/coffebean.png" alt="커피콩" class="modal-icon">
+        <h2>커피콩 환전</h2>
+      </div>
+
+      <div class="exchange-content">
+        <h3 class="beans-label">내 보유 커피콩</h3>
+        <span class="mybeans-val">12,450 콩</span>
+        <ul class="exchange-info-list">
+          <li>환전 시 계좌에 환급은 1~3일이 소요됩니다.</li>
+          <li>수수료 10%가 부과됩니다.</li>
+        </ul>
+      </div>
+
+      <div class="calculation-section">
+        <div class="calc-row">
+          <span>환전 커피콩</span>
+          <span class="val">12,450콩</span>
+        </div>
+        <div class="calc-row">
+          <span>수수료</span>
+          <span class="val minus">-1,245콩</span>
+        </div>
+        <div class="calc-total-row">
+          <span>총 환전 금액</span>
+          <span class="total-val">11,205원</span>
+        </div>
+      </div>
+
+      <div class="account-section">
+        <p class="section-label">계좌 입력 <span class="required">*</span></p>
+        <div class="account-form-table">
+          <div class="form-row">
+            <div class="form-label">농협</div>
+            <div class="form-input">
+              <input type="text" value="4509010-1445860">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">예금주명</div>
+            <div class="form-input">
+              <input type="text" value="김주몽">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="exchange-submit-btn">환전하기</button>
+    </div>
+  </div>
+  <div class="modal" id="exchange-complete-modal">
+    <div class="complete-modal-content">
+      <img src="../../static/images/common/coffebean.png" alt="커피콩" class="complete-icon">
+      <div class="complete-text">
+        <p class="main-msg">회원님의 환전 요청이 관리자에게 정상적으로 전송되었습니다!</p>
+        <p class="sub-msg">해당 요청 처리 건은 1~3일 정도 소요됩니다.</p>
+      </div>
+      <button class="complete-confirm-btn" id="complete-confirm-btn">확인</button>
+    </div>
+  </div>
+</body>
+
+
+<div class="modal" id="cancel-modal">
+  <div class="cancel-modal-content">
+    <div class="modal-header-section">
+      <img src="../../static/images/common/coffebean.png" alt="커피콩" class="modal-icon">
+      <h2>커피콩 결제 취소</h2>
+    </div>
+    <div class="calculation-section">
+      <div class="calc-row">
+        <span>커피콩</span>
+        <span class="val">30,000콩</span>
+      </div>
+      <div class="calc-row">
+        <span>취소 금액</span>
+        <span class="val minus">-30,000원</span>
+      </div>
+      <div class="calc-total-row">
+        <span>총 금액</span>
+        <span class="total-val">0원</span>
+      </div>
+    </div>
+    <button class="cancel-submit-btn">결제 취소하기</button>
+  </div>
+</div>
+
+<div class="modal" id="cancel-success-modal">
+  <div class="complete-modal-content">
+    <img src="../../static/images/common/coffebean.png" alt="커피콩" class="complete-icon">
+    <div class="complete-text">
+      <p class="main-msg">결제 취소가 정상적으로 처리되었습니다!</p>
+    </div>
+    <button class="complete-confirm-btn" id="cancel-success-confirm">확인</button>
+  </div>
+</div>
+
+<div class="modal" id="cancel-fail-modal">
+  <div class="complete-modal-content">
+    <img src="../../static/images/common/coffebean.png" alt="커피콩" class="complete-icon">
+    <div class="complete-text">
+      <p class="main-msg">회원님은 이미 커피콩 사용 내역이 있습니다.<br>취소가 불가능합니다.</p>
+    </div>
+    <button class="complete-confirm-btn" id="cancel-fail-back">돌아가기</button>
+  </div>
+</div>
+
+
+
+<script src="../../static/js/coffeebeans/mybeans.js"></script>
+
+</html>
