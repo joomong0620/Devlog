@@ -1,18 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 블로그</title>
+    <title>DevLog - My Blog</title>
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../../static/css/board/blog/myDev.css">
 </head>
-<body>
-    <main class="container">
-        <div class="">
 
+<body data-user-type="owner">
+    <div class="container">
+        <header class="blog-header">
+            <div class="header-left">
+                <div class="profile-main-img">
+                    <img src="https://placehold.co/180x180/333/fff?text=Profile" alt="Profile">
+                    <button id="tempModeSwitcher" class="temp-mode-btn">[임시] 모드 전환 (현재: 주인)</button>
+                </div>
+                <div class="profile-content">
+                    <div class="nickname-area">
+                        <h1>GwanSik_Yang</h1>
+                        <div class="dropdown-owner owner-only">
+                            <i class="fa-solid fa-ellipsis-vertical" id="menuBtn"></i>
+                            <div class="dropdown-box" id="dropdownMenu">
+                                <a href="#"><i class="fa-solid fa-clock-rotate-left"></i> 내 활동</a>
+                                <a href="#"><i class="fa-solid fa-user-gear"></i> 프로필 설정</a>
+                                <hr>
+                                <a href="#">로그아웃</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lv-row">
+                        <span class="user-name">양관식</span>
+                        <div class="exp-container owner-only">
+                            <div class="exp-fill" style="width: 70%;"></div>
+                            <span class="lv-text">Lv.12</span>
+                        </div>
+                    </div>
+                    <p class="job-tag">백엔드 N년차</p>
+                    <div class="social-links">
+                        <i class="fa-brands fa-github" onclick="window.open('https://github.com')"></i>
+                        <i class="fa-solid fa-house" onclick="window.open('https://homepage.com')"></i>
+                    </div>
+                    <p class="bio">사실 저 양배추 알러지 있습니다. <br> I prefer development to cabbage.</p>
+                </div>
+            </div>
+
+            <div class="header-center">
+                <div class="top-stat-row">
+                    <div class="stat-btn">팔로워 <strong>28</strong></div>
+                    <div class="stat-btn">팔로잉 <strong>1</strong></div>
+                    <div class="stat-btn owner-only">구독 <strong>1</strong></div>
+                </div>
+                <div class="action-row">
+                    <button class="btn-purple visitor-only">팔로우</button>
+                    <button class="btn-white visitor-only">메시지</button>
+                    <button class="btn-purple visitor-only">구독</button>
+                    <button class="btn-white owner-only"><i class="fa-solid fa-plus"></i> 새 글 작성</button>
+                </div>
+                <div class="visit-summary">
+                    <p>전체 방문자 <strong>1,254</strong></p>
+                    <p>전체 글 <strong class="purple-txt">4</strong></p>
+                    <p class="visit-today">오늘 <span>23</span></p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <p class="pick-title">유저 PICK 인기 글🔥</p>
+                <div class="pick-card-item" onclick="location.href='post_detail.html'" style="cursor:pointer;">
+                    <img src="https://placehold.co/180x100/9b5de5/fff?text=PICK" alt="Pick Thumb">
+                    <div class="pick-info">
+                        <h4 class="pick-card-title">2024 백엔드 로드맵</h4>
+                        <span class="tag-pill">Backend</span>
+                        <div class="pick-meta-row">
+                            <div class="p-meta">
+                                <i class="fa-solid fa-heart"></i> 12
+                                <i class="fa-solid fa-comment"></i> 5
+                                <i class="fa-solid fa-eye"></i> 1.2k
+                            </div>
+                            <span class="p-date">2023.12.20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <hr class="header-line">
+
+        <nav class="main-tabs">
+            <div class="tab-btn active" data-type="all" title="일반 글"><i class="fa-solid fa-book"></i></div>
+            <div class="tab-btn owner-only" data-type="scrap" title="스크랩한 글"><i class="fa-solid fa-bookmark"></i></div>
+            <div class="tab-btn" data-type="paid" title="유료 콘텐츠"><i class="fa-solid fa-crown"></i></div>
+        </nav>
+
+        <div class="content-body">
+            <main class="post-area">
+                <div class="list-controls">
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="검색어를 입력하세요">
+                        <i class="fa-solid fa-magnifying-glass" id="searchBtn"></i>
+                    </div>
+                    <div class="filter-options">
+                        <span class="filter-item active" data-sort="최신순">최신순</span>
+                        <span class="filter-item" data-sort="조회순">조회순</span>
+                        <span class="filter-item" data-sort="인기순">인기순</span>
+                        <span class="filter-item" data-sort="댓글순">댓글순</span>
+                    </div>
+                </div>
+
+                <div id="active-filter-bar" class="active-filter-bar" style="display:none;">
+                    <div id="filter-tags-container" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
+                    <i class="fa-solid fa-xmark" id="clear-filter" title="전체 해제"></i>
+                </div>
+
+                <div id="post-list-wrap"></div>
+
+                <div id="infinite-sentinel" class="scroll-loader">
+                    <div class="dot-loader"></div>
+                </div>
+            </main>
+
+            <aside class="side-area">
+                <h3>태그 <span>(10)</span></h3>
+                <ul class="tag-cat-list" id="tag-list">
+                    <li class="tag-item" data-tag="React">React <small>3</small></li>
+                    <li class="tag-item" data-tag="Java">Java <small>5</small></li>
+                    <li class="tag-item" data-tag="Docker">Docker <small>2</small></li>
+                    <li class="tag-item" data-tag="디버깅">디버깅 <small>1</small></li>
+                </ul>
+            </aside>
         </div>
-    </main>
+    </div>
+    
+<button id="goTopBtn" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">목록</h3>
+                <i class="fa-solid fa-xmark close-modal"></i>
+            </div>
+            <ul id="modal-list" class="user-list">
+            </ul>
+        </div>
+    </div>
+
+    <button id="goTopBtn"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="../../../static/js/blog/myDev.js"></script>
 </body>
+
 </html>
-
-
