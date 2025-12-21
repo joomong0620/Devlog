@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="../../static/css/common/main.css" />
+  <link rel="stylesheet" href="../../static/css/common/font.css">
+  <link rel="stylesheet" href="../../static/css/common/notification.css">
 </head>
 <body>
   <!-- header 영역 -->
-<header class="hd">
+    <header class="hd">
   <div class="hd-in">
     <!-- 왼쪽 영역 -->
     <div class="hd-l">
@@ -64,18 +66,151 @@
 
     <!-- 오른쪽 영역 -->
     <div class="hd-r">
-      <!-- 검색창 -->
-      <div class="search">
-        <input type="text" placeholder="여기에 검색어를 입력하세요." />
-        <button aria-label="search">
-          <img src="../../static/images/common/search.svg" alt="search" />
-        </button>
-      </div>
+        <!-- 검색창 -->
+        <div class="search">
+            <input type="text" placeholder="여기에 검색어를 입력하세요." />
+            <button aria-label="search">
+            <img src="../../static/images/common/search.svg" alt="search" />
+            </button>
+        </div>
 
-      <!-- 알림 -->
-      <button class="btn-ico" aria-label="notification">
-        <img src="../../static/images/common/notifications.svg" alt="notification" />
-      </button>
+        <!-- 알림 -->
+        <button class="btn-ico" id="noti-btn" aria-label="notification">
+            <img src="../../static/images/common/notifications.svg" alt="notification" />
+        </button>
+
+        <div class="alarm-panel display-none">
+
+            <!-- 헤더 -->
+            <div class="alarm-header flex-between">
+                <h2>알림</h2>
+
+                <div class="alarm-menu">
+                    <button class="noti-menu-btn">⋮</button>
+                    <ul class="noti-menu-dropdown display-none">
+                        <li id="allDeleteNoti" class="fw-600">전체 삭제</li>
+                        <li id="allReadNoti" class="fw-600">전체 읽음</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 필터 탭 -->
+            <div class="alarm-filters flex gap-8">
+                <button class="filter is-active fs-12 fw-600">⭐ 전체</button>
+                <button class="filter  flex-center gap-4">
+                    <img src="../../static/images/notification/like.svg">
+                    <span class="fs-12 fw-600">좋아요</span>
+                </button>
+                <button class="filter flex-center gap-4">
+                    <img src="../../static/images/notification/comment.svg" >    
+                    <span class="fs-12 fw-600">댓글</span>
+                    
+                </button>
+                <button class="filter flex-center gap-4">
+                    <img src="../../static/images/notification/follow.svg" alt="">    
+                    <span class="fs-12 fw-600">팔로우</span> 
+                </button>
+                <button class="filter flex-center gap-4">
+                    <img src="../../static/images/notification/@.svg">    
+                    <span class="fs-12 fw-600">언급</span>
+                </button>
+            </div>
+
+            <!-- 알림 리스트 -->
+            <div>
+                <!-- 알람이 없을 경우 -->
+                <div class="noAlarm flex-center display-none">
+                    <span class="fw-600 fs-24">/notifications 응답: 204 No Content</span>
+                </div>
+                <!-- 알람이 있을 경우 -->
+                <ul class="alarm-list flex-col gap-12">
+    
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon comment">
+                                <img src="../../static/images/chatting/comment.svg" > 
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>소연님</b>이 회원님의 게시글에 댓글을 남겼습니다.</p>
+                            <span class="sub">파라요 ~</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">5분전</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon mention">
+                                <img src="../../static/images/chatting/@.svg"> 
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>종구님</b>이 회원님을 언급했습니다.</p>
+                            <span class="sub">@홀릭 언급이요 ~</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">7시간 전</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon like">
+                                <img src="../../static/images/chatting/like.svg">
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
+                            <span class="sub">게시글 제목</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">12-08</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+                    <li class="alarm-item flex-between read-noti">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon like">
+                                <img src="../../static/images/chatting/like.svg">
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
+                            <span class="sub">게시글 제목</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">12-08</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon like">
+                                <img src="../../static/images/chatting/like.svg">
+                            </div>
+                            <div class="alarm-text">
+                            <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
+                            <span class="sub">게시글 제목</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">12-08</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+    
+    
+    
+                </ul>
+
+            </div>
+        </div>
 
       <!-- 프로필 -->
       <div class="profile" id="profile">
@@ -92,7 +227,9 @@
       </div>
     </div>
   </div>
-</header>
+    </header>
+
+<script src="../../static/js/notification/noti.js"></script>
 </body>
 <script>
   const profile = document.getElementById('profile');
