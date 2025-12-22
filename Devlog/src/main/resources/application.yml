@@ -37,8 +37,7 @@ spring :
 logging:
   level:
      org.elasticsearch.client : TRACE # Elasticsearch 쿼리 로그 출력 
-     com.devlog.project.common.filter.LoggingFilter : Trace # 필터 로그     
-     org.springframework.security: debug # 로그인 안 될 때 원인 추적
+     edu.og.es.common.filter.LoggingFilter : Trace # 필터 로그     
      
 server:
    port: 8880
