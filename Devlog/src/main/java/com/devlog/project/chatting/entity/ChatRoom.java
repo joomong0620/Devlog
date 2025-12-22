@@ -22,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ChattingRoom {
+public class ChatRoom {
 	
 	@Id
 	@Column(name = "CHATTING_ROOM_NO")
@@ -37,6 +37,10 @@ public class ChattingRoom {
 
     @Column(name = "ROOM_TYPE", nullable = false, length = 30)
     private String roomType;
+    
+    
+    
+
     
     
 }
