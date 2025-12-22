@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevTalk</title>
+
+    <link rel="stylesheet" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" th:href="@{/css/common/main.css}">
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}">
+    <link rel="stylesheet" th:href="@{/css/chatting/chatting.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+</head>
+<body>
+    <header class="hd">
+  <div class="hd-in">
+    <!-- 왼쪽 영역 -->
+    <div class="hd-l">
+      <!-- 메뉴 버튼 -->
+      <button class="menu-btn" id="menuBtn" aria-label="menu">
+        <img src="../../static/images/common/menu.svg" alt="menu" />
+      </button>
+
+      <!-- 사이드바!!! -->
+    <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <img th:src="@{/images/common/devlog.svg}" alt="logo" class="sidebar-logo" />
+        <span class="sidebar-title">DevLog</span>
+    </div>
+
+    <nav class="sidebar-menu">
+        <ul>
+        <li><img th:src="@{/images/common/home.svg}" alt="home" /> Home</li>
+        <li><img th:src="@{/images/common/dashboard.svg}" alt="dashboard" /> Dashboard</li>
+
+        <h4>Community</h4>
+        <li><img th:src="@{/images/common/blog.svg}" alt="blog" /> 블로그</li>
+        <li><img th:src="@{/images/common/board.svg}" alt="board" /> 자유게시판</li>
+        <li><img th:src="@{/images/common/news.svg}" alt="news" /> 지식 뉴스</li>
+        <li><img th:src="@{/images/common/qa.svg}" alt="qa" /> Q&amp;A</li>
+        <li><img th:src="@{/images/common/job.svg}" alt="job" /> 채용 정보</li>
+
+        <h4>Recommend</h4>
+        <li><img th:src="@{/images/common/cafe.svg}" alt="cafe" /> 주변 카페</li>
+        <li><img th:src="@{/images/common/book.svg}" alt="book" /> 관련 서적</li>
+
+        <hr />
+
+        <li><img th:src="@{/images/common/mode.svg}" alt="mode" /> Mode</li>
+        <li><img th:src="@{/images/common/settings.svg}" alt="settings" /> Settings</li>
+        <li><img th:src="@{/images/common/logout.svg}" alt="logout" /> Logout</li>
+        </ul>
+    </nav>
+    </aside>
+
+      <!-- 사이드바 나타났을 때 배경 회색으로 만들기 -->
+      <div class="overlay" id="overlay"></div>
+
+      <!-- 로고 -->
+      <div class="logo">
+        <img src="../../static/images/common/devlog.svg" alt="logo" class="logo-ico" />
+        <div class="logo-text">
+          <span class="logo-sub">상상하는 모든 것을 기록하는 공간</span>
+          <span class="logo-t">DevLog</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 오른쪽 영역 -->
+    <div class="hd-r">
+        <!-- 검색창 -->
+        <div class="search">
+            <input type="text" placeholder="여기에 검색어를 입력하세요." />
+            <button aria-label="search">
+                <img th:src="@{/images/common/search.svg}" alt="search" />
+            </button>
+        </div>
+
+        <!-- 알림 -->
+        <button class="btn-ico" id="noti-btn" aria-label="notification">
+            <img th:src="@{/images/common/notifications.svg}" alt="notification" />
+        </button>
+
+        <div class="alarm-panel display-none">
+
+            <!-- 헤더 -->
+            <div class="alarm-header flex-between">
+                <h2>알림</h2>
+
+                <div class="alarm-menu">
+                    <button class="noti-menu-btn">⋮</button>
+                    <ul class="noti-menu-dropdown display-none">
+                        <li id="allDeleteNoti" class="fw-600">전체 삭제</li>
+                        <li id="allReadNoti" class="fw-600">전체 읽음</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 필터 탭 -->
+            <div class="alarm-filters flex gap-8">
+                <button class="filter is-active fs-12 fw-600">
+                    ⭐ 전체
+                </button>
+
+                <button class="filter flex-center gap-4">
+                    <img th:src="@{/images/notification/like.svg}">
+                    <span class="fs-12 fw-600">좋아요</span>
+                </button>
+
+                <button class="filter flex-center gap-4">
+                    <img th:src="@{/images/notification/comment.svg}">
+                    <span class="fs-12 fw-600">댓글</span>
+                </button>
+
+                <button class="filter flex-center gap-4">
+                    <img th:src="@{/images/notification/follow.svg}">
+                    <span class="fs-12 fw-600">팔로우</span>
+                </button>
+
+                <button class="filter flex-center gap-4">
+                    <img th:src="@{/images/notification/@.svg}">
+                    <span class="fs-12 fw-600">언급</span>
+                </button>
+            </div>
+            
+            <!-- 알림 리스트 -->
+            <div>
+                <!-- 알람이 없을 경우 -->
+                <div class="noAlarm flex-center display-none">
+                    <span class="fw-600 fs-24">/notifications 응답: 204 No Content</span>
+                </div>
+                <!-- 알람이 있을 경우 -->
+                <ul class="alarm-list flex-col gap-12">
+
+                    <li class="alarm-item flex-between">
+                        <div class="alarm-left flex gap-12">
+                            <div class="alarm-icon comment">
+                                <img th:src="@{/images/chatting/comment.svg}">
+                            </div>
+                            <div class="alarm-text">
+                                <p><b>소연님</b>이 회원님의 게시글에 댓글을 남겼습니다.</p>
+                                <span class="sub">파라요 ~</span>
+                            </div>
+                        </div>
+                        <div class="alarm-right">
+                            <span class="time">5분전</span>
+                            <button class="close">✕</button>
+                        </div>
+                    </li>
+
+
+                </ul>
+
+            </div>
+        </div>
+
+      <!-- 프로필 -->
+      <div class="profile" id="profile">
+        <img th:src="@{/images/common/d1.png}" alt="profile" />
+        <span>My</span>
+
+        <!-- 드롭다운 메뉴 -->
+        <ul class="dropdown" id="dropdown">
+          <li>My Dev</li>
+          <li>Coffee Beans</li>
+          <li>DevTalk</li>
+          <li>Logout</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+    </header>
+
+<script th:src="@{/js/notification/noti.js}"></script>
+
+<script>
+  const profile = document.getElementById('profile');
+  const menuBtn = document.getElementById('menuBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+
+  profile.addEventListener('click', () => {
+    profile.classList.toggle('active');
+  });
+
+  window.addEventListener('click', (e) => {
+    if (!profile.contains(e.target)) {
+      profile.classList.remove('active');
+    }
+  });
+
+  menuBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+  });
+
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  });
+</script>
+    
+<!-- 이미지 라이트박스 -->
+<div id="imageViewer" class="image-viewer display-none flex-center">
+    <div class="image-viewer-backdrop"></div>
+    <img id="imageViewerImg" class="viewer-img">
+</div>
+
+    <!-- 채팅 -->
+    <main style="margin-top: 150px;" class="flex" id="chatting">
+        
+        <!-- 채팅방 리스트 -->
+        <aside class="left flex-col gap-24" id="chatting-room-list">
+            <div class="room-list-header flex">
+                <input type="search" id="chatting-search-area" placeholder="Search">
+                <img id="chat-add-btn" th:src="@{/images/chatting/chat-add.svg}">
+                                
+                <!-- 채팅방 생성 -->
+                <div class="create-room flex-col gap-16 hide">
+                    <div>
+                        <h2>새 채팅방 만들기</h2>
+                    </div>
+
+                    <div class="flex-col chat-type gap-12">
+                        <span class="fw-600">채팅방 유형</span>
+
+                        <div class="flex">
+                            <div class="private flex-center fw-600 fs-16 gap-8 type-select">
+                                <img th:src="@{/images/chatting/private.svg}">
+                                개인
+                            </div>
+
+                            <div class="group flex-center fw-600 fs-16 gap-8">
+                                <img th:src="@{/images/chatting/group.svg}">
+                                그룹
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="flex-col gap-12 display-none roomNameArea">
+                        <span class="fw-600" >채팅방 이름</span>
+                        <input type="text" name="roomName" id="roomName">
+                    </div>
+                    <div class="flex-col gap-12 add-user">
+                        <span class="fw-600">초대할 사람</span>
+                        <input id="search-memberName" name="memberName" placeholder="검색" type="search">
+
+                        <ul class="follow-list flex-col gap-12">
+                            <li>
+                                <label class="follow-item flex">
+                                    <div class="flex gap-12">
+                                        <img class="profile-img" th:src="@{/images/logo.png}">
+                                        <span class="name">소연님</span>
+                                    </div>
+                                    <input type="checkbox" name="invite">
+                                </label>
+                            </li>
+
+                            <li>
+                                <label class="follow-item flex">
+                                    <div class="flex gap-12">
+                                        <img class="profile-img" th:src="@{/images/logo.png}">
+                                        <span class="name">주연님</span>
+                                    </div>
+                                    <input type="checkbox" name="invite">
+                                </label>
+                            </li>
+
+                            <li>
+                                <label class="follow-item flex">
+                                    <div class="flex gap-12">
+                                        <img class="profile-img" th:src="@{/images/logo.png}">
+                                        <span class="name">율영님</span>
+                                    </div>
+                                    <input type="checkbox" name="invite">
+                                </label>
+                            </li>
+
+                            <li>
+                                <label class="follow-item flex">
+                                    <div class="flex gap-12">
+                                        <img class="profile-img" th:src="@{/images/logo.png}">
+                                        <span class="name">종구님</span>
+                                    </div>
+                                    <input type="checkbox" name="invite">
+                                </label>
+                            </li>
+
+                            <li>
+                                <label class="follow-item flex">
+                                    <div class="flex gap-12">
+                                        <img class="profile-img" th:src="@{/images/logo.png}">
+                                        <span class="name">희준님</span>
+                                    </div>
+                                    <input type="checkbox" name="invite">
+                                </label>
+                            </li>
+
+                            <li>
+                                <label class="follow-item flex">
+                                    <div class="flex gap-12">
+                                        <img class="profile-img" th:src="@{/images/logo.png}">
+                                        <span class="name">규식님</span>
+                                    </div>
+                                    <input type="checkbox" name="invite">
+                                </label>
+                            </li>
+                        </ul> 
+                        
+                        <div class="select-user-list flex gap-8">
+                            
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <div id="room-create-btn" class="flex-center fw-600">생성하기</div>
+                        <div id="room-cancle-btn" class="flex-center fw-600">취소</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="room-list-body">
+                <!-- 방이 없을 경우 -->
+                <!-- 
+                <div class="flex-center room-empty">
+                    <h1 class="fw-800" style="opacity: 0.5;">room == null</h1>
+                </div> 
+                -->
+
+                <!-- 방이 있을 경우 -->
+                <ul class="room-list flex-col gap-16">
+                    <!-- 채팅방 한 칸 -->
+                    <li class="room-item flex gap-12 is-selected">
+                        <div class="room-img">
+                            <!-- 프로필 이미지 -->
+                            <img th:src="@{/images/logo.png}">
+                        </div> 
+
+                        <div class="room-info flex">
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">Zero-Boost</span>
+                                <span class="ellipsis">html 지옥</span>
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span style="padding-left: 8px;">12:30</span>
+                                <div class="count-pin">
+                                    <span class="unread-count fw-600 fs-14">5</span>
+                                    <img class="pinned" th:src="@{/images/chatting/pin.svg}">
+                                </div>
+                            </div>
+                        </div> 
+                    </li>
+
+                    <li class="room-item flex gap-12">
+                        <div class="room-img">
+                            <img th:src="@{/images/logo.png}">
+                        </div> 
+
+                        <div class="room-info flex">
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">이규식</span>
+                                <span class="ellipsis">html 지옥</span>
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span style="padding-left: 8px;">12:30</span>
+                                <div class="count-pin">
+                                    <!-- <span class="unread-count fw-600 fs-14">5</span> -->
+                                    <img class="pinned" th:src="@{/images/chatting/pin.svg}">
+                                </div>
+                            </div>
+                        </div> 
+                    </li>
+
+                    <li class="room-item flex gap-12">
+                        <div class="room-img">
+                            <img th:src="@{/images/logo.png}">
+                        </div> 
+
+                        <div class="room-info flex">
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">이규식</span>
+                                <span class="ellipsis">
+                                    너는나를존중해야한다나는발롱도르5개와수많은개인트로피를들어올렸으며2016유로에서포르투갈을이끌고우승을차지했고동시에A매치역대최다득점자이다또한챔스역대최다득점자
+                                </span>
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span style="padding-left: 8px;">2025-12-10</span>
+                                <div class="count-pin">
+                                    <span class="unread-count fw-600 fs-14">30</span>
+                                    <!-- <img class="pinned" th:src="@{/images/chatting/pin.svg}"> -->
+                                </div>
+                            </div>
+                        </div> 
+                    </li>
+
+                    <li class="room-item flex gap-12">
+                        <div class="room-img">
+                            <img th:src="@{/images/logo.png}">
+                        </div> 
+
+                        <div class="room-info flex">
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">이규식</span>
+                                <span class="ellipsis">
+                                    너는나를존중해야한다나는발롱도르5개와수많은개인트로피를들어올렸으며2016유로에서포르투갈을이끌고우승을차지했고동시에A매치역대최다득점자이다또한챔스역대최다득점자
+                                </span>
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span style="padding-left: 8px;">2025-12-10</span>
+                                <div class="count-pin">
+                                    <!-- <span class="unread-count fw-600 fs-14">30</span> -->
+                                    <!-- <img class="pinned" th:src="@{/images/chatting/pin.svg}"> -->
+                                </div>
+                            </div>
+                        </div> 
+                    </li>
+                </ul>
+
+
+            </div>
+            
+        </aside>
+
+
+        <!-- 채팅 영역 -->
+        <section class="right" id = "chatting-space">
+
+            <div class="chatting-area">
+                <!-- 방이 없을 경우 -->
+                <div class="flex-col flex-center room-empty">
+                    <img th:src="@{/images/logo.png}" >
+                    <h1>대화가 시작되길 기다리고 있어요</h1>
+                </div>  
+
+                <!-- 방이 있을 경우 -->
+                <div class="flex-col room-exist display-none">
+
+                    <!-- 굿 -->
+                    <div class="overlay" id="chat-overlay"></div>
+
+                    <!-- 나갈거니 ? 확인 화면 -->
+                    <!-- 채팅방 나가기 확인 -->
+                    <div class="exit-check flex-col gap-12 display-none">
+                        <div class="flex gap-12">
+                            <span class="fw-600">채팅방을 나가시겠습니까 ?</span>
+
+                            <img th:src="@{/images/chatting/free-icon-exit-12370353.svg}">
+                        </div>
+
+                        <span class="fs-12">주의* 대화내용이 모두 삭제됩니다.</span>
+
+                        <div class="flex gap-24">
+                            <span id="yes">예</span>
+                            <span id="no">아니오</span>
+                        </div>
+                    </div>
+
+                    <!-- 메시지 삭제 확인 -->
+                    <div class="del-check flex-col gap-12 display-none">
+                        <div class="flex gap-12">
+                            <span class="fw-600">해당 메세지를 삭제하시겠습니까 ?</span>
+
+                            <!-- 휴지통 아이콘 -->
+                            <img th:src="@{/images/chatting/trashtong.svg}">
+                        </div>
+
+                        <div class="flex gap-24">
+                            <span id="msg-del-yes">예</span>
+                            <span id="msg-del-no">아니오</span>
+                        </div>
+                    </div>
+
+                    <!-- 유저 초대 창 -->
+                    <div class="user-invite-box flex-col gap-16 display-none">
+
+                        <!-- 초대 아이콘 -->
+                        <img th:src="@{/images/chatting/invite.svg}"
+                            style="width: 30px; height: 30px;">
+
+                        <span class="fw-600">초대할 사람</span>
+
+                        <input id="room-invite-user"
+                            name="addUserName"
+                            placeholder="검색"
+                            type="search">
+
+                        <ul class="invite-user-list flex-col gap-12">
+                            <li>
+                                <label class="flex user-list">
+                                    <div class="flex gap-12">
+
+                                        <!-- 유저 프로필 이미지 -->
+                                        <img class="profile-img"
+                                            th:src="@{/images/logo.png}">
+
+                                        <span class="user-name">소연님</span>
+                                    </div>
+
+                                    <input type="checkbox"
+                                        name="roomInvite"
+                                        class="roomInvite">
+                                </label>
+                            </li>
+                        </ul>
+
+                        <!-- 유저 선택 시 태그 영역 -->
+                        <div class="select-user-area flex gap-8">
+                            <!-- JS로 동적 추가 -->
+                        </div>
+
+                        <div class="flex gap-24">
+                            <div id="invite-user" class="flex-center fw-600">초대하기</div>
+                            <div id="invite-cancel" class="flex-center fw-600">취소</div>
+                        </div>
+                    </div>
+
+
+
+
+                    <!-- 채팅방 정보 -->
+                    <div class="flex chat-info">
+                        <div class="flex gap-12">
+
+                            <div class="group-profile">
+                                <img th:src="@{/images/logo.png}">
+                                <img th:src="@{/images/logo.png}">
+                                <img th:src="@{/images/logo.png}">
+                            </div>
+
+                            <div class="flex-col gap-8">
+                                <span class="fw-700 fs-24">Zero-Boost</span>
+
+                                <!-- 멤버 수 표시 -->
+                                <span class="member-counting flex gap-12 fw-600">
+                                    <!-- 멤버 아이콘 -->
+                                    <img th:src="@{/images/chatting/member.svg}">
+                                    6
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 상단 메뉴 (검색 / 메뉴) -->
+                        <div class="search-menu flex-center gap-8">
+                            <!-- 메시지 검색 버튼 -->
+                            <img id="text-search-btn"
+                                th:src="@{/images/chatting/Search.svg}">
+
+                            <!-- 채팅 메뉴 버튼 -->
+                            <img id="chat-menu-btn"
+                                th:src="@{/images/chatting/clarity_menu-line.svg}">
+                        </div>
+                    </div>
+
+                    <!-- 검색 패널 -->
+                    <div class="flex-col gap-16 chat-search-panel">
+
+                        <!-- 검색 입력 -->
+                        <div class="search-msg-input flex">
+                            <!-- 돋보기 아이콘 -->
+                            <img th:src="@{/images/chatting/돋보기.svg}">
+
+                            <input type="search"
+                                name="msgSearch"
+                                placeholder="검색어를 입력해주세요">
+                        </div>
+
+                        <!-- 검색 결과 영역 -->
+                        <ul class="search-msg-area flex-col gap-16">
+
+                            <li class="search-msg-item flex">
+                                <div>
+                                    <!-- 메시지 작성자 프로필 -->
+                                    <img class="profile-img"
+                                        th:src="@{/images/chatting/박보검.png}">
+                                </div>
+
+                                <div class="flex-col gap-8">
+                                    <div class="user-info flex gap-12">
+                                        <span class="fw-600">박보검</span>
+                                        <span class="fs-12">2025-12-18</span>
+                                    </div>
+
+                                    <!-- 검색된 메시지 미리보기 -->
+                                    <div class="msg-info ellipsis">
+                                        애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이
+                                    </div>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+
+
+
+                    <!-- 채팅방 정보 메뉴 -->
+                    <div class="chat-menu-panel">
+
+                        <div class="member-panel-title">
+                            <span class="team-name">Zero-Boost</span>
+                            <img class="edit-icon" id="team-name-change" th:src="@{/images/chatting/edit.svg}">
+                        </div>
+
+                        <div class="member-section">
+                            <div class="flex-between">
+                                <span class="member-label">멤버</span>
+
+                                <!-- 멤버 초대 버튼 -->
+                                <img id="invite-btn"
+                                    th:src="@{/images/chatting/invite-user.svg}">
+                            </div>
+
+                            <ul class="member-list flex-col gap-16">
+
+                                <!-- 멤버 아이템 -->
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img"
+                                        th:src="@{/images/chatting/박보검.png}">
+                                    <span class="fw-600">소연님</span>
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img"
+                                        th:src="@{/images/chatting/박보검.png}">
+                                    <span class="fw-600">종구님</span>
+                                </li>
+
+                                <!-- 방장 표시 (왕관 아이콘) -->
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img"
+                                        th:src="@{/images/chatting/박보검.png}">
+                                    <span class="fw-600">주연님</span>
+
+                                    <!-- 방장 아이콘 -->
+                                    <img th:src="@{/images/chatting/crown.svg}">
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img"
+                                        th:src="@{/images/chatting/박보검.png}">
+                                    <span class="fw-600">율영님</span>
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img"
+                                        th:src="@{/images/chatting/박보검.png}">
+                                    <span class="fw-600">희준님</span>
+                                </li>
+
+                                <li class="member-item flex gap-12">
+                                    <img class="profile-img"
+                                        th:src="@{/images/chatting/박보검.png}">
+                                    <span class="fw-600">홀리식</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 나가기 / 고정 관련 버튼 -->
+                        <div class="flex gap-24" id="exit-pin">
+
+                            <!-- 채팅방 나가기 -->
+                            <img id="exit-btn"
+                                th:src="@{/images/chatting/exit.svg}">
+
+                            <!-- 고정 상태 -->
+                            <img id="pinned-btn"
+                                class="pinned display-none"
+                                th:src="@{/images/chatting/pin.svg}">
+
+                            <!-- 고정 해제 상태 -->
+                            <img id="unpinned-btn"
+                                class="unpinned"
+                                th:src="@{/images/chatting/pin-no.svg}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- 메세지 -->
+                    <ul class="message-list flex-col gap-24">
+                        <!-- 상대방 메시지 -->
+                        <li class="flex message-item other gap-12">
+
+                            <img class="profile-img" th:src="@{/images/logo.png}">
+
+                            <!-- 유저 프로필 카드 -->
+                            <div class="profile-card flex-col display-none">
+                                <div class="flex-center">
+
+                                    <img class="profile-card-img"
+                                        th:src="@{/images/chatting/박보검.png}"
+                                        alt="profile">
+                                </div>
+
+                                <div class="profile-info">
+                                    <span class="name">소연님</span>
+                                    <span class="level">LV4</span>
+                                </div>
+
+                                <p class="job-title">프론트엔드 개발자</p>
+
+                                <div class="button-group">
+                                    <button class="btn fw-600 fs-14">프로필 보기</button>
+                                    <button class="btn fw-600 fs-14">1:1 채팅 시작</button>
+                                    <button class="btn fw-600 fs-14">팔로우 하기</button>
+                                </div>
+                            </div>
+
+                            <div class="message-content flex-col gap-12">
+                                <span class="fw-600">소연님</span>
+                                <div class="bubble">한 줄 길이</div>
+
+                                <ul class="list-none msg-option display-none">
+                                    <li class="msg-report-btn">신고하기</li>
+                                    <li class="msg-reaction-btn">공감하기</li>
+                                </ul>
+
+                                <div class="emoji-area flex display-none">
+                                    <span>❤️</span>
+                                    <span>👍</span>
+                                    <span>😀</span>
+                                    <span>😂</span>
+                                    <span>😮</span>
+                                    <span>😡</span>
+                                </div>
+
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12 send-time">2025-12-10</span>
+                            </div>
+                        </li>
+
+                        <!-- 본인이 보낸 텍스트 메시지 -->
+                        <li class="message-item flex my gap-12">
+                            <div class="message-content flex-col gap-12">
+                                <div class="bubble">
+                                    ㄴㄴㄴㄴㄴㄴㄴㄴssssssss
+                                </div>
+
+                                <ul class="list-none msg-option display-none">
+                                    <li class="msg-edit-btn">수정하기</li>
+                                    <li class="msg-delete-btn">삭제하기</li>
+                                    <li class="msg-reaction-btn">공감하기</li>
+                                </ul>
+
+                                <div class="emoji-area flex display-none">
+                                    <span>❤️</span><span>👍</span><span>😀</span>
+                                    <span>😂</span><span>😮</span><span>😡</span>
+                                </div>
+
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12">00:26</span>
+                            </div>
+                        </li>
+
+                        <!-- 본인이 보낸 이미지 메시지 -->
+                        <li class="message-item flex my gap-12">
+                            <div class="message-content flex-col gap-12">
+                                <div class="bubble image">
+
+                                    <img th:src="@{/images/chatting/테스트 이미지.jpg}">
+                                </div>
+
+                                <ul class="list-none msg-option display-none">
+                                    <li class="msg-delete-btn">삭제하기</li>
+                                    <li class="msg-reaction-btn">공감하기</li>
+                                </ul>
+
+                                <div class="emoji-area flex display-none">
+                                    <span>❤️</span><span>👍</span><span>😀</span>
+                                    <span>😂</span><span>😮</span><span>😡</span>
+                                </div>
+
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12">00:35</span>
+                            </div>
+                        </li>
+
+                        <li class="flex message-item other gap-12">
+
+                            <img class="profile-img" th:src="@{/images/logo.png}">
+
+                            <div class="profile-card flex-col display-none">
+                                <div class="flex-center">
+                                    <img class="profile-card-img"
+                                        th:src="@{/images/chatting/박보검.png}"
+                                        alt="profile">
+                                </div>
+
+                                <div class="profile-info">
+                                    <span class="name">주연님</span>
+                                    <span class="level">LV4</span>
+                                </div>
+
+                                <p class="job-title">프론트엔드 개발자</p>
+
+                                <div class="button-group">
+                                    <button class="btn fw-600 fs-14">프로필 보기</button>
+                                    <button class="btn fw-600 fs-14">1:1 채팅 시작</button>
+                                    <button class="btn fw-600 fs-14">팔로우 하기</button>
+                                </div>
+                            </div>
+
+                            <div class="message-content flex-col gap-12">
+                                <span class="fw-600">주연님</span>
+
+                                <div class="bubble image">
+                                    <img src="https://t1.daumcdn.net/news/202512/11/ZDNetKorea/20251211174314543vjbe.gif">
+                                </div>
+
+                                <ul class="list-none msg-option display-none">
+                                    <li class="msg-report-btn">신고하기</li>
+                                    <li class="msg-reaction-btn">공감하기</li>
+                                </ul>
+
+                                <div class="emoji-area flex display-none">
+                                    <span>❤️</span><span>👍</span><span>😀</span>
+                                    <span>😂</span><span>😮</span><span>😡</span>
+                                </div>
+
+                                <span class="unread-people fs-12">1</span>
+                                <span class="fs-12 send-time">00:59</span>
+                            </div>
+                        </li>
+
+ 
+                    </ul>
+
+
+                    <!-- 입력창 -->                    
+                    <div class="send-area flex">
+
+                        <textarea id="send-message"
+                                name="messageContent"
+                                rows="1"
+                                placeholder="메시지를 입력하세요"></textarea>
+
+                        <div class="flex gap-12">
+                            <img id="send-btn" th:src="@{/images/chatting/send.svg}">
+
+                            <label for="chatImg">
+                                <img id="file-btn" th:src="@{/images/chatting/image-upload.svg}">
+                            </label>
+
+                            <input type="file"
+                                name="chatImg"
+                                id="chatImg"
+                                accept="image/*"
+                                hidden>
+                        </div>
+
+                    </div>
+
+                    <!-- 수정창 -->
+                    <div class="edit-area flex gap-24 display-none">
+                        <div class="flex-col gap-8">
+                            <div class="flex gap-8 message-edit">
+                                <img th:src="@{/images/chatting/light-edit.svg}">
+                                <span>메세지 수정하는 중 . . .</span>
+                                <span id="edit-cancle-btn">x</span>
+                            </div>
+
+                            <textarea id="edit-message"
+                                    name="messageContent"
+                                    rows="1"
+                                    placeholder="메시지를 입력하세요"></textarea>
+                        </div>
+
+                        <div class="flex gap-12">
+                            <img id="edit-btn" th:src="@{/images/chatting/edit.svg}">
+                        </div>
+
+                    </div>
+
+
+                    
+
+                </div>
+            </div>
+            
+
+        </section>
+        
+        
+    </main>
+
+
+    <!-- ===== Footer ===== -->
+    <footer class="ft">
+        <div class="ft-in">
+            <!-- 상단 로고/소개 -->
+            <div class="ft-top">
+                <div class="ft-logo">
+                <img th:src="@{/static/images/common/devlog.svg}" alt="DevLog Logo" class="ft-logo-img" />
+                <p class="ft-desc">
+                    개발자의 감성과 지식을 잇는 새로운 블로그 커뮤니티<br />
+                    <strong>Devlog</strong> 가 만들어갑니다.
+                </p>
+            </div>
+            
+                <ul class="ft-menu">
+                    <li><a th:href="@{#}">SHOP</a></li>
+                    <li><a th:href="@{#}">REVIEW</a></li>
+                    <li><a th:href="@{#}">COMMUNITY</a></li>
+                    <li><a th:href="@{#}">ABOUT</a></li>
+                </ul>
+            </div>
+            
+            <!-- 하단 정보 -->
+            <div class="ft-bottom">
+                <p>
+                    상호 : (주)디블로그 | 대표 팀 : ZeroBoost<br />
+                    사업자등록번호 : 000-00-00000 | 문의처 : dev-logs2@gmail.com<br />
+                    주소 : 서울특별시 용산구 우정국로21 9층 903호
+                </p>
+    
+                <p class="ft-links">
+                    <a th:href="@{#}">이용약관</a> |
+                    <a th:href="@{#}">개인정보처리방침</a>
+                </p>
+    
+                <p class="ft-copy">Copyright © 제로부스트</p>
+                </div>
+        </div>
+    </footer>
+
+    <script th:src="@{/js/chatting/chatting.js}"></script>
+</body>
+</html>

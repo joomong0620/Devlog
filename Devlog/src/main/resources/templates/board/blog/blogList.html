@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>블로그 목록 조회</title>
+    <link rel="stylesheet" href="../../../static/css/board/blog/blogList.css">
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+</head>
+
+<body>
+    <main class="container">
+        <div class="list-control">
+            <div class="filter-group">
+                <button class="filter-btn active">최신순</button>
+                <button class="filter-btn">인기순</button>
+                <button class="filter-btn">조회순</button>
+                <button class="filter-btn">댓글순</button>
+            </div>
+            <button class="write-btn">
+                <img src="https://cdn-icons-png.flaticon.com/512/1159/1159633.png" alt="icon">
+                글 쓰기
+            </button>
+        </div>
+
+        <div class="blog-grid" id="blogGrid">
+        </div>
+
+        <div id="loader" class="loader">
+            <div class="spinner"></div>
+        </div>
+    </main>
+
+    <button id="scrollTopBtn" class="scroll-top-btn">
+        <img src="https://cdn-icons-png.flaticon.com/512/2985/2985150.png" alt="up">
+    </button>
+
+    <script src="../../../static/js/blog/blogList.js"></script>
+
+</body>
+
+</html>

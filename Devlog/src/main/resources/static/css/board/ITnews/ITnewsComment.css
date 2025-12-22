@@ -1,0 +1,218 @@
+.comment-write-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  width: 100%;
+  max-width: 1200px;
+  margin: 40px auto 24px;
+
+  background-color: #efedf6;
+  padding: 20px 24px;
+  border-radius: 20px;
+}
+
+#commentContent {
+  flex: 1;
+  height: 56px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-size: 15px;
+  color: #333;
+}
+
+#commentContent::placeholder {
+  color: #999;
+}
+
+#addComment {
+  border: none;
+  background-color: #b18bdc;
+  color: #fff;
+
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+#addComment:hover {
+  background-color: #9f74d4;
+}
+
+#commentTitle {
+  max-width: 1200px;
+  margin: 32px auto 12px;
+}
+
+#commentTitle h3 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+
+.comment-list-area {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#commentList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+
+.comment-row {
+  position: relative;
+  padding: 16px 0;
+}
+
+
+/* 왼쪽 세로 라인 */
+.comment-row::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 80px;
+  bottom: -16px;
+  width: 1px;
+  background-color: #ddd;
+}
+
+
+.comment-writer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-profile {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-nickname {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.comment-date {
+  font-size: 12px;
+  color: #999;
+}
+
+
+.comment-content {
+  margin: 6px 0 6px 44px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 44px;
+}
+
+.comment-actions button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #666;
+}
+
+.comment-icon {
+  width: 16px;
+  height: 16px;
+}
+
+
+/* 전체 행 */
+.comment-row.reply {
+  margin-left: 44px;
+  padding-left: 20px;
+  position: relative;
+}
+
+/* 세로선*/
+.comment-row.reply::before {
+  content: "";
+  position: absolute;
+  left: -27px;
+  top: -16px;
+  width: 1px;
+  height: calc(100% + 16px);
+  background-color: #ddd;
+}
+
+/* L자 */
+.comment-row.reply::after {
+  content: "";
+  position: absolute;
+  left: -27px;
+  top: 15px;
+  width: 35px;
+  height: 15px;
+  border-left: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-bottom-left-radius: 10px;
+  z-index: -1;
+}
+
+/*  마지막 대댓글일 때 세로선이 아래로 삐져나오지 않게 방지 */
+.comment-row.reply:last-child::before {
+  height: 34px;
+}
+
+/* 대댓글 내부 레이아웃 보정 */
+.comment-row.reply .comment-profile {
+  width: 32px;
+  height: 32px;
+  z-index: 1;
+  position: relative;
+}
+
+.comment-row.reply .comment-content,
+.comment-row.reply .comment-actions {
+  margin-left: 40px;
+}
+
+.comment-row.reply .comment-profile {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: relative;
+  z-index: 10;
+  background-color: #fff;
+  border: 2px solid #fff;
+}
+
+
+/* 활성화 느낌 (좋아요 눌렀을 때) */
+.comment-good-btn.active {
+  color: #b18bdc;
+}
+
+.comment-bad-btn.active {
+  color: #888;
+}
+
+
+.comment-row.deleted .comment-content {
+  color: #aaa;
+  font-style: italic;
+}

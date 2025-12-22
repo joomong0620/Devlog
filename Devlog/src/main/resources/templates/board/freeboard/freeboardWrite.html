@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>자유게시판 글쓰기</title>
+    <link rel="stylesheet" href="../../../static/css/board/freeboard/freeboardWrite.css">
+    <link rel="stylesheet" href="../../static/css/common/font.css">
+</head>
+
+<body>
+
+    <!-- 상단 타이틀 바 -->
+    <h2 class="title-main fw-800">자유게시판</h2>  
+    <div class="container">
+
+        <!-- 글작성 도우미 -->
+        <div class="helper-box">
+            <button class="helper-btn">글작성 도우미</button>
+
+            <div class="select-box">
+                <select class="ai-select">
+                    <option class="sel-ai">AI</option>
+                    <option class="sel-chatbot">챗봇</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 제목 입력 -->
+        <input type="text" class="title-input" placeholder="   제목을 입력해주세요.">
+
+        <!-- 사진 등록 -->
+        <div class="photo-header">
+            <span class="photo-title">사진 등록</span>
+            <span class="photo-max">최대 5장</span>
+        </div>
+
+        <!-- 이미지 업로드 박스 -->
+        <div class="photo-upload">
+            <span class="plus">+</span>
+        </div>
+
+        <p class="image-warning">
+            본 사이트 약관/정책을 위반하는 이미지는 안내 없이 삭제 될 수 있습니다.
+        </p>
+
+        <!-- 내용 입력 -->
+        <textarea class="content-box" placeholder="내용을 입력해 주세요.
+악의적인 비난/광고성 글은 검토 후 경고/삭제 조치될 수 있습니다.
+관련 문의는 Q and A 게시판을 이용해주시기 바랍니다."></textarea>
+
+        <div class="text-limit">최소 10자, 최대 4000자</div>
+
+        <!-- 버튼 -->
+        <div class="button-box">
+            <button class="submit-btn">새글 등록</button>
+            <button class="cancel-btn">취소</button>
+        </div>
+
+    </div>
+
+</body>
+</html>

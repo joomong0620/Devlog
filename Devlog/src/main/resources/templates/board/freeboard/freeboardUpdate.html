@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 수정</title>
+    <link rel="stylesheet" href="../../../static/css/board/freeboard/freeboardUpdate.css">
+    <link rel="stylesheet" href="../../static/css/common/font.css">
+</head>
+
+<body>
+
+    <!-- 상단 타이틀 바 -->
+    <h2 class="title-main fw-800">자유게시판</h2>
+    <div class="container">
+
+        <!-- 글작성 도우미 -->
+        <div class="helper-box">
+            <button class="helper-btn">글작성 도우미</button>
+
+            <div class="select-box">
+                <select class="ai-select">
+                    <option class="sel-ai">AI</option>
+                    <option class="sel-chatbot">챗봇</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 제목 입력 -->
+        <input type="text" class="title-input" value="사이드 프로젝트 팀원을 모으는게 생각보다 어렵네요">
+
+        <!-- 사진 등록 -->
+        <div class="photo-header">
+            <span class="photo-title-spaceholder"></span>
+            <span class="photo-title">사진 등록</span>
+            <span class="photo-max">최대 5장</span>
+        </div>
+
+        <!-- 미리보기 이미지 + 업로드 박스 -->
+        <div class="photo-row">
+            <img src="../../../static/images/board/freeboard/fbUpdate_img1.png" class="preview-img">
+            <img src="../../../static/images/board/freeboard/fbDetail_img2.png" class="preview-img">
+            <img src="../../../static/images/board/freeboard/fbDetail_img3.png" class="preview-img">
+
+            <div class="photo-upload">
+                <span class="plus">+</span>
+            </div>
+        </div>
+
+        <p class="image-warning">
+            본 사이트 약관/정책을 위반하는 이미지는 안내 없이 삭제 될 수 있습니다.
+        </p>
+
+        <!-- 내용 입력 -->
+        <textarea class="content-box">
+사이드 프로젝트 팀을 꾸리는 순간 저는 개발자가 아니라 스케줄 관리자가 됩니다. 서로 시간 조율하다가 하루가 사라지고, 회의를 하면 잡담이 기능 구현보다 길고, 회의 끝날 때마다 “우리… 뭐했지?” 싶습니다. 그래도 잘 맞는 팀원을 만나면 속도가 빛의 속도로 변하고 개발이 ‘힐링 취미’가 되는 기적을 봤어요. 문제는 그런 사람 찾는 게 진짜로… 힘들다는 거죠. 여러분은 팀원을 고를 때 어떤 기준을 쓰시나요? 스택, 성격, 협업력… 혹은 ‘팀 이해도 95% 이상’ 같은 중요한 요소 있나요? 진지하게 듣고 싶습니다.
+저는 이미 세 번 팀 구성 실패해서 마음이 닳았습니다.
+        </textarea>
+
+        <div class="text-limit">최소 10자, 최대 4000자</div>
+
+        <!-- 버튼 -->
+        <div class="button-box">
+            <button class="submit-btn">수정 완료</button>
+            <button class="cancel-btn">취소</button>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
