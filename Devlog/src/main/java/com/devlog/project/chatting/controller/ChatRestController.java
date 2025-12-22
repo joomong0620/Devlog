@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatRestController {
 	
 	
-	/*
-	 * @GetMapping('/devtalk/chatList') public
-	 */
+	@GetMapping('/devtalk/chatList')
+	public 
+	
 }	
