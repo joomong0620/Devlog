@@ -133,7 +133,7 @@ body {
     accent-color: #2563eb; 
 }*/
 
-#inputCheckboxSaveId {
+#saveId {
     appearance: none;
     -webkit-appearance: none;
 
@@ -150,12 +150,12 @@ body {
     position: relative;
 }
 
-#inputCheckboxSaveId:checked {
+#saveId:checked {
     background-color: #BD83CE;
     border-color: #BD83CE;
 }
 
-#inputCheckboxSaveId:checked::after {
+#saveId:checked::after {
     content: '';
     position: absolute;
     width: 8px;
