@@ -1109,3 +1109,56 @@ input[name='msgSearch'] {
         opacity: 1;
     }
 }
+
+
+
+/* ---------------------- */
+/* 그룹채팅방 이미지 */
+
+.room-image-picker {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    margin-left: 110px;
+    border: 1px solid #E0CAFF;
+}
+
+#roomImagePreview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.room-image-picker img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.room-image-picker .image-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: 0.2s;
+}
+
+.room-image-picker:hover .image-overlay {
+    opacity: 1;
+}
+
+
+.image-edit-btn{
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 0px;
+    right: -20px;
+}

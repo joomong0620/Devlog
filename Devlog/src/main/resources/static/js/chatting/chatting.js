@@ -62,6 +62,12 @@ const private = document.querySelector('.private');
 const group = document.querySelector('.group');
 const roomNameARea = document.querySelector('.roomNameArea')
 
+const roomNameArea = document.querySelector('.roomNameArea');
+const roomImageArea = document.querySelector('.roomImageArea');
+
+const imageInput = document.getElementById('roomImageInput');
+const imagePreview = document.getElementById('roomImagePreview');
+
 
 let chatType = 'private'
 
@@ -71,6 +77,9 @@ private.addEventListener('click', e=>{
     if(group.classList.contains('type-select')){
         group.classList.remove('type-select')
     }
+
+    roomNameArea.classList.add('display-none');
+    roomImageArea.classList.add('display-none');
 
     private.classList.add('type-select')
     roomNameARea.classList.add('display-none')
@@ -91,6 +100,9 @@ group.addEventListener('click', e=>{
     }
 
     group.classList.add('type-select');
+
+    roomNameArea.classList.remove('display-none');
+    roomImageArea.classList.remove('display-none');
     
     roomNameARea.classList.remove('display-none');
 
@@ -105,6 +117,19 @@ group.addEventListener('click', e=>{
 
 
 })
+
+// 이미지 미리보기
+imageInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 확실하지 않음: 파일 용량 제한은 서버 정책에 따라 다름
+    const reader = new FileReader();
+    reader.onload = () => {
+        imagePreview.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+});
 
 
 for (let item of radioCheck) {

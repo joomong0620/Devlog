@@ -66,7 +66,8 @@ public class SecurityConfig {
 	                "/member/signUp",
 	                "/member/signUp-debug",
 	                "/member/signUpTest",
-	                "/error"
+	                "/error",
+	                "/devtalk/**"
 	            ).permitAll()
 	            .anyRequest().authenticated()
 	        )
