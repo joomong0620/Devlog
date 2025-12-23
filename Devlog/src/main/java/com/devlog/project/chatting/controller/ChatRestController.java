@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.devlog.project.chatting.dto.ChattingListDTO;
+import com.devlog.project.chatting.dto.ChattingDTO;
 import com.devlog.project.chatting.service.ChattingService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,11 +19,11 @@ public class ChatRestController {
 	private final ChattingService chattingService;
 	
 	@GetMapping("/devtalk/chatList")
-	public List<ChattingListDTO> selectChatList(){
+	public List<ChattingDTO.ChattingListDTO> selectChatList(){
 		
 		int memberNo = 1;
 		
-		List<ChattingListDTO> chatList = chattingService.selectChatList(memberNo);
+		List<ChattingDTO.ChattingListDTO> chatList = chattingService.selectChatList(memberNo);
 		
 		log.info("chatList = {}", chatList);
 		

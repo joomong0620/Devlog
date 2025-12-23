@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.devlog.project.chatting.dto.ChattingListDTO;
 import com.devlog.project.chatting.mapper.ChattingMapper;
 import com.devlog.project.chatting.repository.ChattingRepository;
 
@@ -18,14 +17,14 @@ public class ChattingServiceImpl implements ChattingService {
 	private final ChattingMapper chatMapper;
 	
 	
+	
+	// 채팅방 목록 조회
 	@Override
-	public List<ChattingListDTO> selectChatList(int memberNo) {
+	public List<com.devlog.project.chatting.dto.ChattingDTO.ChattingListDTO> selectChatList(int memberNo) {
 		
-		List<Object[]> list = chattingRepository.selectChatList(memberNo);
-		
-		System.out.println(list);
-		
-		return null;
+		return chatMapper.selectChatList(memberNo);
 	}
+	
+	
 
 }
