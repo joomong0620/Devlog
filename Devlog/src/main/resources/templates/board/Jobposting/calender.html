@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <title>IT 채용 정보 캘린더</title>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../../static/css/board/Jobposting/calender.css">
+  <script th:src=@{https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js}></script>
+  <link rel="stylesheet" th:href="@{https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap}">
+  <link rel="stylesheet" th:href="@{/css/board/Jobposting/calender.css}">
+  <link rel="stylesheet" th:href="@{/css/common/main.css}" />
+
+
 </head>
 
 <body>
+  <div th:replace="common/header :: header"></div>
 
   <div class="calendar-container">
     <div class="calendar-header">
@@ -20,6 +24,8 @@
     <div id="calendar"></div>
   </div>
 
-  <script src="../../../static/js/board/Jobposting/calender.js"></script>
-
+  <script th:src="@{/js/board/Jobposting/calender.js}"></script>
+  <div th:replace="common/footer :: footer"></div>
 </body>
+
+</html>

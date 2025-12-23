@@ -68,6 +68,8 @@ public class SecurityConfig {
 	                "/member/signUpTest",
 	                "/error",
 	                "/devtalk/**",
+	                "/jobposting",
+	                "/job-crawler",
 	                "/error"
 	            ).permitAll()
 	            .anyRequest().authenticated()
