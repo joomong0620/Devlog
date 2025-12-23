@@ -1,0 +1,828 @@
+/* 기본 설정 */
+:root {
+    --primary-color: #9b59b6;
+    /* 보라색 */
+    --primary-hover: #8e44ad;
+    --text-color: #333;
+    --gray-color: #888;
+    --light-bg: #f8f9fa;
+    --border-color: #eee;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* 레이아웃 컨테이너 */
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 40px;
+    /* 좌우 여백 */
+}
+
+/* === 헤더 스타일 === */
+.post-header {
+    margin-top: 60px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+}
+
+.post-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.crown-icon {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.post-title {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--gray-color);
+    margin-bottom: 15px;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.author strong {
+    color: var(--primary-color);
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.stats span {
+    margin-right: 10px;
+}
+
+.report {
+    cursor: pointer;
+}
+
+.date {
+    font-size: 0.85rem;
+}
+
+.tag-badges .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background-color: #f3e5f5;
+    /* 연한 보라 */
+    color: var(--primary-color);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+/* === 메인 레이아웃 (본문 + 사이드바) === */
+.content-layout {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    /* 3:1 비율 */
+    gap: 60px;
+    margin-bottom: 80px;
+}
+
+/* 본문 스타일 */
+.post-body {
+    position: relative;
+}
+
+.dummy-img {
+    width: 100%;
+    height: 300px;
+    background: #333;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.caption {
+    text-align: center;
+    color: var(--gray-color);
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+}
+
+.text-content p {
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+}
+
+.text-content h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+}
+
+/* === 잠금(Locked) 효과 === */
+.post-body.locked {
+    max-height: 600px;
+    /* 잠김 상태 높이 제한 */
+    overflow: hidden;
+}
+
+/* 오버레이 (White Gradient + Blur) */
+.lock-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 400px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 40%, #fff 100%);
+    display: flex;
+    align-items: flex-end;
+    /* 카드를 아래쪽에 배치 */
+    justify-content: center;
+    padding-bottom: 50px;
+    z-index: 10;
+}
+
+/* 유료 콘텐츠 해제 시 숨김 */
+.post-body:not(.locked) .lock-overlay {
+    display: none;
+}
+
+.post-body:not(.locked) .blur-target {
+    filter: none;
+    opacity: 1;
+}
+
+.lock-card {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 40px 60px;
+    text-align: center;
+    width: 400px;
+}
+
+.lock-card i {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.lock-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* 버튼 스타일 */
+.btn-primary {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* === 사이드바 === */
+.sidebar {
+    padding-top: 20px;
+    border-left: 1px solid var(--border-color);
+    padding-left: 30px;
+}
+
+.tags-container h3 {
+    font-size: 1rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.tag-list {
+    list-style: none;
+}
+
+.tag-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.tag-list li .num {
+    color: #aaa;
+    font-size: 0.8rem;
+}
+
+/* === 댓글 섹션 === */
+.comments-section {
+    border-top: 2px solid #333;
+    padding-top: 30px;
+    margin-bottom: 100px;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    border-radius: 50%;
+}
+
+.comment-input-area {
+    background: var(--light-bg);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: right;
+}
+
+.comment-input-area textarea {
+    width: 100%;
+    height: 80px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    resize: none;
+    margin-bottom: 10px;
+}
+
+/* === 모달 시스템 스타일 === */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-box.hidden {
+    display: none;
+}
+
+.modal-box {
+    background: #fff;
+    width: 800px;
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-box.small {
+    width: 400px;
+    padding: 40px;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 구매 모달 내부 */
+.modal-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.payment-section {
+    display: flex;
+    gap: 40px;
+}
+
+.left-col,
+.right-col {
+    flex: 1;
+}
+
+.bean-card {
+    background: #dcd6f7;
+    /* 커피콩 카드 배경색 유사하게 */
+    border-radius: 12px;
+    padding: 30px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 15px 0;
+    color: #5a3e75;
+}
+
+.bean-icon {
+    font-size: 2rem;
+    color: #b08d55;
+}
+
+/* 커피콩 색 */
+.bean-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.bean-info strong {
+    font-size: 1.5rem;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.info-row.price-row {
+    margin-top: 30px;
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.full-width {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* 작은 모달 (잔액 부족 / 성공) */
+.purple-icon {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* ... (기존 CSS 유지) ... */
+
+/* === 1. & 2. 작성자 링크 및 팔로우 버튼 === */
+.author-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
+
+.author-link:hover .author strong {
+    text-decoration: underline;
+}
+
+.btn-follow {
+    background: #fff;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-follow:hover {
+    background: #f3e5f5;
+}
+
+.btn-follow.following {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+/* === 3. 목차(TOC) 스타일 === */
+.toc-container {
+    position: sticky;
+    /* 스크롤 따라오게 하려면 */
+    top: 100px;
+}
+
+.toc-container h3 {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.toc-list {
+    list-style: none;
+    padding-left: 5px;
+    border-left: 2px solid #eee;
+}
+
+.toc-list li {
+    padding: 0;
+    margin-bottom: 10px;
+    border: none;
+    /* 기존 태그 스타일 제거 */
+}
+
+.toc-list a {
+    text-decoration: none;
+    color: #666;
+    font-size: 0.9rem;
+    display: block;
+    padding-left: 15px;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.toc-list a:hover {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* 현재 활성화된 목차 표시용 */
+.toc-list a.active {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.toc-list a.active::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    /* 부모 border 덮기 */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--primary-color);
+}
+
+/* === 4. 댓글 등록 버튼 꾸미기 === */
+.btn-submit-styled {
+    background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    /* 둥글게 */
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+    /* 그림자 */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-submit-styled:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(155, 89, 182, 0.4);
+}
+
+.btn-submit-styled:active {
+    transform: translateY(0);
+}
+
+/* === 5. 신고 모달 스타일 === */
+.report-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.report-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.report-text {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: none;
+    margin-bottom: 20px;
+}
+
+/* === 6. 작성자 수정/삭제 버튼 === */
+.author-actions {
+    display: flex;
+    justify-content: flex-end;
+    /* 오른쪽 정렬 */
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.author-actions.hidden {
+    display: none;
+}
+
+.btn-action {
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.btn-action:hover {
+    background: #f8f8f8;
+    color: #333;
+}
+
+.btn-action.delete {
+    color: #e74c3c;
+    border-color: #fadbd8;
+}
+
+.btn-action.delete:hover {
+    background: #fdedec;
+}
+
+/* 비활성화 버튼 스타일 (수정/삭제 불가 시) */
+.btn-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #eee;
+    color: #aaa;
+    border-color: #eee;
+}
+
+/* ... (기존 CSS 유지) ... */
+
+/* === 1. & 2. 작성자 링크 및 팔로우 버튼 === */
+.author-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
+
+.author-link:hover .author strong {
+    text-decoration: underline;
+}
+
+.btn-follow {
+    background: #fff;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-follow:hover {
+    background: #f3e5f5;
+}
+
+.btn-follow.following {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+/* === 3. 목차(TOC) 스타일 === */
+.toc-container {
+    position: sticky;
+    /* 스크롤 따라오게 하려면 */
+    top: 100px;
+}
+
+.toc-container h3 {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.toc-list {
+    list-style: none;
+    padding-left: 5px;
+    border-left: 2px solid #eee;
+}
+
+.toc-list li {
+    padding: 0;
+    margin-bottom: 10px;
+    border: none;
+    /* 기존 태그 스타일 제거 */
+}
+
+.toc-list a {
+    text-decoration: none;
+    color: #666;
+    font-size: 0.9rem;
+    display: block;
+    padding-left: 15px;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.toc-list a:hover {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* 현재 활성화된 목차 표시용 */
+.toc-list a.active {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.toc-list a.active::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    /* 부모 border 덮기 */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--primary-color);
+}
+
+/* === 4. 댓글 등록 버튼 꾸미기 === */
+.btn-submit-styled {
+    background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    /* 둥글게 */
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+    /* 그림자 */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-submit-styled:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(155, 89, 182, 0.4);
+}
+
+.btn-submit-styled:active {
+    transform: translateY(0);
+}
+
+/* === 5. 신고 모달 스타일 === */
+.report-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.report-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.report-text {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: none;
+    margin-bottom: 20px;
+}
+
+/* === 6. 작성자 수정/삭제 버튼 === */
+.author-actions {
+    display: flex;
+    justify-content: flex-end;
+    /* 오른쪽 정렬 */
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.author-actions.hidden {
+    display: none;
+}
+
+.btn-action {
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.btn-action:hover {
+    background: #f8f8f8;
+    color: #333;
+}
+
+.btn-action.delete {
+    color: #e74c3c;
+    border-color: #fadbd8;
+}
+
+.btn-action.delete:hover {
+    background: #fdedec;
+}
+
+/* 비활성화 버튼 스타일 (수정/삭제 불가 시) */
+.btn-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #eee;
+    color: #aaa;
+    border-color: #eee;
+}

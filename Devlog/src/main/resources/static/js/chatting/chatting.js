@@ -1,26 +1,40 @@
 
+const memberNo = 1;
+document.addEventListener('DOMContentLoaded', e => {
 
+    selectChatList(memberNo);
 
+})
 
-/* 선택 효과 주기 */
-const listItem = document.getElementsByClassName('room-item')
+function selectChatList(memberNo){
 
-for (let item of listItem) {
+    fetch('/devtalk/chatList?memberNo=' + memberNo)
+    .then(resp => resp.text())
+    .then(html => {
+        console.log(roomList);
+        console.log(roomList.length);
 
-    item.addEventListener('click', e => {
+        document.getElementById('roomList').outerHTML = html;
 
-        for (let el of listItem) {
-            el.classList.remove('is-selected')
-            
-        }
         
-        item.classList.add('is-selected')
     })
-    
+    .catch(e => console.log('채팅방 목록 조회 실패', e))
+
 }
 
-document.addEventListener('DOMContentLoaded', e => {
-})
+
+// roomList 컨테이너에 한 번만 이벤트 걸기
+document.addEventListener('click', (e) => {
+  const item = e.target.closest('.room-item');
+  if (!item) return; // room-item이 아닌 곳 클릭이면 무시
+
+  // 현재 room-list 안의 room-item만 대상으로 선택 해제
+  const container = document.getElementById('roomList');
+  container.querySelectorAll('.room-item').forEach(el => el.classList.remove('is-selected'));
+
+  item.classList.add('is-selected');
+});
+
 
 window.addEventListener('load', () => {
     scrollToBottom();

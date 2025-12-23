@@ -1,7 +1,7 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.7'
-	id 'io.spring.dependency-management' version '1.1.7'
+   id 'java'
+   id 'org.springframework.boot' version '3.5.7'
+   id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.devlog'
@@ -9,23 +9,23 @@ version = '0.0.1-SNAPSHOT'
 description = 'Devlog Team Project'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+   toolchain {
+      languageVersion = JavaLanguageVersion.of(17)
+   }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+   compileOnly {
+      extendsFrom annotationProcessor
+   }
 }
 
 repositories {
-	mavenCentral()
+   mavenCentral()
 }
 
 ext {
-	set('springAiVersion', "1.1.0")
+   set('springAiVersion', "1.1.0")
 }
 
 dependencies {
@@ -73,15 +73,15 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     
     // Chatbot
-	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
-	
-	// Spring Security, 2025/12/20
+   implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+   
+   // Spring Security, 2025/12/20
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// JWT(jjwt), 2025/12/20
+   // JWT(jjwt), 2025/12/20
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'	
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'   
     
     // additional: DTO validation(선택)&test, 2025/12/20
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -90,12 +90,12 @@ dependencies {
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-	}
+   imports {
+      mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+   }
 }
 
 
 tasks.named('test') {
-	useJUnitPlatform()
+   useJUnitPlatform()
 }

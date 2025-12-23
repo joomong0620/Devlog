@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevLog Post Detail</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../static/css/board/blog/blogDetail.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <main class="main-content">
+
+            <header class="post-header">
+                <div id="authorActionArea" class="author-actions hidden">
+                    <button id="btnEdit" class="btn-action">수정</button>
+                    <button id="btnDelete" class="btn-action delete">삭제</button>
+                </div>
+
+                <div class="post-title-wrap">
+                    <i class="fa-solid fa-crown crown-icon"></i>
+                    <h1 class="post-title">기술면접에서 살아남는 현실 꿀팁 7가지</h1>
+                </div>
+
+                <div class="post-meta">
+                    <div class="author-info">
+                        <a href="/blog/GwanSik_Yang" class="author-link">
+                            <span class="author">by <strong>GwanSik_Yang</strong></span>
+                        </a>
+                        <button class="btn-follow" onclick="toggleFollow(this)">+ 팔로우</button>
+
+                        <div class="stats">
+                            <span><i class="fa-solid fa-heart"></i> 1</span>
+                            <span><i class="fa-regular fa-comment-dots"></i> 3</span>
+                            <span><i class="fa-solid fa-link"></i> <span id="viewCount">999</span>+</span>
+                            <span class="report" onclick="openReportModal()"><i class="fa-regular fa-bell"></i>
+                                신고</span>
+                        </div>
+                    </div>
+                    <span class="date">2025.11.07</span>
+                </div>
+
+                <div class="tag-badges">
+                    <span class="badge">React</span>
+                    <span class="badge">TypeScript</span>
+                    <span class="badge">Docker</span>
+                </div>
+            </header>
+
+            <div class="content-layout">
+                <article id="articleContent" class="post-body locked">
+                    <div class="post-image-area">
+                        <div class="dummy-img">
+                            <p>이미지 영역 (그의 손에 쥐어지는 합격 목걸이)</p>
+                        </div>
+                        <p class="caption">"준비는 디테일에서 갈린다"</p>
+                    </div>
+
+                    <div class="text-content">
+                        <p>기술면접은 코딩 실력만 본다고 생각하기 쉽지만, 실제로는 사고 과정, 문제 해결 방식, 그리고 커뮤니케이션 능력까지 전부 평가받는 종합 경기다.</p>
+                        <br>
+
+                        <h3 id="section1">1. 답을 외우지 말고 '설명하는 능력'을 길러야 해</h3>
+                        <p>면접관이 가장 싫어하는 답변은 "책을 읽어주는 듯한 답변"이다. 단순히 개념을 암기해서 뱉는 것은 누구나 할 수 있다.</p>
+                        <p>예를 들어 React의 Virtual DOM에 대해 질문받았다고 치자.</p>
+
+                        <div class="blur-target">
+                            <p>❌ "Virtual DOM은 가상 돔입니다." (탈락)</p>
+                            <p>⭕ "Virtual DOM은 실제 DOM 조작을 최소화하여 성능을 최적화하는 기술입니다..." (합격)</p>
+                            <br>
+                            <h3 id="section2">2. 모르는 질문이 나오면 아는 척 하지 말고 솔직해지자</h3>
+                            <p>모르는 건 죄가 아니다. 하지만 모르는 걸 아는 척 하는 건 죄악이다.</p>
+                            <p>모르면 "그 부분은 제가 미처 깊이 공부하지 못했습니다. 하지만 ~와 연관지어 생각해보면..." 처럼 유연하게 대처하는 태도가 중요하다.</p>
+                        </div>
+                    </div>
+
+                    <div id="lockOverlay" class="lock-overlay">
+                        <div class="lock-card">
+                            <i class="fa-solid fa-crown"></i>
+                            <h3>구매 후 열람이 가능합니다</h3>
+                            <button class="btn-primary" onclick="openPurchaseModal()">구매하기</button>
+                        </div>
+                    </div>
+                </article>
+
+                <aside class="sidebar">
+                    <div class="toc-container">
+                        <h3>목차</h3>
+                        <ul class="toc-list">
+                            <li><a href="#section1">1. 답을 외우지 말고 '설명하는 능력'을 길러야 해</a></li>
+                            <li><a href="#section2">2. 모르는 질문이 나오면 아는 척 하지 말고 솔직해지자</a></li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+
+            <section class="comments-section">
+                <div class="comment-header">
+                    <a href="/blog/GwanSik_Yang">
+                        <img src="https://via.placeholder.com/40" alt="User" class="avatar">
+                    </a>
+                    <span class="username">GwanSik_Yang</span>
+                </div>
+                <h3>댓글</h3>
+                <div class="comment-input-area">
+                    <textarea placeholder="댓글을 작성하세요..."></textarea>
+                    <button class="btn-submit-styled">등록하기</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay hidden">
+
+        <div id="modalPurchase" class="modal-box hidden">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-crown"></i> 유료 콘텐츠 구매하기</h3>
+                <button class="close-btn" onclick="closeAllModals()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-section">
+                    <div class="left-col">
+                        <h4>결제 수단</h4>
+                        <div class="bean-card">
+                            <div class="bean-icon"><i class="fa-solid fa-seedling"></i></div>
+                            <div class="bean-info">
+                                <span>내 보유 커피콩</span>
+                                <strong id="userBalance">12,450콩</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-col">
+                        <h4>구매 정보</h4>
+                        <div class="info-row"><span class="label">가격 :</span><span class="val price">3,000원</span></div>
+                        <button class="btn-primary full-width" onclick="processPayment()">구매하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modalNoBalance" class="modal-box small hidden">
+            <div class="modal-content-center">
+                <i class="fa-solid fa-crown purple-icon"></i>
+                <h3>포인트가 부족합니다.<br>충전페이지로 이동하시겠습니까?</h3>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="closeAllModals()">예</button>
+                    <button class="btn-secondary" onclick="closeAllModals()">아니오</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modalSuccess" class="modal-box small hidden">
+            <div class="modal-content-center">
+                <i class="fa-solid fa-crown purple-icon"></i>
+                <h3>구매 완료!</h3>
+                <button class="btn-primary" onclick="completePurchase()">확인</button>
+            </div>
+        </div>
+
+        <div id="modalReport" class="modal-box hidden">
+            <div class="modal-header">
+                <h3><i class="fa-regular fa-bell"></i> 게시글 신고하기</h3>
+                <button class="close-btn" onclick="closeAllModals()">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="desc">신고 사유를 선택하거나 입력해주세요.</p>
+                <div class="report-options">
+                    <label><input type="radio" name="reportReason" value="spam"> 스팸 / 부적절한 홍보</label>
+                    <label><input type="radio" name="reportReason" value="abuse"> 욕설 / 비하 발언</label>
+                    <label><input type="radio" name="reportReason" value="info"> 불법 정보 유출</label>
+                    <label><input type="radio" name="reportReason" value="other" checked> 기타</label>
+                </div>
+                <textarea class="report-text" placeholder="상세 사유를 입력해주세요."></textarea>
+                <button class="btn-primary full-width" onclick="submitReport()">신고 접수</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div
+        style="position:fixed; top:10px; right:10px; background:#fff; border:1px solid #ddd; padding:10px; z-index:9999; font-size:12px;">
+        <strong>Test Controls</strong><br>
+        <button onclick="setBalance(12450)">잔액 충분</button>
+        <button onclick="setBalance(100)">잔액 부족</button>
+        <hr>
+        <label><input type="checkbox" id="checkAuthor" onclick="toggleAuthorMode()" checked> 작성자 모드</label><br>
+        <label><input type="checkbox" id="checkPaid" onclick="toggleAuthorMode()" checked> 유료글 여부</label>
+    </div>
+
+    <script src="../../../static/js/board/blog/blogDetail.js"></script>
+</body>
+
+</html>

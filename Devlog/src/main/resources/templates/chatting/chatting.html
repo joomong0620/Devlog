@@ -336,105 +336,42 @@
                 </div>
             </div>
 
-            <div class="room-list-body">
-                <!-- 방이 없을 경우 -->
-                <!-- 
-                <div class="flex-center room-empty">
+            <div class="room-list-body" id="roomList">
+                <div th:if="${chatList == null or #lists.isEmpty(chatList)}" class="flex-center room-empty">
                     <h1 class="fw-800" style="opacity: 0.5;">room == null</h1>
                 </div> 
-                -->
+
 
                 <!-- 방이 있을 경우 -->
-                <ul class="room-list flex-col gap-16">
+                <ul class="room-list flex-col gap-16" >
                     <!-- 채팅방 한 칸 -->
-                    <li class="room-item flex gap-12 is-selected">
+                    <li th:each="crl : ${chatList}" th:data-room-no = ${crl.chattingRoomNo} class="room-item flex gap-12">
                         <div class="room-img">
                             <!-- 프로필 이미지 -->
-                            <img th:src="@{/images/logo.png}">
+                            <img th:src="${crl.roomImg}">
                         </div> 
 
                         <div class="room-info flex">
                             <div class="flex-col gap-8">
-                                <span class="fw-700 fs-24">Zero-Boost</span>
-                                <span class="ellipsis">html 지옥</span>
-                            </div>
-
-                            <div class="flex-col gap-8">
-                                <span style="padding-left: 8px;">12:30</span>
-                                <div class="count-pin">
-                                    <span class="unread-count fw-600 fs-14">5</span>
-                                    <img class="pinned" th:src="@{/images/chatting/pin.svg}">
-                                </div>
-                            </div>
-                        </div> 
-                    </li>
-
-                    <li class="room-item flex gap-12">
-                        <div class="room-img">
-                            <img th:src="@{/images/logo.png}">
-                        </div> 
-
-                        <div class="room-info flex">
-                            <div class="flex-col gap-8">
-                                <span class="fw-700 fs-24">이규식</span>
-                                <span class="ellipsis">html 지옥</span>
-                            </div>
-
-                            <div class="flex-col gap-8">
-                                <span style="padding-left: 8px;">12:30</span>
-                                <div class="count-pin">
-                                    <!-- <span class="unread-count fw-600 fs-14">5</span> -->
-                                    <img class="pinned" th:src="@{/images/chatting/pin.svg}">
-                                </div>
-                            </div>
-                        </div> 
-                    </li>
-
-                    <li class="room-item flex gap-12">
-                        <div class="room-img">
-                            <img th:src="@{/images/logo.png}">
-                        </div> 
-
-                        <div class="room-info flex">
-                            <div class="flex-col gap-8">
-                                <span class="fw-700 fs-24">이규식</span>
-                                <span class="ellipsis">
-                                    너는나를존중해야한다나는발롱도르5개와수많은개인트로피를들어올렸으며2016유로에서포르투갈을이끌고우승을차지했고동시에A매치역대최다득점자이다또한챔스역대최다득점자
+                                <span class="fw-700 fs-24" th:text="${crl.displayName}">채팅방 이름</span>
+                                <span class="ellipsis last-message"
+                                    th:text="${crl.lastMessage != null ? crl.lastMessage : ''}">
+                                    &nbsp;
                                 </span>
                             </div>
 
                             <div class="flex-col gap-8">
-                                <span style="padding-left: 8px;">2025-12-10</span>
+                                <span style="padding-left: 8px;" th:text="${crl.lastMessageAt}">마지막 메세지 보낸 시간</span>
                                 <div class="count-pin">
-                                    <span class="unread-count fw-600 fs-14">30</span>
-                                    <!-- <img class="pinned" th:src="@{/images/chatting/pin.svg}"> -->
+                                    
+                                    <span th:if="${crl.unreadCount != 0}" class="unreadCount fw-600 fs-14" th:text="${crl.unread_count}">안 읽은 메세지 개수</span>
+                                    <img th:if="${crl.pinnedYn == Y}" class="pinned" th:src="@{/images/chatting/pin.svg}">
                                 </div>
                             </div>
                         </div> 
                     </li>
 
-                    <li class="room-item flex gap-12">
-                        <div class="room-img">
-                            <img th:src="@{/images/logo.png}">
-                        </div> 
-
-                        <div class="room-info flex">
-                            <div class="flex-col gap-8">
-                                <span class="fw-700 fs-24">이규식</span>
-                                <span class="ellipsis">
-                                    너는나를존중해야한다나는발롱도르5개와수많은개인트로피를들어올렸으며2016유로에서포르투갈을이끌고우승을차지했고동시에A매치역대최다득점자이다또한챔스역대최다득점자
-                                </span>
-                            </div>
-
-                            <div class="flex-col gap-8">
-                                <span style="padding-left: 8px;">2025-12-10</span>
-                                <div class="count-pin">
-                                    <!-- <span class="unread-count fw-600 fs-14">30</span> -->
-                                    <!-- <img class="pinned" th:src="@{/images/chatting/pin.svg}"> -->
-                                </div>
-                            </div>
-                        </div> 
-                    </li>
+                    
                 </ul>
 
 

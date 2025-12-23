@@ -2,8 +2,10 @@ package com.devlog.project.chatting.controller;
 
 import java.util.List;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.devlog.project.chatting.dto.ChattingDTO;
 import com.devlog.project.chatting.service.ChattingService;
@@ -11,7 +13,7 @@ import com.devlog.project.chatting.service.ChattingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @Slf4j
 public class ChatRestController {
@@ -19,15 +21,17 @@ public class ChatRestController {
 	private final ChattingService chattingService;
 	
 	@GetMapping("/devtalk/chatList")
-	public List<ChattingDTO.ChattingListDTO> selectChatList(){
+	public String selectChatList(@RequestParam("memberNo") int memberNo
+			, Model model){
 		
-		int memberNo = 1;
 		
 		List<ChattingDTO.ChattingListDTO> chatList = chattingService.selectChatList(memberNo);
 		
 		log.info("chatList = {}", chatList);
 		
-		return null;
+		model.addAttribute("chatList", chatList);
+		
+		return "chatting/chatting ::#roomList";
 	}
 	
 }	
