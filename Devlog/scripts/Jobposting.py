@@ -16,25 +16,39 @@ try:
     driver.get('https://www.jobkorea.co.kr/Theme/it_developer')
     wait = WebDriverWait(driver, 10)
     
-    # 오늘 등록 필터 클릭
-    today_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "label[for='rlistTab27']")))
-    today_btn.click()
-    time.sleep(3)
-
-    # 목록 수집
-    job_elements = driver.find_elements(By.XPATH, "//tr[descendant::div[@class='titBx']]")
+    # 수집된 전체 공고를 담을 리스트
     temp_list = []
-    for row in job_elements:
-        try:
-            title_tag = row.find_element(By.CSS_SELECTOR, ".titBx strong a")
-            temp_list.append({
-                'COMPANY_NAME': row.find_element(By.CSS_SELECTOR, ".tplCo a").text.strip(),
-                'POSTING_TITLE': title_tag.text.strip(),
-                'DETAIL_URL': title_tag.get_attribute('href')
-            })
-        except: continue
 
+    # 오늘 등록(rlistTab27), 오늘 마감(rlistTab26) 탭 순회
+    btn_ids = ["rlistTab27", "rlistTab26"]
+
+    for btn_id in btn_ids:
+        print(f"탭 클릭 중: {btn_id}")
+        btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f"label[for='{btn_id}']")))
+        btn.click()
+        time.sleep(3) # 리스트 로딩 대기
+
+        # 해당 탭의 목록 수집
+        job_elements = driver.find_elements(By.XPATH, "//tr[descendant::div[@class='titBx']]")
+        
+        for row in job_elements:
+            try:
+                title_tag = row.find_element(By.CSS_SELECTOR, ".titBx strong a")
+                comp_name = row.find_element(By.CSS_SELECTOR, ".tplCo a").text.strip()
+                post_title = title_tag.text.strip()
+                detail_url = title_tag.get_attribute('href')
+
+                # 중복 수집 방지 (URL 기준)
+                if not any(item['DETAIL_URL'] == detail_url for item in temp_list):
+                    temp_list.append({
+                        'COMPANY_NAME': comp_name,
+                        'POSTING_TITLE': post_title,
+                        'DETAIL_URL': detail_url
+                    })
+            except: 
+                continue
     final_db_data = []
+    print(f"총 {len(temp_list)}개의 공고를 발견했습니다. 상세 수집을 시작합니다.")
 
    # 상세 요강 내부
     for i, job in enumerate(temp_list, 1):
@@ -143,6 +157,19 @@ if final_db_data:
                     VALUES (:1, :2, :3, :4)
                 """, [com_code, data['COMPANY_NAME'], data['WORK_ADDR'], data['NEARBY_SUB']])
                 print(f"   > 새 회사 등록: {data['COMPANY_NAME']} (ID: {com_code})")
+            
+
+            # 중복 공고 스킵
+            cursor.execute("""
+                SELECT 1 
+                FROM JOB_POSTING 
+                WHERE COMPANY_CODE = :1 
+                AND POSTING_TITLE = :2
+            """, [com_code, data['POSTING_TITLE']])
+
+            if cursor.fetchone():
+                print(f"     -> 중복 공고 스킵: {data['POSTING_TITLE']}")
+                continue
 
             # 공고 번호 생성
             cursor.execute("SELECT NVL(MAX(POSTING_NO), 0) + 1 FROM JOB_POSTING")
