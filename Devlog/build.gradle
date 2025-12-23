@@ -74,7 +74,19 @@ dependencies {
     
     // Chatbot
 	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+	
+	// Spring Security, 2025/12/20
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
+	// JWT(jjwt), 2025/12/20
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'	
+    
+    // additional: DTO validation(선택)&test, 2025/12/20
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springframework.security:spring-security-test'    
+    
 }
 
 dependencyManagement {
