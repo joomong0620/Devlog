@@ -151,6 +151,10 @@ input[type="search"]::-webkit-search-cancel-button {
     padding-right: 10px;
 }
 
+.room-info>div:first-child {
+
+}
+
 .pinned {
     width: 25px;
     height: 25px;
@@ -1161,4 +1165,8 @@ input[name='msgSearch'] {
     height: 30px;
     top: 0px;
     right: -20px;
+}
+
+.last-message {
+    min-height: 1.2em;
 }
