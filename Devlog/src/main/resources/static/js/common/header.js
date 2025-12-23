@@ -14,7 +14,7 @@ signinBtn?.addEventListener("click", () => {
 
 // 로그인
 const logout = document.getElementById("logout");
-signinBtn?.addEventListener("click", () => {
+logout?.addEventListener("click", () => {
   window.location.href = "/member/logout";
 });
 
