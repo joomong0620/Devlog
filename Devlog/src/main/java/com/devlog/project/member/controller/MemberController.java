@@ -79,7 +79,7 @@ public class MemberController {
     		Model model,
             @RequestParam(value="saveId", required=false) String saveId,
 			HttpServletResponse resp,          
-			HttpSession session
+			HttpServletRequest request
     ) {
     	
     	try {
@@ -128,7 +128,14 @@ public class MemberController {
 	        // --------------------------------------------------
 			// 로그인 성공 시 response DTO에 로그인회원정보 담겨있다
 			// 1) 세션에 로그인한 회원 정보 추가
-			session.setAttribute("loginMember", response);	// 따라서 이방법으로 세션에 직접저장
+	        // 세션 고정 공격 방지 + 이전 사용자 정보 제거
+	        HttpSession oldSession = request.getSession(false);
+	        if (oldSession != null) {
+	            oldSession.invalidate();
+	        }
+
+	        HttpSession newSession = request.getSession(true);
+	        newSession.setAttribute("loginMember", response);
 				
 			// 2) 아이디 저장(쿠키에)
 			// 쿠키 생성(K:V로 해당 쿠키에 담을 (로그인멤버의 이메일) 데이터 지정)
@@ -182,7 +189,8 @@ public class MemberController {
 	// 로그아웃 요청처리
 	// GET - 리다이렉트 방식
 	@GetMapping("/logout")
-	public String logoutGet(HttpServletRequest request) {
+	public String logoutGet(HttpServletRequest request, SessionStatus status) {
+		status.setComplete(); // @SessionAttributes 제거
 	    logout(request);
 	    System.out.println("###%%%@@@ 로그아웃 성공 (GET)");
 	    return "redirect:/member/login";
@@ -191,7 +199,11 @@ public class MemberController {
 	// POST - REST API 방식
 	@ResponseBody
 	@PostMapping("/logout")
-	public ResponseEntity<Map<String, String>> logoutPost(HttpServletRequest request) {
+	public ResponseEntity<Map<String, String>> logoutPost(
+			HttpServletRequest request
+			, SessionStatus status
+			) {
+		status.setComplete(); // @SessionAttributes 제거
 	    logout(request);
 	    System.out.println("###%%%@@@ 로그아웃 성공 (POST)");
 	    

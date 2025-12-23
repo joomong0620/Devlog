@@ -59,7 +59,8 @@ if (loginFrm != null) {
         .then(data => {
             console.log('로그인 성공:', data);
             // 메인 페이지로 이동
-            window.location.href = '/'; //  브라우저가 해당 URL로 새로 요청 -> 현재 페이지에서 / 경로로 브라우저가 이동 (redirect)
+            //window.location.href = '/'; //  브라우저가 해당 URL로 새로 요청 -> 현재 페이지에서 / 경로로 브라우저가 이동 (redirect)
+            window.location.href = '/member/login'; //  브라우저가 해당 URL로 새로 요청 -> 현재 페이지에서 / 경로로 브라우저가 이동 (redirect)
             // 클라이언트 측에서 페이지 이동이 일어나므로 redirect 동작
         })
         .catch(error => {
@@ -70,4 +71,54 @@ if (loginFrm != null) {
             memberPw.focus();
         });
     });
+}
+
+
+
+// 자바스크립트 쿠키 얻어오기: key를 전달하면, value얻는 JS함수
+function getCookie(key) {
+    const cookies = document.cookie;
+    // 현재 페이지에서 접근 가능한 모든 쿠키를 "문자열"로 가지고 옴(특정쿠키만 가져오는건 spring-boot version 3이상에서 않됨)
+
+    console.log("inside getCookie() function: ");
+    console.log(cookies);
+
+    // saveId=user01@og.or.kr; test=123; temp=abc;
+    // 배열.map() : 배열의 모든 요소에 순차 접근하여 함수 수행 후
+    //             수행 결과를 이용해서 새로운 배열을 만드는 함수
+    const cookieList = cookies.split("; ").map(cookie => cookie.split("="))
+    // {saveId=user01@og.or.kr, test=123, temp=abc}
+    // 
+    //console.log(cookieList); // 
+
+    // [[a, 1], [b, 1]]
+    const obj = {}; // 비어있는 JS 객체 생성
+
+    for(let i=0; i<cookieList.length; i++) {
+        obj[cookieList[i][0]] = cookieList[i][1]; // K값에 V를 대입 형식으로 담겨지게 된다. 
+    } // obj = {a:1, b:1}
+
+    return obj[key];
+}
+
+
+// 쿠키에 saveId가 있을 경우
+if( document.getElementsByName("memberEmail")[0] != null ) {
+    // 화면에 memberEmail이 있을 경우
+
+    const saveId = getCookie("saveId");
+    // 있으면 이메일, 없으면 undefined 나온다
+
+    console.log("cookie(saveId) in current view by getCookie() 함수: ");
+    console.log(saveId);
+
+    if (saveId != undefined) { // 쿠키에 저장된 이메일이 있는 경우
+        // memberEmail input에 값 세팅
+        // document.getElementsByName("memberEmail")[0].value = saveId;
+        document.querySelector("input[name='memberEmail'").value = saveId;
+        // 아이디 저장 checkbox 체크하기
+        // document.getElementsByName("saveId")[0].checked = true;
+        document.querySelector("input[name='saveId']").checked = true;
+
+    }
 }
