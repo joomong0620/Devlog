@@ -194,9 +194,11 @@ body {
     margin-bottom: 80px;
 }
 
-/* 본문 스타일 */
+/* === [중요 수정] 본문 및 잠금 스타일 === */
 .post-body {
     position: relative;
+    min-height: 300px;
+    /* 맛보기 텍스트가 너무 짧아도 레이아웃 유지 */
 }
 
 .dummy-img {
@@ -228,43 +230,64 @@ body {
     font-size: 1.4rem;
 }
 
-/* 잠금 효과 */
+/* 1. 잠금 상태 컨테이너 */
 .post-body.locked {
-    max-height: 600px;
     overflow: hidden;
+    /* max-height는 이제 불필요 (서버에서 잘라서 주니까) */
 }
 
+/* 2. 잠긴 텍스트 스타일 (보안/UX 효과) */
+.post-body.locked .text-content {
+    /* 맛보기 텍스트 드래그 방지 */
+    user-select: none;
+    -webkit-user-select: none;
+
+    /* 전체적으로 살짝 흐리게 해서 '맛보기' 느낌 강조 (선택사항) */
+    /* filter: blur(0.5px); */
+}
+
+/* 3. 페이드아웃 오버레이 (핵심) */
 .lock-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 400px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 40%, #fff 100%);
+
+    /* 오버레이 높이: 텍스트를 얼마나 가릴지 결정 */
+    height: 350px;
+
+    /* 투명 -> 흰색 그라데이션 */
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.6) 40%,
+            rgba(255, 255, 255, 1) 80%,
+            #fff 100%);
+
     display: flex;
     align-items: flex-end;
+    /* 버튼을 아래쪽에 배치 */
     justify-content: center;
-    padding-bottom: 50px;
+    padding-bottom: 60px;
     z-index: 10;
 }
 
+/* 잠금 상태가 아닐 땐 오버레이 숨김 */
 .post-body:not(.locked) .lock-overlay {
     display: none;
-}
-
-.post-body:not(.locked) .blur-target {
-    filter: none;
-    opacity: 1;
 }
 
 .lock-card {
     background: #fff;
     border: 1px solid var(--border-color);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    /* 그림자 조금 더 부드럽게 */
     border-radius: 12px;
     padding: 40px 60px;
     text-align: center;
     width: 400px;
+    /* 카드가 그라데이션 위에 둥둥 떠있는 느낌 */
+    position: relative;
+    z-index: 20;
 }
 
 .lock-card i {
@@ -283,7 +306,7 @@ body {
     font-size: 0.95rem;
 }
 
-/* 버튼 공통 */
+/* === 버튼 공통 === */
 .btn-primary {
     background: var(--primary-color);
     color: #fff;
@@ -384,7 +407,6 @@ body {
     margin-bottom: 10px;
 }
 
-/* [추가] 프로필 링크 스타일 */
 .profile-link {
     text-decoration: none;
     color: inherit;
@@ -485,11 +507,6 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     transition: all 0.2s ease;
 }
-
-/* .comment-content:hover {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
-} */
 
 .comment-header {
     display: flex;

@@ -1,110 +1,111 @@
-// 상태 변수
-let userCoffeeBeans = 12450;
-const contentPrice = 3000;
-let isFollowing = false;
+/* * [Backend Integration Clean Version]
+ * Mock Data 제거, API 연동 준비 완료
+ */
 
-// 게시글 상태
-let isAuthor = true;
-let isPaidContent = true;
-let viewCount = 999;
-let postLikeCount = 1;
-let isPostLiked = false;
-
-// 현재 로그인한 사용자 정보
-const currentUser = {
-    id: 'user1',
-    nickname: 'GwanSik_Yang',
-    profileUrl: 'https://via.placeholder.com/40'
-};
-
-// 댓글 데이터
-let comments = [
-    {
-        id: 1,
-        userId: 'user2',
-        nickname: 'DevKing',
-        profileUrl: 'https://via.placeholder.com/40/333',
-        content: '정말 유익한 글이네요! 면접 준비 중인데 큰 도움이 되었습니다.',
-        date: '2025.11.07 14:20',
-        likes: 5,
-        isLiked: false,
-        replies: [
-            {
-                id: 101,
-                userId: 'user1',
-                nickname: 'GwanSik_Yang',
-                profileUrl: 'https://via.placeholder.com/40',
-                content: '감사합니다! 꼭 합격하시길 응원합니다 :)',
-                date: '2025.11.07 15:00',
-                likes: 2,
-                isLiked: true,
-            }
-        ]
-    },
-    {
-        id: 2,
-        userId: 'user3',
-        nickname: 'NewBie',
-        profileUrl: 'https://via.placeholder.com/40/777',
-        content: '질문 2번 내용이 특히 공감되네요. 솔직함이 무기죠.',
-        date: '2025.11.08 09:10',
-        likes: 0,
-        isLiked: false,
-        replies: []
-    }
-];
+// === 전역 변수 및 초기 데이터 로드 ===
+const postId = document.getElementById('postId').value;
+const loginUserId = document.getElementById('loginUserId').value;
+const postPrice = parseInt(document.getElementById('postPrice').value || 0);
+let userBalance = parseInt(document.getElementById('userBalance').value || 0);
 
 // DOM 요소 참조
-const postHeartIcon = document.getElementById('postHeartIcon');
-const postLikeCountSpan = document.getElementById('postLikeCount');
-const btnPostLike = document.getElementById('btnPostLike');
-
 const commentListEl = document.getElementById('commentList');
 const commentTotalCountEl = document.getElementById('commentTotalCount');
 const mainCommentInput = document.getElementById('mainCommentInput');
-
-const authorActionArea = document.getElementById('authorActionArea');
-const btnEdit = document.getElementById('btnEdit');
-const btnDelete = document.getElementById('btnDelete');
+const postLikeCountSpan = document.getElementById('postLikeCount');
+const btnPostLike = document.getElementById('btnPostLike');
+const postHeartIcon = document.getElementById('postHeartIcon');
 
 // 초기화
 function init() {
-    updateBalanceDisplay();
-    checkAuthorPermissions();
-    renderComments();
+    loadComments(); // 댓글 목록 서버에서 불러오기
+    // checkIsLiked(); // (선택) 내가 이 글을 좋아요 했는지 체크하는 API 호출
 }
 
-// === 게시글 좋아요 ===
+// === 게시글 기능 ===
+
+// 좋아요 토글
 function togglePostLike() {
-    isPostLiked = !isPostLiked;
+    if (!loginUserId) return alert("로그인이 필요합니다.");
 
-    if (isPostLiked) {
-        postLikeCount++;
-        btnPostLike.classList.add('active');
-        postHeartIcon.classList.remove('fa-regular');
-        postHeartIcon.classList.add('fa-solid');
-    } else {
-        postLikeCount--;
-        btnPostLike.classList.remove('active');
-        postHeartIcon.classList.remove('fa-solid');
-        postHeartIcon.classList.add('fa-regular');
-    }
-    postLikeCountSpan.innerText = postLikeCount;
+    // TODO: 서버로 좋아요 요청 전송
+    fetch(`/api/posts/${postId}/like`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            // data.liked 여부에 따라 아이콘 및 숫자 갱신
+            if (data.liked) {
+                btnPostLike.classList.add('active');
+                postHeartIcon.classList.replace('fa-regular', 'fa-solid');
+            } else {
+                btnPostLike.classList.remove('active');
+                postHeartIcon.classList.replace('fa-solid', 'fa-regular');
+            }
+            postLikeCountSpan.innerText = data.count;
+        })
+        .catch(err => console.error("Like Error:", err));
 }
 
-// === 댓글 렌더링 ===
-function renderComments() {
+// 게시글 삭제
+function deletePost() {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    fetch(`/api/posts/${postId}`, { method: 'DELETE' })
+        .then(res => {
+            if (res.ok) {
+                alert('삭제되었습니다.');
+                location.href = '/blog/list'; // 목록 페이지로 이동
+            } else {
+                alert('삭제 실패');
+            }
+        });
+}
+
+// 팔로우 토글 (UI 로직만 유지, 실제 연동 시 API 필요)
+function toggleFollow(btn) {
+    if (!loginUserId) return alert("로그인이 필요합니다.");
+
+    // TODO: 팔로우 API 호출
+    // fetch(...)
+
+    const isFollowing = btn.classList.contains("following");
+    if (isFollowing) {
+        btn.innerText = "+ 팔로우";
+        btn.classList.remove("following");
+    } else {
+        btn.innerText = "✓ 팔로잉";
+        btn.classList.add("following");
+    }
+}
+
+// === 댓글 기능 (API 연동) ===
+
+// 1. 댓글 목록 불러오기
+function loadComments() {
+    // TODO: API 엔드포인트에 맞게 수정
+    fetch(`/api/posts/${postId}/comments`)
+        .then(res => res.json())
+        .then(data => {
+            renderComments(data); // 데이터를 받아서 그리는 함수
+        })
+        .catch(err => console.error("Comment Load Error:", err));
+}
+
+// 2. 댓글 렌더링
+function renderComments(comments) {
     commentListEl.innerHTML = '';
     let totalCount = 0;
 
+    // 댓글 구조에 맞게 순회 (계층형인지 평문형인지에 따라 로직 조정 필요)
+    // 여기서는 평탄화된 리스트라고 가정하거나, 백엔드에서 계층형으로 준다고 가정
     comments.forEach(comment => {
         totalCount++;
-        commentListEl.appendChild(createCommentElement(comment, false));
+        commentListEl.appendChild(createCommentElement(comment));
 
-        if (comment.replies && comment.replies.length > 0) {
-            comment.replies.forEach(reply => {
+        // 대댓글이 children 필드에 있다면 재귀적으로 처리 필요
+        if (comment.children && comment.children.length > 0) {
+            comment.children.forEach(reply => {
                 totalCount++;
-                commentListEl.appendChild(createCommentElement(reply, true, comment.id));
+                commentListEl.appendChild(createCommentElement(reply, true));
             });
         }
     });
@@ -113,19 +114,19 @@ function renderComments() {
     document.getElementById('commentCount').innerText = totalCount;
 }
 
-function createCommentElement(data, isReply, parentId = null) {
+// 댓글 HTML 생성
+function createCommentElement(data, isReply = false) {
     const el = document.createElement('div');
     el.className = `comment-item ${isReply ? 'reply' : ''}`;
     el.id = `comment-${data.id}`;
 
-    const isMine = data.userId === currentUser.id;
+    const isMine = String(data.userId) === String(loginUserId);
     const heartClass = data.isLiked ? 'fa-solid' : 'fa-regular';
     const activeClass = data.isLiked ? 'active' : '';
 
-    // [수정] 프로필 이미지와 닉네임에 링크 적용
     el.innerHTML = `
         <a href="/blog/${data.nickname}" class="profile-link">
-            <img src="${data.profileUrl}" alt="${data.nickname}" class="avatar">
+            <img src="${data.profileUrl || '/images/default_profile.png'}" alt="${data.nickname}" class="avatar">
         </a>
         <div class="comment-content">
             <div class="comment-header">
@@ -133,20 +134,20 @@ function createCommentElement(data, isReply, parentId = null) {
                     <a href="/blog/${data.nickname}" class="profile-link">
                         <span class="username">${data.nickname}</span>
                     </a>
-                    <span class="comment-date">${data.date}</span>
+                    <span class="comment-date">${data.createdDate}</span>
                 </div>
             </div>
             
             <div class="comment-text" id="text-${data.id}">${data.content}</div>
             
             <div class="comment-actions">
-                <button class="action-btn like-comment-btn ${activeClass}" onclick="toggleCommentLike(${data.id}, ${parentId})">
-                    <i class="${heartClass} fa-heart"></i> ${data.likes || 0}
+                <button class="action-btn like-comment-btn ${activeClass}" onclick="toggleCommentLike(${data.id})">
+                    <i class="${heartClass} fa-heart"></i> ${data.likeCount || 0}
                 </button>
                 ${!isReply ? `<button class="action-btn" onclick="openReplyForm(${data.id})">답글 달기</button>` : ''}
                 ${isMine ? `
-                    <button class="action-btn" onclick="enableEditMode(${data.id}, ${parentId})">수정</button>
-                    <button class="action-btn delete-btn" onclick="deleteComment(${data.id}, ${parentId})">삭제</button>
+                    <button class="action-btn" onclick="enableEditMode(${data.id})">수정</button>
+                    <button class="action-btn delete-btn" onclick="deleteComment(${data.id})">삭제</button>
                 ` : ''}
             </div>
             <div id="reply-form-area-${data.id}"></div>
@@ -155,52 +156,43 @@ function createCommentElement(data, isReply, parentId = null) {
     return el;
 }
 
-// === 댓글 CRUD ===
-
-// 1. 메인 댓글 작성
+// 3. 메인 댓글 작성
 function addMainComment() {
+    if (!loginUserId) return alert("로그인이 필요합니다.");
     const content = mainCommentInput.value.trim();
-    if (!content) {
-        alert("내용을 입력해주세요.");
-        return;
-    }
+    if (!content) return alert("내용을 입력해주세요.");
 
-    const newComment = {
-        id: Date.now(),
-        userId: currentUser.id,
-        nickname: currentUser.nickname,
-        profileUrl: currentUser.profileUrl,
+    const payload = {
+        postId: postId,
         content: content,
-        date: new Date().toLocaleString(),
-        likes: 0,
-        isLiked: false,
-        replies: []
+        parentId: null // 최상위 댓글
     };
 
-    comments.push(newComment);
-    mainCommentInput.value = '';
-    renderComments();
+    fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(res => {
+            if (res.ok) {
+                mainCommentInput.value = '';
+                loadComments(); // 목록 새로고침
+            } else {
+                alert('댓글 등록 실패');
+            }
+        });
 }
 
-// 2. 답글 폼 열기
+// 4. 답글 폼 열기 (HTML 생성)
 function openReplyForm(commentId) {
-    const area = document.getElementById(`reply-form-area-${commentId}`);
-    if (area.innerHTML !== '') {
-        area.innerHTML = '';
-        return;
-    }
+    if (!loginUserId) return alert("로그인이 필요합니다.");
 
+    // 기존 열린 폼 초기화
     document.querySelectorAll('[id^="reply-form-area-"]').forEach(el => el.innerHTML = '');
 
-    // [수정] 답글 폼 내 프로필에도 링크 적용
-    const formHtml = `
+    const area = document.getElementById(`reply-form-area-${commentId}`);
+    area.innerHTML = `
         <div class="reply-form-container">
-            <div class="comment-user-profile">
-                 <a href="/blog/${currentUser.nickname}" class="profile-link">
-                    <img src="${currentUser.profileUrl}" class="avatar" style="width:24px;height:24px;">
-                    <span class="username" style="font-size:0.85rem;">${currentUser.nickname}</span>
-                 </a>
-            </div>
             <div class="input-wrapper">
                 <textarea id="replyInput-${commentId}" placeholder="답글을 작성하세요..."></textarea>
                 <div class="input-footer">
@@ -209,188 +201,114 @@ function openReplyForm(commentId) {
             </div>
         </div>
     `;
-    area.innerHTML = formHtml;
 }
 
-// 3. 답글 작성 완료
+// 5. 답글 등록
 function addReply(parentId) {
     const input = document.getElementById(`replyInput-${parentId}`);
     const content = input.value.trim();
     if (!content) return alert("내용을 입력하세요.");
 
-    const parentComment = comments.find(c => c.id === parentId);
-    if (parentComment) {
-        const newReply = {
-            id: Date.now(),
-            userId: currentUser.id,
-            nickname: currentUser.nickname,
-            profileUrl: currentUser.profileUrl,
-            content: content,
-            date: new Date().toLocaleString(),
-            likes: 0,
-            isLiked: false
-        };
-        parentComment.replies.push(newReply);
-        renderComments();
-    }
+    const payload = {
+        postId: postId,
+        content: content,
+        parentId: parentId
+    };
+
+    fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(res => {
+        if (res.ok) loadComments();
+        else alert('답글 등록 실패');
+    });
 }
 
-// 4. 댓글 좋아요
-function toggleCommentLike(id, parentId) {
-    let target;
-    if (parentId) {
-        const parent = comments.find(c => c.id === parentId);
-        target = parent.replies.find(r => r.id === id);
-    } else {
-        target = comments.find(c => c.id === id);
-    }
-
-    if (target) {
-        target.isLiked = !target.isLiked;
-        target.likes += target.isLiked ? 1 : -1;
-        renderComments();
-    }
-}
-
-// 5. 댓글 삭제
-function deleteComment(id, parentId) {
+// 6. 댓글 삭제
+function deleteComment(commentId) {
     if (!confirm("정말 삭제하시겠습니까?")) return;
 
-    if (parentId) {
-        const parent = comments.find(c => c.id === parentId);
-        parent.replies = parent.replies.filter(r => r.id !== id);
-    } else {
-        comments = comments.filter(c => c.id !== id);
-    }
-    renderComments();
+    fetch(`/api/comments/${commentId}`, { method: 'DELETE' })
+        .then(res => {
+            if (res.ok) loadComments();
+            else alert('삭제 실패');
+        });
 }
 
-// 6. 댓글 수정 모드 (버튼 숨김)
-function enableEditMode(id, parentId) {
+// 7. 댓글 수정 (UI 모드 전환)
+function enableEditMode(id) {
     const textEl = document.getElementById(`text-${id}`);
     const currentText = textEl.innerText;
 
     textEl.innerHTML = `
         <textarea id="editInput-${id}" class="edit-textarea">${currentText}</textarea>
         <div style="text-align:right;">
-            <button class="action-btn" onclick="saveEdit(${id}, ${parentId})" style="display:inline-block; color:var(--primary-color);">저장</button>
-            <button class="action-btn" onclick="renderComments()" style="display:inline-block;">취소</button>
+            <button class="action-btn" onclick="saveEdit(${id})" style="color:var(--primary-color);">저장</button>
+            <button class="action-btn" onclick="loadComments()">취소</button>
         </div>
     `;
-
-    // 수정 중 하단 액션 버튼 숨기기
-    const commentItem = document.getElementById(`comment-${id}`);
-    const actionArea = commentItem.querySelector('.comment-actions');
-    if (actionArea) {
-        actionArea.style.display = 'none';
-    }
 }
 
-// 7. 댓글 수정 저장
-function saveEdit(id, parentId) {
+function saveEdit(id) {
     const newContent = document.getElementById(`editInput-${id}`).value;
 
-    if (parentId) {
-        const parent = comments.find(c => c.id === parentId);
-        const target = parent.replies.find(r => r.id === id);
-        target.content = newContent;
-    } else {
-        const target = comments.find(c => c.id === id);
-        target.content = newContent;
-    }
-    renderComments();
+    fetch(`/api/comments/${id}`, {
+        method: 'PUT', // or PATCH
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newContent })
+    }).then(res => {
+        if (res.ok) loadComments();
+        else alert('수정 실패');
+    });
 }
 
-// === 유틸 함수 ===
-function updateBalanceDisplay() {
-    document.getElementById('userBalance').innerText = userCoffeeBeans.toLocaleString() + '콩';
-}
-
-function closeAllModals() {
-    document.getElementById('modalOverlay').classList.add('hidden');
-    document.getElementById('modalPurchase').classList.add('hidden');
-    document.getElementById('modalNoBalance').classList.add('hidden');
-    document.getElementById('modalSuccess').classList.add('hidden');
-    document.getElementById('modalReport').classList.add('hidden');
-}
+// === 유료 결제 및 모달 관련 ===
 
 function openPurchaseModal() {
+    if (!loginUserId) return alert("로그인이 필요합니다.");
     document.getElementById('modalOverlay').classList.remove('hidden');
     document.getElementById('modalPurchase').classList.remove('hidden');
 }
 
+function closeAllModals() {
+    document.getElementById('modalOverlay').classList.add('hidden');
+    document.querySelectorAll('.modal-box').forEach(box => box.classList.add('hidden'));
+}
+
 function processPayment() {
     document.getElementById('modalPurchase').classList.add('hidden');
-    if (userCoffeeBeans >= contentPrice) {
-        document.getElementById('modalSuccess').classList.remove('hidden');
-    } else {
+
+    if (userBalance < postPrice) {
         document.getElementById('modalNoBalance').classList.remove('hidden');
+        return;
     }
-}
 
-function completePurchase() {
-    closeAllModals();
-    userCoffeeBeans -= contentPrice;
-    updateBalanceDisplay();
-    document.getElementById('articleContent').classList.remove('locked');
-}
-
-function toggleFollow(btn) {
-    isFollowing = !isFollowing;
-    if (isFollowing) {
-        btn.innerText = "✓ 팔로잉";
-        btn.classList.add("following");
-    } else {
-        btn.innerText = "+ 팔로우";
-        btn.classList.remove("following");
-    }
+    // 서버로 결제 요청
+    fetch('/api/payment/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId: postId, amount: postPrice })
+    })
+        .then(res => {
+            if (res.ok) {
+                document.getElementById('modalSuccess').classList.remove('hidden');
+            } else {
+                alert("결제 처리 중 오류가 발생했습니다.");
+            }
+        });
 }
 
 function openReportModal() {
+    if (!loginUserId) return alert("로그인이 필요합니다.");
     document.getElementById('modalOverlay').classList.remove('hidden');
     document.getElementById('modalReport').classList.remove('hidden');
 }
 
 function submitReport() {
+    // TODO: 신고 API 호출
     alert("신고가 접수되었습니다.");
     closeAllModals();
-}
-
-function checkAuthorPermissions() {
-    if (!isAuthor) {
-        authorActionArea.classList.add('hidden');
-        return;
-    }
-    authorActionArea.classList.remove('hidden');
-
-    if (isPaidContent) {
-        btnEdit.disabled = true;
-        btnEdit.title = "유료 게시글은 수정할 수 없습니다.";
-    } else {
-        btnEdit.disabled = false;
-        btnEdit.title = "";
-    }
-
-    if (viewCount > 0) {
-        btnDelete.disabled = true;
-        btnDelete.title = "조회수가 있어 삭제 불가";
-    } else {
-        btnDelete.disabled = false;
-        btnDelete.onclick = function () {
-            if (confirm('삭제하시겠습니까?')) alert('삭제됨');
-        }
-    }
-}
-
-function setBalance(amount) {
-    userCoffeeBeans = amount;
-    updateBalanceDisplay();
-}
-
-function toggleAuthorMode() {
-    isAuthor = document.getElementById('checkAuthor').checked;
-    isPaidContent = document.getElementById('checkPaid').checked;
-    checkAuthorPermissions();
 }
 
 // 실행
