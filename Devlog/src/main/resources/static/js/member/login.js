@@ -59,8 +59,8 @@ if (loginFrm != null) {
         .then(data => {
             console.log('로그인 성공:', data);
             // 메인 페이지로 이동
-            //window.location.href = '/'; //  브라우저가 해당 URL로 새로 요청 -> 현재 페이지에서 / 경로로 브라우저가 이동 (redirect)
-            window.location.href = '/member/login'; //  브라우저가 해당 URL로 새로 요청 -> 현재 페이지에서 / 경로로 브라우저가 이동 (redirect)
+            window.location.href = '/'; //  브라우저가 해당 URL로 새로 요청 -> 현재 페이지에서 / 경로로 브라우저가 이동 (redirect)
+            //window.location.href = '/member/login'; //  session.loginMember 갱신 테스트용
             // 클라이언트 측에서 페이지 이동이 일어나므로 redirect 동작
         })
         .catch(error => {
