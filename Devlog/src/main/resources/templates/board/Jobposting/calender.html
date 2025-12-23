@@ -6,26 +6,31 @@
   <title>IT 채용 정보 캘린더</title>
   <script th:src=@{https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js}></script>
   <link rel="stylesheet" th:href="@{https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap}">
+  <link rel="stylesheet" th:href="@{/css/common/common.css}" />
+  <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
   <link rel="stylesheet" th:href="@{/css/board/Jobposting/calender.css}">
-  <link rel="stylesheet" th:href="@{/css/common/main.css}" />
 
 
 </head>
 
 <body>
-  <div th:replace="common/header :: header"></div>
+  <main class="calendar-body">
+    <div th:replace="common/header :: header"></div>
+    <script th:src="@{/js/common/header.js}"></script>
 
-  <div class="calendar-container">
-    <div class="calendar-header">
-      <h1>IT 채용 정보</h1>
-      <p>최신 공고를 한 눈에 모아보세요!</p>
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <h1>IT 채용 정보</h1>
+        <p>최신 공고를 한 눈에 모아보세요!</p>
+      </div>
+
+      <div id="calendar"></div>
     </div>
 
-    <div id="calendar"></div>
-  </div>
-
-  <script th:src="@{/js/board/Jobposting/calender.js}"></script>
-  <div th:replace="common/footer :: footer"></div>
+    <div th:replace="common/footer :: footer"></div>
+    <script th:src="@{/js/board/Jobposting/calender.js}"></script>
+    <script th:src="@{/js/notification/noti.js}"></script>
+  </main>
 </body>
 
 </html>
