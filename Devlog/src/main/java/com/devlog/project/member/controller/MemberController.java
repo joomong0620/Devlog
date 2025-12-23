@@ -255,23 +255,5 @@ public class MemberController {
 	    return ResponseEntity.ok().build();
 	}
 	
-	@PostMapping("/signUpTest") // Postman test용: {} 나오면 Postman 문제, 값나오면 DTO문제
-	public ResponseEntity<?> test(@RequestBody Map<String, Object> body) {
-	    System.out.println("BODY = " + body);
-	    return ResponseEntity.ok().build();
-	}
-	
-	@PostMapping("/signUp-debug")// Postman test용
-	public ResponseEntity<?> debug(HttpServletRequest request) throws Exception {
-
-	    String body = request.getReader()
-	            .lines()
-	            .collect(Collectors.joining("\n"));
-
-	    System.out.println("RAW BODY >>> " + body);
-
-	    return ResponseEntity.ok().build();
-	}
-	
 	
 }
