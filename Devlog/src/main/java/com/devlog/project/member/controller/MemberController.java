@@ -79,7 +79,8 @@ public class MemberController {
     		Model model,
             @RequestParam(value="saveId", required=false) String saveId,
 			HttpServletResponse resp,          
-			HttpServletRequest request
+			HttpServletRequest request,
+			SessionStatus status   // @SessionAttributes 기반 old loginMember 제거용, placeholder
     ) {
     	
     	try {
@@ -128,6 +129,10 @@ public class MemberController {
 	        // --------------------------------------------------
 			// 로그인 성공 시 response DTO에 로그인회원정보 담겨있다
 			// 1) 세션에 로그인한 회원 정보 추가
+	        
+	        // Model 기반 SessionAttributes 제거 (old loginMember 제거)
+	        //status.setComplete();
+	        
 	        // 세션 고정 공격 방지 + 이전 사용자 정보 제거
 	        HttpSession oldSession = request.getSession(false);
 	        if (oldSession != null) {
@@ -193,7 +198,8 @@ public class MemberController {
 		status.setComplete(); // @SessionAttributes 제거
 	    logout(request);
 	    System.out.println("###%%%@@@ 로그아웃 성공 (GET)");
-	    return "redirect:/member/login";
+	    //return "redirect:/member/login";
+	    return "redirect:/";
 	}
 
 	// POST - REST API 방식
