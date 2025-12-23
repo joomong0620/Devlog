@@ -21,7 +21,7 @@ public class ChatRestController {
 	@GetMapping("/devtalk/chatList")
 	public List<ChattingListDTO> selectChatList(){
 		
-		Long memberNo = 1l;
+		int memberNo = 1;
 		
 		List<ChattingListDTO> chatList = chattingService.selectChatList(memberNo);
 		

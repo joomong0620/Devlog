@@ -17,7 +17,7 @@ public interface ChattingRepository extends JpaRepository<ChattingUser, Chatting
 
 	@Query(value = """
 			
-			SELECT
+			SELECT 
 				CR.CHATTING_ROOM_NO AS "chattingRoomNo",
 				CR.ROOM_TYPE AS "roomType",
 				CU.PINNED_YN AS "pinnedYn",
@@ -28,7 +28,7 @@ public interface ChattingRepository extends JpaRepository<ChattingUser, Chatting
 														AND U2.MEMBER_NO != :memberNo)
 					ELSE CR.CHATTING_ROOM_NAME
 				END AS "displayName",
-
+				
 				CASE
 					WHEN CR.ROOM_TYPE = 'PRIVATE' THEN (SELECT PROFILE_IMG FROM MEMBER M2
 														JOIN CHATTING_USER U2 ON M2.MEMBER_NO = U2.MEMBER_NO
@@ -38,7 +38,9 @@ public interface ChattingRepository extends JpaRepository<ChattingUser, Chatting
 				END AS "roomImg",
 
 				M.MESSAGE_CONTENT AS "lastMessage",
+				
 				M.SEND_TIME AS "lastMessageAt",
+				
 				(SELECT COUNT(*) FROM MESSAGE M2
 					WHERE M2.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO
 					AND M2.MESSAGE_NO > CU.LAST_READ_NO) AS "unreadCount"
@@ -52,6 +54,6 @@ public interface ChattingRepository extends JpaRepository<ChattingUser, Chatting
 			WHERE m.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO)
 			WHERE CU.MEMBER_NO = :memberNo
 			""", nativeQuery = true)
-	List<ChattingListDTO> selectChatList(@Param("memberNo") Long memberNo);
+	List<Object[]> selectChatList(@Param("memberNo") int memberNo);
 
 }

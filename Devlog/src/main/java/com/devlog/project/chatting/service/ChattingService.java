@@ -7,6 +7,6 @@ import com.devlog.project.chatting.dto.ChattingListDTO;
 public interface ChattingService {
 	
 	// 채팅방 목록 조회
-	List<ChattingListDTO> selectChatList(Long memberNo);
+	List<ChattingListDTO> selectChatList(int memberNo);
 
 }

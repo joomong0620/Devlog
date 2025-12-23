@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.devlog.project.chatting.dto.ChattingListDTO;
+import com.devlog.project.chatting.mapper.ChattingMapper;
 import com.devlog.project.chatting.repository.ChattingRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -14,13 +15,17 @@ import lombok.RequiredArgsConstructor;
 public class ChattingServiceImpl implements ChattingService {
 	
 	private final ChattingRepository chattingRepository;
+	private final ChattingMapper chatMapper;
 	
 	
 	@Override
-	public List<ChattingListDTO> selectChatList(Long memberNo) {
+	public List<ChattingListDTO> selectChatList(int memberNo) {
 		
-		List<ChattingListDTO> list = chattingRepository.selectChatList(memberNo);
-		return list;
+		List<Object[]> list = chattingRepository.selectChatList(memberNo);
+		
+		System.out.println(list);
+		
+		return null;
 	}
 
 }

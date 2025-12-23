@@ -8,8 +8,10 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class ChattingUserId implements Serializable {
 	
+	
+	
 	@Column(name = "CHATTING_ROOM_NO")
-	private int roomNo;
+	private Long roomNo;
 	
 	@Column(name = "MEMBER_NO")
 	private int memberNo;

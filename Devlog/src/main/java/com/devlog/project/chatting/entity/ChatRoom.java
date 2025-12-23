@@ -29,7 +29,7 @@ public class ChatRoom {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long chattingRoomNo;
 	
-	@Column(name = "CHATTING_ROOM_NAME", nullable = false, length = 50)
+	@Column(name = "CHATTING_ROOM_NAME", nullable = true, length = 50)
     private String chattingRoomName;
 
     @Column(name = "CREATE_DATE", nullable = false)
@@ -37,6 +37,9 @@ public class ChatRoom {
 
     @Column(name = "ROOM_TYPE", nullable = false, length = 30)
     private String roomType;
+    
+    @Column(name = "ROOM_IMG", nullable = true, length = 255)
+    private String roomImg;
     
     
     
