@@ -79,7 +79,8 @@ public class MemberController {
     		Model model,
             @RequestParam(value="saveId", required=false) String saveId,
 			HttpServletResponse resp,          
-			HttpServletRequest request
+			HttpServletRequest request,
+			SessionStatus status   // @SessionAttributes 기반 old loginMember 제거용, placeholder
     ) {
     	
     	try {
@@ -101,9 +102,9 @@ public class MemberController {
 	        System.out.println(saveId);
 	        System.out.println("===== 인증 성공 =====");
 	        //log.info("##### userDetails: {}", userDetails); // 
-	        System.out.println("userDetails 타입: " + userDetails.getClass().getName());
-	        System.out.println("##### userDetails: ");
-	        System.out.println(userDetails);
+	        //System.out.println("userDetails 타입: " + userDetails.getClass().getName());
+	        //System.out.println("##### userDetails: ");
+	        //System.out.println(userDetails);
 	        // 상세하게 출력
 	        System.out.println("memberNo: " + userDetails.getMember().getMemberNo());
 	        System.out.println("memberEmail: " + userDetails.getMember().getMemberEmail());
@@ -128,6 +129,10 @@ public class MemberController {
 	        // --------------------------------------------------
 			// 로그인 성공 시 response DTO에 로그인회원정보 담겨있다
 			// 1) 세션에 로그인한 회원 정보 추가
+	        
+	        // Model 기반 SessionAttributes 제거 (old loginMember 제거)
+	        //status.setComplete();
+	        
 	        // 세션 고정 공격 방지 + 이전 사용자 정보 제거
 	        HttpSession oldSession = request.getSession(false);
 	        if (oldSession != null) {
@@ -149,9 +154,9 @@ public class MemberController {
 			// 클라이언트가 어떤 요청을 할 때 쿠키가 첨부될지 경로(주소)를 지정
 			cookie.setPath("/"); // localhost/ 이하의 모든 주소 ex) /, /member/login, /member/logout 등 모든 요청에 쿠키 첨부
 			
-			System.out.println("saveId and cookie");
-	        System.out.println(saveId);
-	        System.out.println(cookie);
+			//System.out.println("saveId and cookie");
+	        //System.out.println(saveId);
+	        //System.out.println(cookie);
 			// 응답 객체(HttpServletResponse)을 이용해서 만들어진 쿠키를 클라이언트에게 전달
 			resp.addCookie(cookie); // @ResponseBody, ResponseEntity, Spring Security 여부와 전혀 상관없이 동작(HTTP 레벨에서의 동작=>쿠키는 Body가 아니라 Header(HTTP Response Header; HTTP 표준 헤더)로 전달)
 			
@@ -193,7 +198,8 @@ public class MemberController {
 		status.setComplete(); // @SessionAttributes 제거
 	    logout(request);
 	    System.out.println("###%%%@@@ 로그아웃 성공 (GET)");
-	    return "redirect:/member/login";
+	    //return "redirect:/member/login";
+	    return "redirect:/";
 	}
 
 	// POST - REST API 방식
