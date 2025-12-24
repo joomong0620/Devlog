@@ -1,5 +1,5 @@
 package com.devlog.project.board.blog.service;
 
-public class BlogService {
+public interface BlogService {
 
 }
