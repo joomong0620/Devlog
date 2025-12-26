@@ -65,8 +65,21 @@ public class fileUploadConfig implements WebMvcConfigurer {
 		String webPath = "/images/**";
 		
 		// 실제로 자원이 저장되어있는 로컬 경로
-		String resourcePath = "file:///C:/DevlogImg/"; 
+		//String resourcePath = "file:///C:/DevlogImg/"; 
+		String resourcePath;
 		
+	    String osName = System.getProperty("os.name").toLowerCase();
+
+	    if (osName.contains("win")) {
+	        // Windows
+	        resourcePath = "file:///C:/DevlogImg/";
+	    } else if (osName.contains("mac")) {
+	        // macOS
+	        resourcePath = "file:///MacUsers/soyeon/DevlogImg/";
+	    } else {
+	        // Linux (Ubuntu 22.04 포함)
+	        resourcePath = "file:///home/yypark/C:/DevlogImg/";
+	    }		
 		
 		registry.addResourceHandler(webPath).addResourceLocations(resourcePath);
 		
