@@ -196,7 +196,7 @@ section {
 /* ===== 활동중인 친구들 ===== */
 .active-friends {
   flex: 1.2;
-  padding: 28px 30px;
+  padding: 85px 30px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

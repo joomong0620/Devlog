@@ -18,7 +18,7 @@
         </button>
 
         <!-- 사이드바 -->
-        <a class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar">
           <div class="sidebar-header">
             <img th:src="@{/images/common/devlog.svg}" alt="logo" class="sidebar-logo theme-icon" />
             <span class="sidebar-title">DevLog</span>
@@ -26,7 +26,12 @@
 
           <nav class="sidebar-menu">
             <ul>
-              <li><img th:src="@{/images/common/home.svg}" alt="home" /> Home</li>
+              <li>
+                <a th:href="@{/}" class="sidebar-link">
+                  <img th:src="@{/images/common/home.svg}" alt="home" />
+                  <span>Home</span>
+                </a>
+              </li>
               <li><img th:src="@{/images/common/dashboard.svg}" alt="dashboard" /> Dashboard</li>
       
               <h4>Community</h4>
@@ -71,19 +76,19 @@
               <li><img th:src="@{/images/common/logout.svg}" alt="logout" /> Logout</li>
             </ul>
           </nav>
-        </a>
+        </aside>
 
         <!-- 배경 오버레이 -->
         <div class="overlay" id="overlay"></div>
 
         <!-- 로고 -->
-        <div class="logo">
+        <a th:href="@{/}" class="logo">
           <img th:src="@{/images/common/devlog.svg}" alt="logo" class="logo-ico theme-icon" />
           <div class="logo-text">
             <span class="logo-sub">상상하는 모든 것을 기록하는 공간</span>
             <span class="logo-t">DevLog</span>
           </div>
-        </div>
+        </a>
       </div>
 
       <!-- 오른쪽 영역 -->
