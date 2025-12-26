@@ -1,7 +1,5 @@
 package com.devlog.project.chatting.entity;
 
-import java.time.LocalDateTime;
-
 import com.devlog.project.member.model.entity.Member;
 
 import jakarta.persistence.Column;
@@ -12,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -22,37 +19,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "MESSAGE_IMG")
+@Table(name = "MESSAGE_EMOJI")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-public class MessageImage {
+@Entity
+public class MessageEmoji {
+	
 	
 	@Id
-	@Column(name = "MSG_IMG_NO")
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "msg_image_seq")  
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reaction_seq")  
 	@SequenceGenerator(																// 
-	    name = "msg_image_seq",
-	    sequenceName = "SEQ_MSG_IMG_NO",
+	    name = "reaction_seq",
+	    sequenceName = "SEQ_REACTION_NO",
 	    allocationSize = 1)
-	private Long msgImageNo;
+	private Long reactionNo;
 	
+	@JoinColumn(name = "MESSAGE_NO", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Message message;
 	
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "MESSAGE_NO")
-    private Message message;
+	@JoinColumn(name = "EMOJI_CODE", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Emoji emoji;
 	
-	
-	@Column(name = "IMG_PATH")
-	private String imgPath;
-	
-	@Column(name = "ORIGIN_NAME")
-	private String original;
-	
-	@Column(name = "RENAME_NAME")
-	private String rename;
+	@JoinColumn(name = "MEMBER_NO", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member member;
 
 }

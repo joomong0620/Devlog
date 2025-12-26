@@ -1,0 +1,48 @@
+package com.devlog.project.chatting.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.devlog.project.chatting.dto.MessageDTO;
+import com.devlog.project.chatting.entity.Message;
+
+@Repository
+public interface MessageRepository extends JpaRepository<Message, Long> {
+	
+	
+	// 메세지 목록 조회함수
+	@Query("""
+			SELECT new com.devlog.project.chatting.dto.MessageDTO(
+			    m.messageNo,
+			    m.member.memberNo,
+			    mem.memberNickname,
+			    mem.profileImg,
+			    m.type,
+			    m.messageContent,
+			    mi.imgPath,
+			    m.sendTime,
+			    m.status,
+			    (
+			        SELECT COUNT(cu)
+			        FROM ChattingUser cu
+			        WHERE cu.chatUserId.roomNo = m.chattingRoom.roomNo
+			          AND cu.chatUserId.memberNo <> m.member.memberNo
+			          AND cu.lastReadNo < m.messageNo
+			    ),
+			    CASE WHEN m.member.memberNo = :memberNo THEN 1 ELSE 0 END
+			)
+			FROM Message m
+			JOIN m.member mem
+			LEFT JOIN m.messageImg mi
+			WHERE m.chattingRoom.roomNo = :roomNo
+			ORDER BY m.messageNo
+			""")
+
+
+	List<MessageDTO> findByMessageList(Long roomNo, Long memberNo);
+	
+	
+}

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.ibatis.javassist.bytecode.stackmap.BasicBlock.Catch;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,8 @@ import com.devlog.project.chatting.chatenums.ChatEnums;
 import com.devlog.project.chatting.dto.ChattingDTO.FollowListDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.GroupCreateDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.RoomInfoDTO;
+import com.devlog.project.chatting.dto.EmojiDTO;
+import com.devlog.project.chatting.dto.MessageDTO;
 import com.devlog.project.chatting.dto.ParticipantDTO;
 import com.devlog.project.chatting.entity.ChatRoom;
 import com.devlog.project.chatting.entity.ChattingUser;
@@ -24,6 +27,8 @@ import com.devlog.project.chatting.entity.ChattingUserId;
 import com.devlog.project.chatting.mapper.ChattingMapper;
 import com.devlog.project.chatting.repository.ChatRoomRepository;
 import com.devlog.project.chatting.repository.ChattingUserRepository;
+import com.devlog.project.chatting.repository.EmojiRepository;
+import com.devlog.project.chatting.repository.MessageRepository;
 import com.devlog.project.common.utility.Util;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.MemberRepository;
@@ -42,10 +47,16 @@ public class ChattingServiceImpl implements ChattingService {
 
 	private final ChattingMapper chatMapper;
 	private final MemberRepository memberRepository;
-
-
-	String filePath = "C:/workspace/Devlog-Project/Devlog/src/main/resources/static/images/chatprofile/";
-	String webPath = "/images/chatprofile/";
+	
+	private final MessageRepository messageRepository;
+	private final EmojiRepository emojiRepository;
+	
+	
+	@Value("${my.chatprofile.location}")
+	private String filePath;
+	
+	@Value("${my.chatprofile.webpath}")
+	private String webPath;
 
 	// 채팅방 목록 조회
 	@Override
@@ -209,7 +220,7 @@ public class ChattingServiceImpl implements ChattingService {
 	
 	// 채팅방 정보 조회
 	@Override
-	public RoomInfoDTO roomInfoLoad(Long roomNo) {
+	public RoomInfoDTO roomInfoLoad(Long roomNo, Long memberNo) {
 		
 		RoomInfoDTO roomInfo = new RoomInfoDTO();
 		
@@ -225,6 +236,23 @@ public class ChattingServiceImpl implements ChattingService {
 		List<ParticipantDTO> users = chattingUserRepository.findByParticipants(roomNo);
 		
 		log.info("참여회원 목록 조회 결과 : {}", users);
+		
+		// 3. 메세지 목록 조회
+		// List<MessageDTO> messageList = 
+		List<MessageDTO> message = messageRepository.findByMessageList(roomNo, memberNo);
+		
+		log.info("메세지 목록 조회 결과 : {}", message);
+		
+		// 3-1 메세지에 달린 이모지 조회
+		// 메세지 번호들 꺼내오기
+		List<Long> messageNos = message.stream()
+					.map(MessageDTO::getMessageNo)
+					.toList();
+		
+		List<EmojiDTO> emojiCount = emojiRepository.findEmojiCount(messageNos);
+		
+		log.info("이모지 개수 확인 : {}", emojiCount);
+		
 		
 		return null;
 	}

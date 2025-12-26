@@ -105,7 +105,9 @@ public class ChatRestController {
 			@RequestParam("roomNo") Long roomNo,
 			Model model) {
 		
-		ChattingDTO.RoomInfoDTO roomInfo = chattingService.roomInfoLoad(roomNo);
+		Long memberNo = 1l;
+		
+		ChattingDTO.RoomInfoDTO roomInfo = chattingService.roomInfoLoad(roomNo, memberNo);
 		
 		
 		

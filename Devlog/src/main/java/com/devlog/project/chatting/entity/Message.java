@@ -1,6 +1,7 @@
 package com.devlog.project.chatting.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.devlog.project.chatting.chatenums.MsgEnums;
 import com.devlog.project.member.model.entity.Member;
@@ -15,6 +16,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -69,6 +72,10 @@ public class Message {
     @Enumerated(EnumType.STRING)
     @Column(name = "MESSAGE_STATUS", nullable = true, length = 30)
     private MsgEnums.MsgStatus status; // 수정 / 삭제
+    
+    
+    @OneToOne(mappedBy = "message", fetch = FetchType.LAZY)
+    private MessageImage messageImg;
     
     
     @PrePersist

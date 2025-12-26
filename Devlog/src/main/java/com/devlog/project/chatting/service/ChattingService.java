@@ -26,7 +26,7 @@ public interface ChattingService {
 	
 	
 	// 채팅방 정보 조회
-	RoomInfoDTO roomInfoLoad(Long roomNo);
+	RoomInfoDTO roomInfoLoad(Long roomNo, Long memberNo);
 	
 
 }

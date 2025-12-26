@@ -26,7 +26,7 @@
 				END AS "roomImg",
 
 				M.MESSAGE_CONTENT AS "lastMessage",
-				M.SEND_TIME AS "lastMessageAt",
+				TRUNC(M.SEND_TIME, 'MI') AS "lastMessageAt",
 				(SELECT COUNT(*) FROM MESSAGE M2
 					WHERE M2.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO
 					AND M2.MESSAGE_NO > CU.LAST_READ_NO) AS "unreadCount"
