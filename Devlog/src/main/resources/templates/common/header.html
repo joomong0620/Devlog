@@ -234,23 +234,23 @@
             </div>
         </div>
         <!-- 비회원일 시 -->
-        <button th:if="${loginMember == null}"
+        <button th:if="${session.loginMember == null}"
                 id="signinBtn"
                 class="signin-btn">
           Sign in
         </button>
 
         <!-- 회원일 시 -->
-        <div th:if="${loginMember != null}"
+        <div th:if="${session.loginMember != null}"
             class="profile"
             id="profile">
 
-          <img th:src="${loginMember.profileImg != null 
-                        ? loginMember.profileImg 
+          <img th:src="${session.loginMember.profileImg != null 
+                        ? session.loginMember.profileImg 
                         : '/images/common/d1.png'}"
               alt="profile" />
 
-          <span th:text="${loginMember.memberNickname}">
+          <span th:text="${session.loginMember.memberNickname}">
             My
           </span>
 
