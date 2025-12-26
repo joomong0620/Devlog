@@ -14,13 +14,13 @@
       <div class="hd-l">
         <!-- 메뉴 버튼 -->
         <button class="menu-btn" id="menuBtn" aria-label="menu">
-          <img th:src="@{/images/common/menu.svg}" alt="menu" />
+          <img th:src="@{/images/common/menu.svg}" class="theme-icon" alt="menu" />
         </button>
 
         <!-- 사이드바 -->
         <a class="sidebar" id="sidebar">
           <div class="sidebar-header">
-            <img th:src="@{/images/common/devlog.svg}" alt="logo" class="sidebar-logo" />
+            <img th:src="@{/images/common/devlog.svg}" alt="logo" class="sidebar-logo theme-icon" />
             <span class="sidebar-title">DevLog</span>
           </div>
 
@@ -41,8 +41,32 @@
               <li><img th:src="@{/images/common/book.svg}" alt="book" /> 관련 서적</li>
       
               <hr/>
-      
-              <li><img th:src="@{/images/common/mode.svg}" alt="mode" /> Mode</li>
+
+              <!-- 다크모드로 전환 -->
+              <!-- <li class="mode-item">
+                <button class="mode-toggle" id="darkModeBtn" aria-label="dark mode toggle">
+                  <span class="icon sun">
+                    <img th:src="@{/images/common/sun.svg}" alt="light mode" />
+                  </span>
+                  <span class="icon moon">
+                    <img th:src="@{/images/common/moon.svg}" alt="dark mode" />
+                  </span>
+                  <span class="mode-text">Mode</span>
+                </button>
+              </li> -->
+              <li class="mode-item">
+                <button class="mode-toggle" id="darkModeBtn" aria-label="dark mode toggle">
+                  <span class="mode-icon">
+                    <span class="icon sun">
+                      <img th:src="@{/images/common/sun.svg}" alt="light mode" />
+                    </span>
+                    <span class="icon moon">
+                      <img th:src="@{/images/common/moon.svg}" alt="dark mode" />
+                    </span>
+                  </span>
+                  <span class="mode-text">Mode</span>
+                </button>
+              </li>
               <li><img th:src="@{/images/common/settings.svg}" alt="settings" /> Settings</li>
               <li><img th:src="@{/images/common/logout.svg}" alt="logout" /> Logout</li>
             </ul>
@@ -54,7 +78,7 @@
 
         <!-- 로고 -->
         <div class="logo">
-          <img th:src="@{/images/common/devlog.svg}" alt="logo" class="logo-ico" />
+          <img th:src="@{/images/common/devlog.svg}" alt="logo" class="logo-ico theme-icon" />
           <div class="logo-text">
             <span class="logo-sub">상상하는 모든 것을 기록하는 공간</span>
             <span class="logo-t">DevLog</span>
@@ -68,13 +92,13 @@
         <div class="search">
           <input type="text" placeholder="여기에 검색어를 입력하세요."/>
           <button aria-label="search">
-            <img th:src="@{/images/common/search.svg}" alt="search"/>
+            <img th:src="@{/images/common/search.svg}" class="theme-icon" alt="search"/>
           </button>
         </div>
 
         <!-- 알림 -->
         <button class="btn-ico" id="noti-btn" aria-label="notification">
-            <img th:src="@{/images/common/notifications.svg}" alt="notification" />
+            <img th:src="@{/images/common/notifications.svg}" class="theme-icon" alt="notification" />
         </button>
 
         <div class="alarm-panel display-none">
@@ -210,23 +234,23 @@
             </div>
         </div>
         <!-- 비회원일 시 -->
-        <button th:if="${loginMember == null}"
+        <button th:if="${session.loginMember == null}"
                 id="signinBtn"
                 class="signin-btn">
           Sign in
         </button>
 
         <!-- 회원일 시 -->
-        <div th:if="${loginMember != null}"
+        <div th:if="${session.loginMember != null}"
             class="profile"
             id="profile">
 
-          <img th:src="${loginMember.profileImg != null 
-                        ? loginMember.profileImg 
+          <img th:src="${session.loginMember.profileImg != null 
+                        ? session.loginMember.profileImg 
                         : '/images/common/d1.png'}"
               alt="profile" />
 
-          <span th:text="${loginMember.memberNickname}">
+          <span th:text="${session.loginMember.memberNickname}">
             My
           </span>
 

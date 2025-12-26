@@ -153,13 +153,12 @@ latestPosts.forEach((post) => {
 
 // 활동중인 친구 목록 나중에 요청으로 바꿀거임 지금은 그냥 더미
 const activeFriends = [
-  { img: "friend1.png", name: "짱구" },
-  { img: "friend2.png", name: "예솔" },
-  { img: "friend3.jpeg", name: "주몽" },
-  { img: "friend1.png", name: "훈이" },
-  { img: "friend1.png", name: "맹구" },
-  { img: "friend1.png", name: "나비" },
-  { img: "friend1.png", name: "도라미" },
+  { img: "/images/common/profile2.jpeg", name: "유저일" },
+  { img: "/images/common/profile4.jpg", name: "유저이" },
+  { img: "/images/common/profile1.png", name: "유저삼" },
+  { img: "/images/common/profile5.png", name: "유저사" },
+  { img: "/images/common/profile6.png", name: "유저일오" },
+  { img: "/images/common/profile3.jpg", name: "유저이이" },
 ];
 
 const friendsList = document.getElementById("friendsList");
