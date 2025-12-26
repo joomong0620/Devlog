@@ -4,6 +4,7 @@
   box-sizing: border-box;
 }
 
+
 button {
   border: none;
   background: none;
@@ -32,8 +33,7 @@ img {
 /* ===== 섹션 기본설정? ===== */
 section {
   padding: 20px;
-  border: 2px solid #000;
-  background-color: #fff;
+  background-color: var(--bg);
 }
 
 /* ===== 상단 ===== */
@@ -55,7 +55,7 @@ section {
 .section-title {
   font-size: 20px;
   font-weight: 700;
-  color: #333;
+  color: var(--text-main);
   margin-bottom: 24px;
   text-align: left;
 }
@@ -71,9 +71,9 @@ section {
 
 /* 카드 하나 */
 .post-card {
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   overflow: hidden;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
@@ -81,7 +81,7 @@ section {
 
 .post-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow);
 }
 
 /* 카드 이미지 */
@@ -127,19 +127,19 @@ section {
 
 .likes span {
   font-size: 14px;
-  color: #d94b86;
+  color: var(--text-main);
   font-weight: 600;
 }
 
 .writer {
   font-size: 13px;
-  color: #666;
+  color: var(--text-sub);
 }
 
 /* 미리보기 텍스트 */
 .post-preview {
   font-size: 14px;
-  color: #333;
+  color: var(--text-main);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -150,19 +150,18 @@ section {
 
 /* ===== 나머지 섹션 ===== */
 .latest-feed {
-  border: 2px solid #000;
   text-align: center;
   padding: 60px;
 }
 
 .news {
-  border: 2px solid #000;
+  /* border: 2px solid #000; */
   text-align: center;
   padding: 50px;
 }
 
 .cafe {
-  border: 2px solid #000;
+  /* border: 2px solid #000; */
   text-align: center;
   padding: 50px;
 }
@@ -177,14 +176,14 @@ section {
 
 .more-link {
   font-size: 15px;
-  color: #6b3fa0;
+  color: var(--accent-main);
   font-weight: 600;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .more-link:hover {
-  color: #4f298c;
+  color: var(--text-main);
 }
 
 /* 최신 피드용 카드 */
@@ -204,17 +203,18 @@ section {
   justify-content: flex-start;
   gap: 18px;
   text-align: left;
+  background: var(--bg);
 }
 
 /* 인사 문구 */
 .greeting p {
   font-size: 16px;
-  color: #333;
+  color: var(--text-main);
   line-height: 1.6;
 }
 
 .greeting strong {
-  color: #6b3fa0;
+  color: var(--accent-main);
 }
 
 /* 글 작성 버튼 */
@@ -222,16 +222,16 @@ section {
   margin-top: 8px;
   padding: 6px 14px;
   border-radius: 8px;
-  border: 1.8px solid #bd83ce;
-  background-color: #e5b0ea;
-  color: #fff;
+  border: 1.8px solid var(--accent-main);
+  background-color: var(--accent-soft);
+  color: var(--text-main);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
 }
 
 .write-btn:hover {
-  background-color: #d18ed9;
+  background-color: var(--accent-strong);
 }
 
 /* 친구 */
@@ -241,7 +241,7 @@ section {
 
 .friends-section h4 {
   font-size: 15px;
-  color: #222;
+  color: var(--text-main);
   margin-bottom: 10px;
 }
 
@@ -292,7 +292,7 @@ section {
   max-width: 1400px;
   margin: 60px auto;
   padding: 20px 40px;
-  background: #fff;
+  background: var(--bg);
 }
 
 .news-header {
@@ -309,7 +309,7 @@ section {
 
 .more-link {
   font-size: 14px;
-  color: #7a4bb4;
+  color: var(--text-main);
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -327,7 +327,7 @@ section {
 
 /* 개별 뉴스 카드 */
 .news-card {
-  background: #fff;
+  color: var(--bg-card);
   border-radius: 14px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   padding: 20px 24px;
@@ -352,13 +352,13 @@ section {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 6px;
-  color: #222;
+  color: var(--text-main);
 }
 
 .news-desc {
   font-size: 14px;
   line-height: 1.5;
-  color: #555;
+  color: var(--text-sub);
 }
 
 /* 카드 오른쪽 이미지 */
@@ -382,7 +382,7 @@ section {
   margin: 80px auto;
   padding: 20px 40px;
   text-align: center;
-  background: #fff;
+  background: var(--bg);
 }
 
 /* 제목 영역 중앙 정렬 */
@@ -460,13 +460,14 @@ section {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 6px;
+  color: var(--text-main);
 }
 
 .cafe-address,
 .cafe-phone,
 .cafe-hours {
   font-size: 13px;
-  color: #555;
+  color: var(--text-sub);
   line-height: 1.4;
 }
 
@@ -477,10 +478,10 @@ section {
   align-items: center;
   gap: 4px;
   padding: 5px 9px;
-  background-color: #f7e6fa;
-  border: 1.5px solid #d4aee8;
+  background-color: var(--accent-soft);
+  border: 1.5px solid var(--accent-main);
+  color: var(--text-main);
   border-radius: 6px;
-  color: #6b3fa0;
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;

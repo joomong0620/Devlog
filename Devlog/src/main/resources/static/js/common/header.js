@@ -12,7 +12,7 @@ signinBtn?.addEventListener("click", () => {
   window.location.href = "/member/login";
 });
 
-// 로그인
+// 로그아웃
 const logout = document.getElementById("logout");
 logout?.addEventListener("click", () => {
   window.location.href = "/member/logout";
@@ -44,4 +44,18 @@ menuBtn?.addEventListener("click", () => {
 overlay?.addEventListener("click", () => {
   sidebar?.classList.remove("active");
   overlay?.classList.remove("active");
+});
+
+const darkModeBtn = document.getElementById("darkModeBtn");
+
+// 초기 테마
+const savedTheme = localStorage.getItem("theme") || "light";
+document.documentElement.setAttribute("data-theme", savedTheme);
+
+darkModeBtn?.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme");
+  const next = current === "dark" ? "light" : "dark";
+
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("theme", next);
 });

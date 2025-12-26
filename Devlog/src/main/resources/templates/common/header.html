@@ -41,8 +41,32 @@
               <li><img th:src="@{/images/common/book.svg}" alt="book" /> 관련 서적</li>
       
               <hr/>
-      
-              <li><img th:src="@{/images/common/mode.svg}" alt="mode" /> Mode</li>
+
+              <!-- 다크모드로 전환 -->
+              <!-- <li class="mode-item">
+                <button class="mode-toggle" id="darkModeBtn" aria-label="dark mode toggle">
+                  <span class="icon sun">
+                    <img th:src="@{/images/common/sun.svg}" alt="light mode" />
+                  </span>
+                  <span class="icon moon">
+                    <img th:src="@{/images/common/moon.svg}" alt="dark mode" />
+                  </span>
+                  <span class="mode-text">Mode</span>
+                </button>
+              </li> -->
+              <li class="mode-item">
+                <button class="mode-toggle" id="darkModeBtn" aria-label="dark mode toggle">
+                  <span class="mode-icon">
+                    <span class="icon sun">
+                      <img src="/images/common/sun.svg" alt="light mode" />
+                    </span>
+                    <span class="icon moon">
+                      <img src="/images/common/moon.svg" alt="dark mode" />
+                    </span>
+                  </span>
+                  <span class="mode-text">Mode</span>
+                </button>
+              </li>
               <li><img th:src="@{/images/common/settings.svg}" alt="settings" /> Settings</li>
               <li><img th:src="@{/images/common/logout.svg}" alt="logout" /> Logout</li>
             </ul>
