@@ -76,8 +76,12 @@ public class SecurityConfig {
 	                ,"/dupCheck/**"
 	                ,"/sendEmail/**"
 	                ,"/board/freeboard/**"
-	                ///// PYY API Addition End: /////
-	                ////* YHJ *////  
+	                ///// PYY API Addition End: /////	                
+	                ,"/blog/**"
+	                ,"/api/blog/**"
+	                ,"/board/qna/**"
+                
+                  ////* YHJ *////  
 	                ,"/blog/list"
 	                ,"/api/blog/list"
 	                // [글쓰기 경로 테스트 임시 추가]
