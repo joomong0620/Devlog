@@ -79,6 +79,7 @@ public class SecurityConfig {
 	                ///// PYY API Addition End: /////	                
 	                ,"/blog/**"
 	                ,"/api/blog/**"
+	                ,"/board/qna/**"
 	            ).permitAll()
 	            .anyRequest().authenticated()
 	        )
