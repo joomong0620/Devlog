@@ -76,9 +76,13 @@ public class SecurityConfig {
 	                ,"/dupCheck/**"
 	                ,"/sendEmail/**"
 	                ,"/board/freeboard/**"
-	                ///// PYY API Addition End: /////	                
-	                ,"/blog/**"
-	                ,"/api/blog/**"
+	                ///// PYY API Addition End: /////
+	                ////* YHJ *////  
+	                ,"/blog/list"
+	                ,"/api/blog/list"
+	                // [글쓰기 경로 테스트 임시 추가]
+	                ,"/blog/write"
+	                ,"/api/blog/write"
 	            ).permitAll()
 	            .anyRequest().authenticated()
 	        )
