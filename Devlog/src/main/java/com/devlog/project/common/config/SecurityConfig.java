@@ -75,7 +75,9 @@ public class SecurityConfig {
 	                ///// PYY API Addition Start: /////
 	                ,"/dupCheck/**"
 	                ,"/sendEmail/**"
+	                ,"/checkCode/**"
 	                ,"/board/freeboard/**"
+	                ,"/app/login/**"
 	                ///// PYY API Addition End: /////	                
 	                ,"/blog/**"
 	                ,"/api/blog/**"
