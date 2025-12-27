@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.devlog.project.board.ITnews.mapper.ITnewsMapper">
+	
+	<select id="selectjoblist" resultType="ITnewsDTO">
+		SELECT *
+		FROM BOARD B
+		LEFT JOIN BOARDTYPE T ON B.BOARD_CODE = T.BOARD_CODE
+		LEFT JOIN BOARD_IMG I ON B.BOARD_NO = I.BOARD_NO
+	</select>
+	
+	<select id="selectNewsDetail" resultType="ITnewsDTO">
+	SELECT 
+	        B.BOARD_NO,
+	        B.BOARD_TITLE,
+	        B.BOARD_CONTENT,
+	        B.BOARD_COUNT,
+	        B.NEWS_REPORTER,
+	        TO_CHAR(B.B_CREATE_DATE, 'YYYY-MM-DD') AS B_CREATE_DATE,
+	        I.IMG_PATH
+	    FROM BOARD B
+	    LEFT JOIN BOARD_IMG I ON (B.BOARD_NO = I.BOARD_NO)
+	    WHERE B.BOARD_NO = #{boardNo} AND B.BOARD_DEL_FL = 'N'
+	</select>
+</mapper>

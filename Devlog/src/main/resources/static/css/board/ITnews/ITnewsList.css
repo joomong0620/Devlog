@@ -4,7 +4,7 @@
   margin: 0 auto;
   padding: 0 20px;
   justify-self: center;
-
+  margin-top: 60px;
 }
 
 .ITnews h1 {
@@ -71,6 +71,7 @@ button:hover img {
   border-radius: 10px;
   width: 110px;
   height: 110px;
+  margin-top: 15px;
 }
 
 

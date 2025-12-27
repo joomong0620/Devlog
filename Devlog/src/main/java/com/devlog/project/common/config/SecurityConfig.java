@@ -67,11 +67,17 @@ public class SecurityConfig {
 	                "/member/signUp-debug",
 	                "/member/signUpTest",
 	                "/error",
+	                
 	                "/devtalk/**",
+	                
+	                //// KJY ////
 	                "/jobposting",
 	                "/jobposting/**",
 	                "/job-crawler",
-	                "/error"
+	                "/ITnews/**",
+	                "/ITnews"
+	                
+	                
 	                ///// PYY API Addition Start: /////
 	                ,"/dupCheck/**"
 	                ,"/sendEmail/**"
