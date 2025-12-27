@@ -1,17 +1,25 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEVLOG - 글 작성</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- TUI 에디터 CSS CDN -->
+
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-    <link rel="stylesheet" href="../../../static/css/board/blog/blogWrite.css">
+
+    <link rel="stylesheet" th:href="@{/css/board/blog/blogWrite.css}">
+
+    <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <link rel="stylesheet" th:href="@{/css/common/header.css}">
+    <link rel="stylesheet" th:href="@{/css/common/footer.css}">
 </head>
 
 <body>
+
+    <div th:replace="~{common/header :: header}"></div>
 
     <main class="write-container">
         <section class="title-section">
@@ -32,8 +40,7 @@
             </label>
         </div>
 
-        <!-- TUI 에디터 적용 -->
-        <div id="editor"></div> 
+        <div id="editor"></div>
 
         <section class="bottom-section">
 
@@ -143,9 +150,13 @@
         </div>
     </div>
 
-    <!-- TUI 에디터 JS CDN -->
+    <div th:replace="~{common/footer :: footer}"></div>
+
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-    <script src="../../../static/js/board/blog/blogWrite.js"></script>
+
+    <script th:src="@{/js/common/header.js}"></script>
+
+    <script th:src="@{/js/board/blog/blogWrite.js}"></script>
 </body>
 
 </html>

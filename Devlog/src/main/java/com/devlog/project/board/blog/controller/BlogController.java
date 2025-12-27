@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.devlog.project.board.blog.dto.BlogListResponseDto;
+import com.devlog.project.board.blog.dto.BlogWriteRequestDto;
 import com.devlog.project.board.blog.service.BlogService;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -34,7 +37,7 @@ public class BlogController {
 		return "board/blog/blogList";
 	}
 	
-	// 스크롤 내릴 때 데이터만 주기 (URL: /api/blog/list)
+	// 블로그 목록 데이터(스크롤 내릴 때 데이터만 주기)
     @GetMapping("/api/blog/list")
     @ResponseBody // HTML 말고 데이터(JSON)만 반환
     public Page<BlogListResponseDto> getBlogListApi(
@@ -42,9 +45,43 @@ public class BlogController {
         
         return blogService.getBlogList(pageable);
     }
+    
+    // 글 작성 화면 이동
+	@GetMapping("/blog/write")
+    public String blogWrite() {
+    	
+    	return "board/blog/blogWrite";
+    }
 	
+	// 글 작성 처리 (API)
+	public ResponseEntity<String> writeBlog(@RequestBody BlogWriteRequestDto requestDto){
+		// @RequestBody : 프론트에서 보낸 JSON 데이터를 DTO로 매핑
+		
+		System.out.println("전송된 데이터 : " + requestDto.toString());
+		
+		blogService.writeBlog(requestDto);
+		
+		return ResponseEntity.ok("저장 성공");
+	}
 	
 	
 	
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

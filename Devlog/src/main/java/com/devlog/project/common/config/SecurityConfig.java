@@ -75,10 +75,20 @@ public class SecurityConfig {
 	                ///// PYY API Addition Start: /////
 	                ,"/dupCheck/**"
 	                ,"/sendEmail/**"
+	                ,"/checkCode/**"
 	                ,"/board/freeboard/**"
+	                ,"/app/login/**"
 	                ///// PYY API Addition End: /////	                
 	                ,"/blog/**"
 	                ,"/api/blog/**"
+	                ,"/board/qna/**"
+                
+                  ////* YHJ *////  
+	                ,"/blog/list"
+	                ,"/api/blog/list"
+	                // [글쓰기 경로 테스트 임시 추가]
+	                ,"/blog/write"
+	                ,"/api/blog/write"
 	            ).permitAll()
 	            .anyRequest().authenticated()
 	        )

@@ -36,5 +36,12 @@ public class AjaxController {
 		return ajaxServiceJpa.dupCheckNickname(nickname);
 	}	
 	
+	// 관리자 승인 코드 유효성 검사
+	@GetMapping(value="/checkCode/adminCode")
+	@ResponseBody
+	public int checkAdminCode(String adminCode) {
+		log.info("[ 관리자 승인코드 유효성 검사 ] adminCode 출력 : {}", adminCode);
+		return adminCode.equals("devlog1234")? 1:0;
+	}		
 
 }

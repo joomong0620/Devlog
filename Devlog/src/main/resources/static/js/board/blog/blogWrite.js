@@ -154,15 +154,33 @@ document.querySelector('.btn-publish').addEventListener('click', () => {
     // 데이터 구성
     const postData = {
         title: title,
-        tags: Array.from(tags), // Set을 Array로 변환
+        tags: Array.from(tags), 
         content: content,
         isPaid: isPaid,
-        price: isPaid ? priceInput.value : 0
+        price: isPaid ? parseInt(priceInput.value) : 0 // 숫자로 변환
     };
 
     console.log('발행 데이터:', postData);
 
-    // TODO: 백엔드 전송 로직 (fetch/axios)
-    alert('발행이 완료되었습니다!');
-    // location.href = '/list'; // 목록 페이지로 이동
+    // 백엔드 전송 로직 (fetch)
+    fetch('/api/blog/write',{
+        method : 'POST',
+        headers : {
+            'Content-Type' : 'application/json',
+        },
+        body : JSON.stringify(postData),
+    })
+    .then(response => {
+        if(response.ok){
+            alert('발행이 완료되었습니다!');
+            location.href = "/blog/list"; // 목록 페이지로 이동
+        } else {
+            alert('발행 중 오류가 발생했습니다.');
+            console.error('Error : ', response);
+        }
+    })
+    .catch(error => {
+        console.error('Network Error : ', error);
+        alert("서버와 통신 중 오류가 발생했습니다.");
+    })
 });
