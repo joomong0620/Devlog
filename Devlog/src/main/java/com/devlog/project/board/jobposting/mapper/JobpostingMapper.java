@@ -10,7 +10,13 @@ import com.devlog.project.board.jobposting.dto.JobPostingDTO;
 @Mapper
 public interface JobpostingMapper {
 
+	
+	// 캘린더
 	List<JobPostingDTO> selectjoblist();
+
+	
+	// 채용공고 상세 이동
+	JobPostingDTO selectDetail(Long id);
 
 
 

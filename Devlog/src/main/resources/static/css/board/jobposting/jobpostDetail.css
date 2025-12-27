@@ -124,6 +124,7 @@
   display: flex;
   gap: 12px;
   padding-bottom: 5px;
+  justify-content: right;
 }
 
 .header_utils button {
@@ -142,15 +143,31 @@
 }
 
 /* 스크랩 버튼 (노란색 포인트) */
-.btn_scrap .icon {
-  color: #FFD700;
-  font-size: 18px;
+.btn_scrap {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
 }
 
-.btn_scrap:hover {
-  background-color: #FFFDF0;
-  border-color: #FFD700;
+.scrap-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
+
+/* 기본: 빈 북마크 */
+.scrap-icon {
+  background-image: url("/images/common/scrap-empty.png");
+}
+
+/* 스크랩됨 */
+.btn_scrap.active .scrap-icon {
+  background-image: url("/images/common/scrap-filled.png");
+}
+
 
 /* 공유하기 버튼 */
 .kakao_icon {

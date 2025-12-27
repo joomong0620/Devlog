@@ -3,6 +3,7 @@ package com.devlog.project.board.jobposting.service;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class JobPostingServiceImpl implements JobPostingService {
 	private JobpostingMapper jobmapper;
 	
 	
-	@Scheduled(cron = "0 3 0 * * *") // 초 분 시 일 월 요일
+	@Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
 	public void JobCrawler() {
 		System.out.println(">>> JobCrawler() 메서드 진입 성공!");
 	    try {
@@ -58,5 +59,28 @@ public class JobPostingServiceImpl implements JobPostingService {
 	@Override
 	public List<JobPostingDTO> selectjoblist() {
 		return jobmapper.selectjoblist();
+	}
+
+
+	
+	// 채용공고 상세 이동
+	@Override
+	public JobPostingDTO selectDetail(Long id) {
+		JobPostingDTO detail = jobmapper.selectDetail(id);
+	    
+	    if (detail != null && detail.getPostingContent() != null) {
+	        String content = detail.getPostingContent();
+	        
+	        // 정규표현식: .png 로 끝나는 지점을 찾되, .png는 포함
+	        String[] urlArray = content.split("(?<=\\.png)");
+	        
+	        List<String> list = new ArrayList<>();
+	        for(String url : urlArray) {
+	            list.add(url.trim());
+	        }
+	        detail.setImageList(list);
+	    }
+	    
+	    return detail;
 	}
 }
