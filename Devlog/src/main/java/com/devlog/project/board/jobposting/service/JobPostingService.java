@@ -12,4 +12,8 @@ public interface JobPostingService {
 	// 채용리스트 뽑아오기
 	List<JobPostingDTO> selectjoblist();
 
+	
+	// 채용공고 상세 이동
+	JobPostingDTO selectDetail(Long id);
+
 }

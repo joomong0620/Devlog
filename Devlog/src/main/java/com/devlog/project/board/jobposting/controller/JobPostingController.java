@@ -26,7 +26,7 @@ public class JobPostingController {
 	public String jobposting(
 			Model model) {
 		List<JobPostingDTO> jobcalender = jobPostingService.selectjoblist();
-		System.out.println(jobcalender);
+//		System.out.println(jobcalender);
 		model.addAttribute("jobcalender", jobcalender);
 		
 		return "board/Jobposting/calender";
@@ -38,6 +38,21 @@ public class JobPostingController {
 	public void JobCrawler() {
 		jobPostingService.JobCrawler();
 	}
+	
+	
+	// 채용공고 상세 이동
+	@GetMapping("/jobposting/{id}")
+	public String jobPostingDetail(
+			@PathVariable Long id,
+			Model model) {
+		
+		JobPostingDTO detail = jobPostingService.selectDetail(id);
+		model.addAttribute("job", detail);
+		System.out.println(detail);
+		
+		return "board/Jobposting/jobpostDetail"; 
+	}
+	
 	
 	
 	

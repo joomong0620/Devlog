@@ -1,5 +1,7 @@
 package com.devlog.project.board.jobposting.dto;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class JobPostingDTO {
+public class JobPostingDTO extends CompanyDTO {
 	
 	private Long postingNo;
 	private String postingTitle;
@@ -22,5 +24,9 @@ public class JobPostingDTO {
 	private String applyEnd;
 	private String applyMethod;
 	private Long companyCode;
+	
+	
+	// 여러개 이미지 url 리스트
+	private List<String> imageList;
 
 }
