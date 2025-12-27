@@ -72,10 +72,11 @@ public class SecurityConfig {
 	                "/jobposting/**",
 	                "/job-crawler",
 	                "/error"
-	                ///// PYY API Addition
+	                ///// PYY API Addition Start: /////
 	                ,"/dupCheck/**"
 	                ,"/sendEmail/**"
 	                ,"/board/freeboard/**"
+	                ///// PYY API Addition End: /////	                
 	                ,"/blog/**"
 	                ,"/api/blog/**"
 	            ).permitAll()

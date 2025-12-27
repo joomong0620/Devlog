@@ -26,5 +26,4 @@ public class MemberSignUpRequestDTO {
     // 가입 시 선택/필수 옵션
     private Status memberAdmin;      // Y / N; Service에서 반드시 권한 체크 필요
     private Status memberSubscribe;  // Y / N
-    private Integer memberLevel;  // Y / N
 }

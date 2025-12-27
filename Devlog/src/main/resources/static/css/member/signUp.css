@@ -40,7 +40,6 @@ html, body {
 /* ========================= */
 body {
     margin: 0;
-    /*background-color: #f3f3f3;*/
     background-color: #ffffff;
     font-family: 'Pretendard Variable', Arial, Helvetica, sans-serif;
     /* body 전체에 Pretendard Variable Font 적용*/
@@ -52,8 +51,6 @@ body {
 }
 
 .title {
-    /*background-color: #F1C6E7;*/
-    /*background: linear-gradient(to right, #F1C6E7 50%, #FFF 100%);*/
     background: linear-gradient(
         to right,
         rgba(241, 198, 231, 1) 0%,       /* #F1C6E7 불투명도 100% */
@@ -62,7 +59,6 @@ body {
         rgba(241, 198, 231, 0.5) 100%    /* 100% 위치 투명도 50% */
     );    
     padding: 12px 12px 12px 120px;
-    /*border-radius: 6px;*/
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
     color: #000;
@@ -76,9 +72,6 @@ body {
     display: flex;
     padding: 10px 0;
     justify-content: center;
-
-    /* flex-direction: column;
-    align-items: center; */
 }
 
 .signup-box {
@@ -86,13 +79,6 @@ body {
     background: #fff;
     padding: 30px 40px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-
-    /*
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    */
 }    
 
 
@@ -115,7 +101,6 @@ body {
     border-radius: 4px;
     border: 1px solid #D9D9D9;
     font-size: 24px; /* placeholder 크기 */
-    /* color:  #D9D9D9; */
     color:  #000;
     box-sizing: border-box;
 
@@ -175,25 +160,28 @@ div.spaceholder{ /* 임의 행간격 삽입용*/
     align-items: center;
     margin-top: 40px;
     margin-bottom: 40px; 
-    /* margin: 30px 0px; */
     font-size: 24px;
 }
-
-/* .check input {
-    margin-right: 40px;
-} */
 
 .check input[type="checkbox"] {
     margin-right: 10px;
     transform: scale(2.0);
-    accent-color: #2563eb; 
+    accent-color: #BD83CE; 
     margin-right: 26px;
 }
+
+.row.admin-code {
+    display: flex;
+    justify-content: start;
+    flex-direction: row;
+    align-items: first baseline;
+}
+
 
 .input-admin-code-wrapper{
     display: flex;
     justify-content: start;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
 }
 
@@ -205,7 +193,7 @@ div.spaceholder{ /* 임의 행간격 삽입용*/
     border-radius: 4px;
     border: 1px solid #D9D9D9;
     font-size: 24px; /* placeholder 크기 */
-    color:  #D9D9D9;
+    color:  #000;
     box-sizing: border-box;
 }
 
@@ -223,8 +211,6 @@ div.spaceholder{ /* 임의 행간격 삽입용*/
     margin-top: 25px;
     margin-bottom: 100px;
     padding: 14px;
-    /* padding: 14px 40px 14px 40px; */
-    /* margin: 14px 40px 14px 40px; */
 
     background-color: #BD83CE;
     color: white;
