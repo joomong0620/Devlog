@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.devlog.project.board.ITnews.mapper.ITnewsMapper">
+	
+	<select id="selectjoblist" resultType="ITnewsDTO">
+		SELECT B.*, T.BOARD_NAME
+		    FROM BOARD B
+		    JOIN BOARD_TYPE T ON (B.BOARD_CODE = T.BOARD_CODE)
+		    WHERE T.PARENTS_BOARD_CODE = 2  AND B.BOARD_DEL_FL = 'N'
+		    ORDER BY B.BOARD_NO DESC
+	</select>
+	
+</mapper>

@@ -1,5 +1,15 @@
 package com.devlog.project.board.ITnews.mapper;
 
-public class ITnewsMapper {
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.devlog.project.board.ITnews.dto.ITnewsDTO;
+
+@Mapper
+public interface ITnewsMapper {
+
+	// IT뉴스 리스트 이동
+	public List<ITnewsDTO> selectjoblist();
 
 }
