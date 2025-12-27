@@ -20,6 +20,7 @@ public class BlogWriteRequestDto {
 	private List<String> tags; // JS에서 배열로 넘어오니까 List로 받는다.
 	private Boolean isPaid;
 	private Integer price; // int는 초기값이 0
+	private Boolean isTemp; // (true : 임시저장, false: 발행)
 	
 	// DTO -> Entity 변환 메서드
 	public Blog toEntity(String authorName) {
@@ -34,6 +35,7 @@ public class BlogWriteRequestDto {
                 .tags(tagsString)
                 .isPaid(this.isPaid != null && this.isPaid)
                 .price(this.price != null ? this.price : 0)
+                .tempFl(this.isTemp != null ? this.isTemp : false)
                 .build();
 	}
 }

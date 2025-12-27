@@ -114,32 +114,30 @@ modal.addEventListener('click', (e) => {
 
 // 5. 버튼 액션 (나가기, 임시저장, 발행)
 
-// [기능 추가] 나가기 버튼
+// 나가기 버튼
 document.querySelector('.btn-exit').addEventListener('click', () => {
     if (confirm('작성중인 글이 사라집니다. 정말 나가시겠습니까?')) {
-        history.back(); // 뒤로 가기
+        history.back();
     }
 });
 
-// [기능 추가] 임시저장 버튼
-document.querySelector('.btn-draft').addEventListener('click', () => {
-    // 실제 저장 로직 필요 (localStorage 또는 서버 전송)
-    alert('게시글이 임시저장 되었습니다.');
-});
-
-// 발행하기 버튼
-document.querySelector('.btn-publish').addEventListener('click', () => {
+/**
+ * 게시글 저장 함수
+ * @param {boolean} isTemp - true: 임시저장, false: 발행
+ */
+function savePost(isTemp) {
     const title = document.querySelector('.input-title').value.trim();
-    const content = editor.getMarkdown().trim(); // 마크다운 내용
+    const content = editor.getMarkdown().trim();
     const isPaid = document.querySelector('input[name="content-type"]:checked').value === 'paid';
 
-    // [기능 추가] 필수 입력값 검증
+    // 1. 유효성 검사
     if (!title) {
         alert('제목을 입력해주세요.');
         document.querySelector('.input-title').focus();
         return;
     }
 
+    // 임시저장은 내용이 없어도 되는지 정책에 따라 결정 (여기선 내용 필수 유지)
     if (content.length === 0) {
         alert('내용을 입력해주세요.');
         return;
@@ -151,36 +149,103 @@ document.querySelector('.btn-publish').addEventListener('click', () => {
         return;
     }
 
-    // 데이터 구성
+    // 2. 데이터 구성
     const postData = {
         title: title,
-        tags: Array.from(tags), 
+        tags: Array.from(tags),
         content: content,
         isPaid: isPaid,
-        price: isPaid ? parseInt(priceInput.value) : 0 // 숫자로 변환
+        price: isPaid ? parseInt(priceInput.value) : 0,
+        isTemp: isTemp // [핵심] true면 임시저장, false면 발행
     };
 
-    console.log('발행 데이터:', postData);
+    console.log('전송 데이터:', postData);
 
-    // 백엔드 전송 로직 (fetch)
-    fetch('/api/blog/write',{
-        method : 'POST',
-        headers : {
-            'Content-Type' : 'application/json',
+    // 3. 백엔드 전송
+    fetch('/api/blog/write', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
         },
-        body : JSON.stringify(postData),
+        body: JSON.stringify(postData),
     })
-    .then(response => {
-        if(response.ok){
-            alert('발행이 완료되었습니다!');
-            location.href = "/blog/list"; // 목록 페이지로 이동
-        } else {
-            alert('발행 중 오류가 발생했습니다.');
-            console.error('Error : ', response);
-        }
-    })
-    .catch(error => {
-        console.error('Network Error : ', error);
-        alert("서버와 통신 중 오류가 발생했습니다.");
-    })
+        .then(response => {
+            if (response.ok) {
+                // 메시지 구분
+                const msg = isTemp ? '게시글이 임시저장 되었습니다.' : '발행이 완료되었습니다!';
+                alert(msg);
+                location.href = "/blog/list"; // 목록으로 이동
+            } else {
+                alert('저장 중 오류가 발생했습니다.');
+                console.error('Error : ', response);
+            }
+        })
+        .catch(error => {
+            console.error('Network Error : ', error);
+            alert("서버와 통신 중 오류가 발생했습니다.");
+        });
+}
+
+// [임시저장 버튼] -> savePost(true) 호출
+document.querySelector('.btn-draft').addEventListener('click', () => {
+    savePost(true);
 });
+
+// [발행하기 버튼] -> savePost(false) 호출
+document.querySelector('.btn-publish').addEventListener('click', () => {
+    savePost(false);
+});
+
+
+const notiBtn = document.getElementById('noti-btn')
+const alarmArea = document.querySelector('.alarm-panel')
+const notiMenuBtn = document.querySelector('.noti-menu-btn')
+const notiMenuArea = document.querySelector('.noti-menu-dropdown')
+
+
+/* 알림창 */
+notiBtn.addEventListener('click', e => {
+    alarmArea.classList.toggle('display-none')
+})
+
+
+/* 전체 읽음 삭제 메뉴 드롭다운 */
+notiMenuBtn.addEventListener('click', e => {
+    notiMenuArea.classList.toggle('display-none')
+})
+
+
+
+/* 알림 필터 선택 */
+
+const alarmFilters = document.querySelectorAll('.filter');
+
+
+for (let filter of alarmFilters) {
+
+    filter.addEventListener('click', e => {
+
+        for (let item of alarmFilters) {
+            item.classList.remove('is-active');
+        }
+
+        filter.classList.add('is-active')
+
+    })
+
+}
+
+
+/* 해당 알림 클릭 시 읽은 느낌  */
+const alarmItems = document.querySelectorAll('.alarm-item')
+
+
+
+for (let alarmItem of alarmItems) {
+    alarmItem.addEventListener('click', e => {
+
+        alarmItem.classList.add('read-noti')
+    })
+
+}
+
