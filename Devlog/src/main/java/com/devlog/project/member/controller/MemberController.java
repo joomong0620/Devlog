@@ -2,7 +2,6 @@ package com.devlog.project.member.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +13,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.member.model.dto.MemberSignUpRequestDTO;
@@ -182,7 +181,7 @@ public class MemberController {
 	    logout(request);
 	    System.out.println("###%%%@@@ 로그아웃 성공 (GET)");
 	    //return "redirect:/member/login"; // 테스트용
-	    return "redirect:/";
+	    return "redirect:/"; // 메인페이지와 통합시
 	}
 
 	// POST - REST API 방식
@@ -221,40 +220,38 @@ public class MemberController {
 	}	
 	
 	
+	
 	// 회원 가입 진행 // 아이디(이메일), 비밀번호, 이름, 닉네임, 전화번호, 경력사항, 이메일 수신동의, 관리자 계정 신청 
-	@ResponseBody
-	@PostMapping(value="/signUp", consumes="application/json")  // Postman test용
-    public ResponseEntity<Void> signUp( 
-            @RequestBody MemberSignUpRequestDTO request
+	@PostMapping("/signUp")  
+    public String signUp( 
+    		 @ModelAttribute  MemberSignUpRequestDTO request  
+    		 , RedirectAttributes ra
     ) {
-		log.info("email = {}", request.getMemberEmail());
+		log.info("signUp email = {}", request.getMemberEmail());
 		log.info("###@@@%%% CONTROLLER DTO = {}", request);
+
+		String path = "redirect:";
+		String message = null;
+		int result=0; // placeholder
 		
-		System.out.println("CONTROLLER DTO = " + request);
-
-        service.signUp(request);
-        return ResponseEntity.ok().build();
-    }	
+		try { // 회원가입 성공
+			service.signUp(request); // MemberService2에서 signUp 처리, signUp 실패시 예외 발생 -> controller에서 성공(1) 실패(0)처리 반환
+			result = 1;
+			
+			path += "/"; //메인페이지로 (JS에서?)
+			message = request.getMemberNickname() + "님의 가입을 환영합니다.\n 로그인 후 서비스를 이용해 주세요.";	 // (JS에서?)
+		} catch(Exception e) { // 회원가입 실패
+			log.error("회원가입 실패", e);
+			result = 0;
+			path += "/member/signUp"; //다시 회원가입 페이지로 
+			message = "서버 오류로 회원 가입에 실패했습니다.\n 잠시후 다시 이용해 주세요.";				
+		}
+		
+		ra.addFlashAttribute("message", message);
+		
+		return path;
+    }		
 	
-	@ResponseBody
-	@PostMapping("/signUpTest") // Postman test용: {} 나오면 Postman 문제, 값나오면 DTO문제
-	public ResponseEntity<?> test(@RequestBody Map<String, Object> body) {
-	    System.out.println("BODY = " + body);
-	    return ResponseEntity.ok().build();
-	}
-	
-	@ResponseBody
-	@PostMapping("/signUp-debug")// Postman test용
-	public ResponseEntity<?> debug(HttpServletRequest request) throws Exception {
-
-	    String body = request.getReader()
-	            .lines()
-	            .collect(Collectors.joining("\n"));
-
-	    System.out.println("RAW BODY >>> " + body);
-
-	    return ResponseEntity.ok().build();
-	}
 	
 	
 }

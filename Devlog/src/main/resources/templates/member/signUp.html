@@ -92,23 +92,26 @@
 
                         <!-- 이메일 수신 -->
                         <label class="check fw-600" for="memberSubscribe">
-                            <input type="checkbox" name="memberSubscribe" id="memberSubscribe">
+                            <!-- 체크되면 브라우저는 무조건 "on" 을 전송함 => value="Y" 로 enums와 맞춰야함 -->
+                            <input type="checkbox" name="memberSubscribe" id="memberSubscribe" value="Y">
                             이메일 수신동의 (회원 전용 정보 제공 메일 수신에 동의합니다)
                         </label>
 
                         <!-- 관리자 신청 -->
-                        <div class="row">
+                        <div class="row admin-code">
                             <label class="check fw-600" for="memberAdmin">
-                                <input type="checkbox" name="memberAdmin" id="memberAdmin">
+                            <!-- 체크되면 브라우저는 무조건 "on" 을 전송함 => value="Y" 로 enums와 맞춰야함 -->
+                                <input type="checkbox" name="memberAdmin" id="memberAdmin"  value="Y">
                                 관리자 계정 신청
                             </label>
                             <div class="input-admin-code-wrapper">
                                 <!-- <label for="adminCode"> </label> -->
                                 <input type="text" name="adminCode" id="adminCode" class="input admin-code" 
                                     placeholder="관리자 계정 승인코드 입력">
-                                
+                                <p class="desc" id="adminCodeMessage"></p>
                             </div>    
                         </div>
+                
 
                         <div class="spaceholder"><p><br></p></div>
 

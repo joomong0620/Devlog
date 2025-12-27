@@ -55,6 +55,6 @@ public class MemberService2 {
                 .build();
 
         //  저장 
-        memberRepository.save(member);
+        memberRepository.save(member); // 실패 시 예외 발생
     }
 }
