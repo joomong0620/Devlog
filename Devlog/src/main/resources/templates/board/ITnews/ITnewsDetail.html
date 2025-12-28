@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <link rel="stylesheet" th:href="@{/css/common/common.css}" />
   <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+  <link rel="stylesheet" th:href="@{/css/board/ITnews/ITnewsComment.css}">
 
 </head>
 <div th:replace="common/header :: header"></div>
@@ -44,11 +45,9 @@
 
         <!-- 좋아요 -->
         <p>
-          <!-- <span class="like-area">
+          <span class="like-area">
             <i class="fa-heart" th:classappend="${likeCheck} ? fa-solid : fa-regular" id="boardLike"></i>
-
-            <span th:text="${news.likeCount}">0</span>
-          </span> -->
+            <span id="likeCount" th:text="${news.likeCount}">0</span> </span>
         </p>
 
         <!-- 스크랩 -->
@@ -58,12 +57,14 @@
 
             <span th:text="${news.scrapCount}">0</span>
           </span> -->
+          <span class="scrap-area">스크랩</span>
         </p>
         <!-- 신고하기 -->
         <p>
           <!-- <span class="report-area">
             <i class="fa-flag" id="boardReport"></i>
           </span> -->
+          <span class="report-area">신고하기</span>
         </p>
 
 
@@ -83,7 +84,24 @@
   </main>
 
   <div th:replace="common/footer :: footer"></div>
+  <script th:inline="javascript">
+    const loginMemberNo = /*[[${session.loginMember?.memberNo}]]*/ 0;
+
+    const memberNickname = /*[[${session.loginMember?.memberNickname}]]*/ "";
+
+    const boardNo = /*[[${news?.boardNo}]]*/ 0;
+
+    const boardTitle = /*[[${news?.boardTitle}]]*/ "";
+  </script>
+
+
+
+
+
   <script th:src="@{/js/notification/noti.js}"></script>
+  <script th:src="@{/js/board/ITnews/ITnewsDetail.js}"></script>
+  <script th:src="@{/js/board/ITnews/ITnewsComment.js}"></script>
+
 
 </body>
 
