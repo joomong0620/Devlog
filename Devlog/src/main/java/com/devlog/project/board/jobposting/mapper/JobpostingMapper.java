@@ -11,7 +11,7 @@ import com.devlog.project.board.jobposting.dto.JobPostingDTO;
 public interface JobpostingMapper {
 
 	
-	// 캘린더
+	// 채용 리스트 뽑아오기
 	List<JobPostingDTO> selectjoblist();
 
 	

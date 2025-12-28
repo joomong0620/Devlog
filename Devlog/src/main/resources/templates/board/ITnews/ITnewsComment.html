@@ -1,90 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
+<div id="commentArea">
+  <div class="comment-list-area">
+    <ul id="commentList">
+      <li th:each="comment : ${commentList}" class="comment-row"
+        th:classappend="${comment.parentCommentNo != 0} ? 'reply'" th:data-comment-id="${comment.commentNo}">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="../../../static/css/board/ITnews/ITnewsComment.css">
-</head>
+        <p class="comment-writer">
+          <img class="comment-profile" th:src="${comment.profileImg ?: '/images/common/user.png'}">
+          <span class="comment-nickname" th:text="${comment.memberNickname}">닉네임</span>
+          <span class="comment-date" th:text="${comment.commentCreateDate}">작성일</span>
+        </p>
 
-<body>
+        <p class="comment-content" th:text="${comment.commentContent}">내용</p>
 
+        <div class="comment-actions">
+          <span class="reaction-area">
+            <i class="fa-heart comment-like-btn"
+              th:classappend="${comment.likeCheck == 1} ? 'fa-solid' : 'fa-regular'"></i>
+            <span class="count" th:text="${comment.likeCount}">0</span>
+          </span>
 
+          <span class="reaction-area">
+            <img th:src="@{/images/board/ITnews/comment_bad.svg}" class="comment-bad-btn"
+              th:style="${comment.badCheck == 1} ? 'filter:grayscale(0%)' : 'filter:grayscale(100%)'">
+            <span class="count" th:text="${comment.badCount}">0</span>
+          </span>
 
+          <th:block th:if="${session.loginMember != null and session.loginMember.memberNo == comment.memberNo}">
+            <button class="edit-btn">수정</button>
+            <button class="delete-btn">삭제</button>
+          </th:block>
 
-  <!-- 댓글 작성 -->
+          <button th:if="${comment.parentCommentNo == 0}" class="reply-btn">답글</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+
   <div class="comment-write-area">
     <textarea id="commentContent" placeholder="지식뉴스에 대한 댓글을 달아보세요!"></textarea>
     <button id="addComment">등록하기</button>
   </div>
-  </div>
+</div>
 
 
-  <div id="commentTitle">
-    <h3>댓글</h3>
-  </div>
-
-  <div id="commentArea">
-    <!-- 댓글 목록 -->
-    <div class="comment-list-area">
-      <ul id="commentList">
-        <!-- 댓글 1개 (JS로 복제해서 사용) -->
-        <!-- 부모댓글 -->
-        <li class="comment-row" data-comment-id="">
-          <p class="comment-writer">
-            <!-- 프로필 이미지 -->
-            <img class="comment-profile" src="../../../static/images/board/ITnews/thumb.png" alt="프로필" />
-
-            <!-- 닉네임 -->
-            <span class="comment-nickname">닉네임</span>
-
-            <!-- 작성일 -->
-            <span class="comment-date">2025-12-17</span>
-          </p>
-
-          <!-- 댓글 내용 -->
-          <p class="comment-content">
-            댓글 내용
-          </p>
-
-          <!-- 댓글 액션 영역 -->
-          <div class="comment-actions">
-
-            <!-- 좋아요 -->
-            <button class="comment-good-btn" data-type="good">
-              <img src="../../../static/images/board/ITnews/comment_good.svg" alt="좋아요" class="comment-icon" />
-              <span class="good-count">0</span>
-            </button>
-
-            <!-- 싫어요 -->
-            <button class="comment-bad-btn" data-type="bad">
-              <img src="../../../static/images/board/ITnews/comment_bad.svg" alt="싫어요" class="comment-icon" />
-              <span class="bad-count">0</span>
-            </button>
-
-            <button class="comment-edit-btn">수정</button>
-            <button class="comment-delete-btn">삭제</button>
-          </div>
-        </li>
-        <li class="comment-row reply" data-comment-id="2" data-parent-id="1">
-          <p class="comment-writer">
-            <img class="comment-profile" src="../../../static/images/board/ITnews/thumb.png" alt="프로필" />
-            <span class="comment-nickname">대댓글 작성자</span>
-            <span class="comment-date">5분 전</span>
-          </p>
-
-          <p class="comment-content">
-            이게 대댓글입니다.
-          </p>
-        </li>
-      </ul>
-    </div>
-
-
-  </div>
 
 
 </body>
-
-</html>

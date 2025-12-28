@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IT지식뉴스</title>
-  <link rel="stylesheet" href="../../../static/css/board/ITnews/ITnewsList.css">
-
-
+  <link rel="stylesheet" th:href="@{/css/board/ITnews/ITnewsList.css}">
+  <link rel="stylesheet" th:href="@{/css/common/common.css}" />
+  <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
 </head>
+<div th:replace="common/header :: header"></div>
+<script th:src="@{/js/common/header.js}"></script>
 
 <body>
 
@@ -16,28 +18,28 @@
     <h1>IT지식뉴스</h1><br>
     <div class="ITnews-category">
       <div class="form-inline">
-        <button>
-          <img src="../../../static/images/board/ITnews/ITnews_AI.svg">
+        <button class="filter-btn" data-type="21">
+          <img th:src="@{/images/board/ITnews/ITnews_AI.svg}">
           <span>AI</span>
         </button>
-        <button>
-          <img src="../../../static/images/board/ITnews/ITnews_tech.svg">
+        <button class="filter-btn" data-type="22">
+          <img th:src="@{/images/board/ITnews/ITnews_tech.svg}">
           <span>테크</span>
         </button>
-        <button>
-          <img src="../../../static/images/board/ITnews/ITnews_IT.svg">
+        <button class="filter-btn" data-type="23">
+          <img th:src="@{/images/board/ITnews/ITnews_IT.svg}">
           <span>IT기업</span>
         </button>
-        <button>
-          <img src="../../../static/images/board/ITnews/ITnews_game.svg">
+        <button class="filter-btn" data-type="24">
+          <img th:src="@{/images/board/ITnews/ITnews_game.svg}">
           <span>게임</span>
         </button>
-        <button>
-          <img src="../../../static/images/board/ITnews/ITnews_Science.svg">
+        <button class="filter-btn" data-type="25">
+          <img th:src="@{/images/board/ITnews/ITnews_Science.svg}">
           <span>과학</span>
         </button>
-        <button>
-          <img src="../../../static/images/board/ITnews/ITnews_space.svg">
+        <button class="filter-btn" data-type="26">
+          <img th:src="@{/images/board/ITnews/ITnews_space.svg}">
           <span>우주</span>
         </button>
       </div><br><br>
@@ -47,131 +49,27 @@
 
     <main>
       <div class="news-list">
-        <article class="news-item">
-
+        <article class="news-item" th:each="news : ${itnews}" th:attr="data-type=${news.boardCode}"
+          th:onclick="|location.href='/ITnews/${news.boardNo}'|" style="cursor: pointer;">
           <div class="content">
-            <h3 class="title">게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'</h3>
-            <p class="summary">
-              (지디넷코리아=정진성 기자)국내 최대 규모의 서브컬처 축제 'AGF 2025(Anime X Game Festival)'
-              가 지난 5일 경기도 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안 킨텍스 제1전시장 1~
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-            </p>
-          </div>
-          <img class="thumbnail" src="../../../static/images/board/ITnews/thumb.png" alt="썸네일">
+            <h3 class="title" th:text="${news.boardTitle}">뉴스 제목</h3>
 
+            <p class="summary" th:text="${news.boardContent}">뉴스 요약 내용...</p>
+
+            <div class="news-info">
+              <span th:text="${news.newsReporter}">기자명</span> |
+              <span th:text="${news.bCreateDate}">2025.12.28</span>
+            </div>
+          </div>
+
+          <img class="thumbnail" th:src="${news.imgPath != null ? news.imgPath : '/images/common/devlog.svg'}"
+            alt="썸네일">
         </article>
 
-        <article class="news-item">
-
-
-          <div class="content">
-            <h3 class="title">게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'</h3>
-            <p class="summary">
-              (지디넷코리아=정진성 기자)국내 최대 규모의 서브컬처 축제 'AGF 2025(Anime X Game Festival)'
-              가 지난 5일 경기도 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안 킨텍스 제1전시장 1~
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-            </p>
-          </div>
-          <img class="thumbnail" src="../../../static/images/board/ITnews/thumb.png" alt="썸네일">
-
-        </article>
-
-        <article class="news-item">
-
-          <div class="content">
-            <h3 class="title">게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'</h3>
-            <p class="summary">
-              (지디넷코리아=정진성 기자)국내 최대 규모의 서브컬처 축제 'AGF 2025(Anime X Game Festival)'
-              가 지난 5일 경기도 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안 킨텍스 제1전시장 1~
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-            </p>
-          </div>
-          <img class="thumbnail" src="../../../static/images/board/ITnews/thumb.png" alt="썸네일">
-
-        </article>
-
-        <article class="news-item">
-
-          <div class="content">
-            <h3 class="title">게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'</h3>
-            <p class="summary">
-              (지디넷코리아=정진성 기자)국내 최대 규모의 서브컬처 축제 'AGF 2025(Anime X Game Festival)'
-              가 지난 5일 경기도 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안 킨텍스 제1전시장 1~
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-            </p>
-          </div>
-          <img class="thumbnail" src="../../../static/images/board/ITnews/thumb.png" alt="썸네일">
-
-        </article>
-
-
-        <article class="news-item">
-
-          <div class="content">
-            <h3 class="title">게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'</h3>
-            <p class="summary">
-              (지디넷코리아=정진성 기자)국내 최대 규모의 서브컬처 축제 'AGF 2025(Anime X Game Festival)'
-              가 지난 5일 경기도 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안 킨텍스 제1전시장 1~
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-            </p>
-          </div>
-          <img class="thumbnail" src="../../../static/images/board/ITnews/thumb.png" alt="썸네일">
-
-        </article>
-
-
-        <article class="news-item">
-
-          <div class="content">
-            <h3 class="title">게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'</h3>
-            <p class="summary">
-              (지디넷코리아=정진성 기자)국내 최대 규모의 서브컬처 축제 'AGF 2025(Anime X Game Festival)'
-              가 지난 5일 경기도 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안 킨텍스 제1전시장 1~
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-            </p>
-          </div>
-          <img class="thumbnail" src="../../../static/images/board/ITnews/thumb.png" alt="썸네일">
-
-        </article>
-
-
-        <article class="news-item">
-
-          <div class="content">
-            <h3 class="title">게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'</h3>
-            <p class="summary">
-              (지디넷코리아=정진성 기자)국내 최대 규모의 서브컬처 축제 'AGF 2025(Anime X Game Festival)'
-              가 지난 5일 경기도 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안 킨텍스 제1전시장 1~
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-            </p>
-          </div>
-          <img class="thumbnail" src="../../../static/images/board/ITnews/thumb.png" alt="썸네일">
-
-        </article>
-        <article class="news-item">
-
-          <div class="content">
-            <h3 class="title">게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'</h3>
-            <p class="summary">
-              (지디넷코리아=정진성 기자)국내 최대 규모의 서브컬처 축제 'AGF 2025(Anime X Game Festival)'
-              가 지난 5일 경기도 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안 킨텍스 제1전시장 1~
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-              htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.htmlcssjs너무어려워요.
-            </p>
-          </div>
-          <img class="thumbnail" src="../../../static/images/board/ITnews/thumb.png" alt="썸네일">
-
-        </article>
+        <div th:if="${#lists.isEmpty(itnews)}" style="text-align: center; padding: 50px;">
+          <p>수집된 뉴스가 없습니다.</p>
+        </div>
       </div>
-
-
     </main>
 
   </div>
@@ -180,8 +78,9 @@
   <!--  페 이 지 네 이 션 !!!!!!! -->
 
 
-  <!-- <div th:replace="common/footer :: footer"></div> -->
-
+  <div th:replace="common/footer :: footer"></div>
+  <script th:src="@{/js/notification/noti.js}"></script>
+  <script th:src="@{/js/board/ITnews/ITnews.js}"></script>
 </body>
 
 </html>

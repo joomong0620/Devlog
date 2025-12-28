@@ -9,11 +9,12 @@
   <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
 </head>
 
+<div th:replace="common/header :: header"></div>
+<script th:src="@{/js/common/header.js}"></script>
+
 <body>
 
   <div class="detail_container">
-    <div th:replace="common/header :: header"></div>
-    <script th:src="@{/js/common/header.js}"></script>
     <header class="detail_header">
       <div class="company_name" th:text="${job.companyName}"></div>
       <div class="posting_title" th:text="${job.postingTitle}"></div>
