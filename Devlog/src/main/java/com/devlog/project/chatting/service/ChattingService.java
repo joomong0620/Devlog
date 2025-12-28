@@ -11,10 +11,10 @@ public interface ChattingService {
 	
 	
 	// 채팅방 목록 조회
-	List<ChattingDTO.ChattingListDTO> selectChatList(int memberNo);
+	List<ChattingDTO.ChattingListDTO> selectChatList(Long memberNo);
 	
 	// 팔로우 목록 조회
-	List<ChattingDTO.FollowListDTO> selectFollowList(int memberNo);
+	List<ChattingDTO.FollowListDTO> selectFollowList(Long long1);
 	
 	
 	// 개인 채팅방 생성
@@ -27,6 +27,10 @@ public interface ChattingService {
 	
 	// 채팅방 정보 조회
 	RoomInfoDTO roomInfoLoad(Long roomNo, Long memberNo);
+	
+	
+	// 채팅방 마지막 메세지 업데이트
+	void updateLastRead(Long roomNo, Long memberNo);
 	
 
 }

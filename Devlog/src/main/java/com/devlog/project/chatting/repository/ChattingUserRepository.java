@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -42,6 +43,34 @@ public interface ChattingUserRepository extends JpaRepository<ChattingUser, Chat
 			
 			""")
 	List<ParticipantDTO> findByParticipants(@Param("roomNo") Long roomNo);
+
+
+	
+	// 개인채팅방일 경우 상대방 이름, 상대방 프로필 조회
+	@Query("""
+			select cu
+			from ChattingUser cu
+			where cu.chattingRoom.roomNo = :roomNo
+			and cu.member.memberNo <> :memberNo
+			""")
+	ChattingUser findOpponent(@Param("roomNo") Long roomNo,@Param("memberNo") Long memberNo);
+
+
+	
+	
+	// 해당 유저 마지막 읽은 메세지 업데이트
+	@Modifying
+	@Query("""
+			update ChattingUser cu
+			set cu.lastReadNo = (
+				select MAX(m.messageNo)
+				from Message m
+				where m.chattingRoom.roomNo= :roomNo
+			)
+			where cu.member.memberNo = :memberNo
+			and cu.chattingRoom.roomNo = :roomNo		
+			""")
+	void updateLastReadMessageNo(Long roomNo, Long memberNo);
 	
 	
 	

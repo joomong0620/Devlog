@@ -5,16 +5,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.ibatis.javassist.bytecode.stackmap.BasicBlock.Catch;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.chatting.chatenums.ChatEnums;
+import com.devlog.project.chatting.chatenums.ChatEnums.RoomType;
 import com.devlog.project.chatting.dto.ChattingDTO.FollowListDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.GroupCreateDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.RoomInfoDTO;
@@ -40,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
+@PropertySource("classpath:/config.properties")
 public class ChattingServiceImpl implements ChattingService {
 
 	private final ChattingUserRepository chattingUserRepository;
@@ -60,7 +66,7 @@ public class ChattingServiceImpl implements ChattingService {
 
 	// 채팅방 목록 조회
 	@Override
-	public List<com.devlog.project.chatting.dto.ChattingDTO.ChattingListDTO> selectChatList(int memberNo) {
+	public List<com.devlog.project.chatting.dto.ChattingDTO.ChattingListDTO> selectChatList(Long memberNo) {
 
 		return chatMapper.selectChatList(memberNo);
 	}
@@ -68,7 +74,7 @@ public class ChattingServiceImpl implements ChattingService {
 
 	// 팔로우 목록 조회
 	@Override
-	public List<FollowListDTO> selectFollowList(int memberNo) {
+	public List<FollowListDTO> selectFollowList(Long memberNo) {
 		return chatMapper.selectFollowList(memberNo);
 	}
 
@@ -228,20 +234,27 @@ public class ChattingServiceImpl implements ChattingService {
 		ChatRoom room = roomRepository.findById(roomNo)
 				.orElseThrow();
 		
-		roomInfo.setRoomName(room.getChattingRoomName());
-		roomInfo.setRoomProfile(room.getRoomImg());
+		if(room.getRoomType() == RoomType.GROUP) {
+			roomInfo.setRoomName(room.getChattingRoomName());
+			roomInfo.setRoomProfile(room.getRoomImg());
+		}else {
+			ChattingUser opponent = chattingUserRepository.findOpponent(roomNo, memberNo);
+			
+			Member opponentMember = opponent.getMember();
+			roomInfo.setRoomName(opponentMember.getMemberNickname());
+			roomInfo.setRoomProfile(opponentMember.getProfileImg());
+		}
 		
 		
 		// 2. 참여 회원 목록
 		List<ParticipantDTO> users = chattingUserRepository.findByParticipants(roomNo);
 		
-		log.info("참여회원 목록 조회 결과 : {}", users);
-		
+		roomInfo.setParticipantCount(users.size());
 		// 3. 메세지 목록 조회
 		// List<MessageDTO> messageList = 
 		List<MessageDTO> message = messageRepository.findByMessageList(roomNo, memberNo);
 		
-		log.info("메세지 목록 조회 결과 : {}", message);
+		
 		
 		// 3-1 메세지에 달린 이모지 조회
 		// 메세지 번호들 꺼내오기
@@ -251,10 +264,64 @@ public class ChattingServiceImpl implements ChattingService {
 		
 		List<EmojiDTO> emojiCount = emojiRepository.findEmojiCount(messageNos);
 		
-		log.info("이모지 개수 확인 : {}", emojiCount);
+		
+		Map<Long, Map<String, Long>> reactionMap = new HashMap<>();
+		
+		for (EmojiDTO emojiDTO : emojiCount) {
+			
+			Long messageNo = emojiDTO.getMessageNo();
+			String emoji = emojiDTO.getEmoji();
+			Long count = emojiDTO.getCount();
+			
+			if(!reactionMap.containsKey(messageNo)) {
+				reactionMap.put(messageNo, new HashMap<>());
+			}
+			// 4 : {❤️ : 1, 😠 : 1}
+			
+			Map<String, Long> emojiMap = reactionMap.get(messageNo);
+			
+			emojiMap.put(emoji, count);
+		}
+		
+		// 메세지 dto에 추가
+		for (MessageDTO msg : message) {
+			Long msgNo = msg.getMessageNo();
+			
+			Map<String, Long> reactions;
+			
+			if(reactionMap.containsKey(msgNo)) {
+				
+				reactions = reactionMap.get(msgNo);
+			}else {
+				reactions = new HashMap<>();
+			}
+			// ❤️ : 1, 😠 : 1}
+			msg.setReactions(reactions);
+			
+		}
 		
 		
-		return null;
+		roomInfo.setUsers(users);
+		roomInfo.setMessageList(message);
+		
+		// 최종 확인
+		log.info("최종 조회 결과 : {}", roomInfo);
+		
+		return roomInfo;
+	}
+
+	
+	
+	// 마지막으로 읽은 메세지 업데이트
+	@Override
+	@Transactional
+	public void updateLastRead(Long roomNo, Long memberNo) {
+		
+		
+		log.info("roomNo : {}", roomNo);
+		log.info("memberNo : {}", memberNo);
+		
+		chattingUserRepository.updateLastReadMessageNo(roomNo, memberNo);
 	}
 
 

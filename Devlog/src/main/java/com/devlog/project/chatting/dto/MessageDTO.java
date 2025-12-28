@@ -4,7 +4,11 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.devlog.project.chatting.chatenums.MsgEnums;
+import com.devlog.project.chatting.entity.Message;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,7 +37,7 @@ public class MessageDTO {
 	private int unreadCount;
 	private boolean mine;
 	
-	private Map<String, Integer> reactions;
+	private Map<String, Long> reactions;
 	
 	
 	public MessageDTO(
@@ -62,8 +66,71 @@ public class MessageDTO {
 		    this.mine = mine != null && mine == 1;
 		}
 	
-	public MessageDTO(Map<String, Integer> reactions) {
+	public MessageDTO(Map<String, Long> reactions) {
 		this.reactions = reactions;
+	}
+	
+	
+	
+	@Getter
+	@Setter
+	@ToString
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class ChatMessage {
+		
+		@JsonProperty("chatRoomNo")
+		private Long chatRoomNo;
+		private Long sender;
+		private String content;
+		private int totalCount;
+	}
+	
+	
+	@Getter
+	@Setter
+	@ToString
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class ChatMessageResponse {
+		
+		private Long roomNo;
+		private Long senderNo;
+		private String senderName;
+		private String content;
+		private LocalDateTime sendtime;
+		private Long messageNo;
+		private String profileImg;
+		
+		private int unreadCount;
+		
+		
+		
+		public static ChatMessageResponse toDto(Message m) {
+			
+			return ChatMessageResponse.builder()
+					.roomNo(m.getChattingRoom().getRoomNo())
+					.senderNo(m.getMember().getMemberNo())
+					.senderName(m.getMember().getMemberNickname())
+					.content(m.getMessageContent())
+					.sendtime(m.getSendTime())
+					.messageNo(m.getMessageNo())
+					.profileImg(m.getMember().getProfileImg())
+					.build();
+			
+		}
+		
+		
+	}
+	
+	
+	@Getter
+	@Setter
+	@ToString
+	public static class messageReadRequest {
+		private Long roomNo;
+		private Long memberNo;
 	}
 	
 }

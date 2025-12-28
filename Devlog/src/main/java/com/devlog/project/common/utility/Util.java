@@ -1,6 +1,9 @@
 package com.devlog.project.common.utility;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Util {
 	// Cross Site Scripting(XSS) 방지 처리
@@ -35,4 +38,19 @@ public class Util {
 
 	      return date + str + ext;
 	   }
+	   
+	   
+	   // 시간 변경 메소드
+	   public static String formatChatTime(LocalDateTime time) {
+		    if (time == null) return "";
+
+		    LocalDate today = LocalDate.now();
+		    LocalDate date = time.toLocalDate();
+
+		    if (date.equals(today)) {
+		        return time.format(DateTimeFormatter.ofPattern("HH:mm"));
+		    }
+
+		    return time.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+		}
 }

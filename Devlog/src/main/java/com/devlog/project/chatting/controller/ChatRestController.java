@@ -16,7 +16,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.devlog.project.chatting.dto.ChattingDTO;
+import com.devlog.project.chatting.dto.ChattingDTO.ChattingListDTO;
 import com.devlog.project.chatting.service.ChattingService;
+import com.devlog.project.common.utility.Util;
+import com.devlog.project.member.model.dto.MbMember;
+import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +35,17 @@ public class ChatRestController {
 	// 채팅방 목록 조회
 	@GetMapping("/devtalk/chatList")
 	public String selectChatList(
-			Model model){
+			Model model,
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember){
 		
 		int memberNo = 1;
 		
-		List<ChattingDTO.ChattingListDTO> chatList = chattingService.selectChatList(memberNo);
+		List<ChattingDTO.ChattingListDTO> chatList = chattingService.selectChatList(loginMember.getMemberNo());
+		
+		for (ChattingListDTO dto : chatList) {
+			dto.setFormatTime(Util.formatChatTime(dto.getLastMessageAt()));
+			
+		}
 		
 		log.info("chatList = {}", chatList);
 		
@@ -49,12 +59,13 @@ public class ChatRestController {
 	@GetMapping("/devtalk/followSelect")
 	public String selectFollowList(
 			// 세션 로그인 멤버
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember,
 			Model model
 			) {
 		
-		int memberNo = 1;
 		
-		List<ChattingDTO.FollowListDTO> followList = chattingService.selectFollowList(memberNo);
+		
+		List<ChattingDTO.FollowListDTO> followList = chattingService.selectFollowList(loginMember.getMemberNo());
 		
 		log.info("팔로우 리스트 조회 결과 : {} ", followList);
 		
@@ -68,10 +79,10 @@ public class ChatRestController {
 	@PostMapping("/devtalk/create/private")
 	@ResponseBody
 	public Long privateCreate(
-			@RequestBody Long targetMemberNo
-			
+			@RequestBody Long targetMemberNo,
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
 			) {
-		Long myMemberNo = 1l;
+		Long myMemberNo = loginMember.getMemberNo();
 		
 		log.info("myMemberNo={}, targetMemberNo={}", myMemberNo, targetMemberNo);
 		
@@ -83,13 +94,13 @@ public class ChatRestController {
 	@PostMapping("/devtalk/create/group")
 	@ResponseBody
 	public Long gropuCreate(
-			@ModelAttribute ChattingDTO.GroupCreateDTO group
-			// 세션 로그인 멤버
+			@ModelAttribute ChattingDTO.GroupCreateDTO group,
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
 			) throws IOException {
 		
 		log.info("파라미터 확인 group : {}", group);
 		
-		Long loginMemberNo = 1l;
+		Long loginMemberNo = loginMember.getMemberNo();
 		
 		group.getMemberNo().add(0, loginMemberNo);
 		
@@ -103,15 +114,17 @@ public class ChatRestController {
 	@GetMapping("/devtalk/roomInfoLoad")
 	public String roomInfoLoad(
 			@RequestParam("roomNo") Long roomNo,
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember,
 			Model model) {
 		
-		Long memberNo = 1l;
+		Long memberNo = loginMember.getMemberNo();
 		
 		ChattingDTO.RoomInfoDTO roomInfo = chattingService.roomInfoLoad(roomNo, memberNo);
 		
+		model.addAttribute("roomInfo", roomInfo);
 		
 		
-		return null;
+		return "chatting/chatting ::#chatting-space";
 		
 	}
 	

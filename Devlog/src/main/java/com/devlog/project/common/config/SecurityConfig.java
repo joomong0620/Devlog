@@ -69,6 +69,9 @@ public class SecurityConfig {
 	                "/error",
 	                
 	                "/devtalk/**",
+					"/ws-chat/**",
+	                "/topic/**",
+	                "/queue/**",
 	                
 	                //// KJY ////
 	                "/jobposting",

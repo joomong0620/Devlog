@@ -28,24 +28,31 @@ document.addEventListener('click', (e) => {
     const item = e.target.closest('.room-item');
     if (!item) return; // room-item이 아닌 곳 클릭이면 무시
 
+    const roomNo = Number(item.dataset.roomNo);
     // 현재 room-list 안의 room-item만 대상으로 선택 해제
-    const container = document.getElementById('roomList');
+   /*  const container = document.getElementById('roomList');
     container.querySelectorAll('.room-item').forEach(el => el.classList.remove('is-selected'));
 
     item.classList.add('is-selected');
+    showChatRoomUI();
+    loadChatRoom(roomNo); */
+
+    enterChatRoom(roomNo);
 });
 
 
 window.addEventListener('load', () => {
-    scrollToBottom();
+    
+    connectSocket();
 });
 
 
 
 /* 메세지 하단 고정 함수 */
-const messageArea = document.getElementsByClassName('message-list')[0]
-
+/* 채팅 영역 함수 */
 function scrollToBottom() {
+    const messageArea = document.getElementsByClassName('message-list')[0]
+    if (!messageArea) return;
     messageArea.scrollTop = messageArea.scrollHeight
 }
 
@@ -260,6 +267,10 @@ document.getElementById('room-create-btn').addEventListener('click', async e => 
         await selectChatList();
 
         enterChatRoom(result);
+
+        showChatRoomUI();
+
+        await loadChatRoom(result)
         
     }
 
@@ -274,6 +285,10 @@ document.getElementById('room-create-btn').addEventListener('click', async e => 
         await selectChatList();
 
         enterChatRoom(result);
+
+        showChatRoomUI();
+
+        await loadChatRoom(result)
     }
     
 });
@@ -416,13 +431,22 @@ function enterChatRoom(roomNo) {
     const target = document.querySelector(`[data-room-no="${roomNo}"]`);
     if (!target) return;
 
-    console.log('enterChatRoom : ' + roomNo);
     target.classList.add('is-selected');
 
-    // // 2. 실제 채팅방 이동 로직
-    // loadChatRoom(roomNo);      // 메시지 조회
-    // subscribeRoom(roomNo);    // 웹소켓 구독
+    // 2. 채팅 UI 생성
+    showChatRoomUI();
+
+    // 3. 채팅 정보 로딩
+    loadChatRoom(roomNo);
+
+    // 4. STOMP 구독
+    subscribeRoom(roomNo);
+
+
+    // 5. 채팅방 입장 시 마지막 읽은 메세지 업데이트
+    sendReadSignal(roomNo);
 }
+
 
 
 
@@ -437,62 +461,64 @@ document.getElementById('room-cancle-btn')?.addEventListener('click', e => {
 
 
 /* 메세지 수정 공감 삭제 드롭다운 */
-const messageOption = document.querySelectorAll('.message-option');
-const messageBox = document.querySelectorAll('.bubble')
-
+/* 채팅 영역 함수 */
 let openBox = null;
 
-for (let box  of messageBox) {
 
-    box.addEventListener('contextmenu', e => {
 
-        
-        e.preventDefault();   
-        e.stopPropagation(); 
 
-        const option = box.nextElementSibling;
-        const emojiArea = option.nextElementSibling;
+function bindMessageContextMenu() {
 
-        /* 같은 요소 우클릭 시 제거 후 함수 종료 */
+    const chatArea = document.getElementById('chattingArea');
+    if (!chatArea) return;
+
+    chatArea.addEventListener('contextmenu', e => {
+
+        const box = e.target.closest('.bubble');
+        if (!box) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const container = box.closest('.message-content');
+        if (!container) return;
+
+        const option = container.querySelector('.msg-option');
+        const emojiArea = container.querySelector('.emoji-area');
+        if (!option || !emojiArea) return;
+
         if (openBox === option) {
             option.classList.add('display-none');
             openBox = null;
             return;
         }
 
-        /* 다른 요소 클릭 시 기존에 열려있는 옵션창 제거 */
         if (openBox) {
-        openBox.classList.add('display-none');
+            openBox.classList.add('display-none');
         }
 
+        option.classList.toggle('display-none');
+        openBox = option;
 
-        option.classList.toggle('display-none')
-
-        openBox = option
-        
-        /* 이모지 공감 버튼 클릭 시 */
         const reactionBtn = option.querySelector('.msg-reaction-btn');
-        reactionBtn.onclick = e => {
+        if (reactionBtn) {
+            reactionBtn.onclick = ev => {
+                ev.stopPropagation();
 
-            e.stopPropagation();
+                option.classList.add('display-none');
+                openBox = null;
 
-            option.classList.add('display-none');
-            openBox = null;
-
-            emojiArea.classList.remove('display-none');
-
-            
-
-            emojiAreaClose(emojiArea)
-
-            emojiClickClose(emojiArea)
-        };
-
-        
-
-    })
-    
+                emojiArea.classList.remove('display-none');
+                emojiAreaClose(emojiArea);
+                emojiClickClose(emojiArea);
+            };
+        }
+    });
 }
+
+
+
+
 
 
 /* 이모지 영역 바깥을 클릭 했을 떄 닫히게 하는 함수 */
@@ -536,121 +562,186 @@ function emojiClickClose(emojiArea) {
 
 /* ---------------------------------------- */
 /* 검색, 메뉴 슬라이드 효과 */
-const searchPanel = document.querySelector('.chat-search-panel');
-const searchBtn = document.getElementById('text-search-btn');
-const chatMenuBtn = document.getElementById('chat-menu-btn')
-const menuPanel = document.querySelector('.chat-menu-panel');
+// const searchPanel = document.querySelector('.chat-search-panel');
+// const searchBtn = document.getElementById('text-search-btn');
+// const chatMenuBtn = document.getElementById('chat-menu-btn')
+// const menuPanel = document.querySelector('.chat-menu-panel');
+// 
+// searchBtn.addEventListener('click', e => {
+//     e.stopPropagation();
+// 
+//     menuPanel?.classList.remove('is-open');
+//     searchPanel.classList.toggle('is-open')
+// })
+// 
+// 
+// 
+// chatMenuBtn.addEventListener('click', e => {
+//     e.stopPropagation()
+//     searchPanel?.classList.remove('is-open');
+//     
+//     menuPanel.classList.toggle('is-open');
+// })
+// 
+// 
+// /* ----------------------------------- */
+// /* 채팅방 나가기 버튼 클릭 시 */
+// const exitBtn = document.getElementById('exit-btn');
+// const exitArea = document.querySelector('.exit-check')
+// const chatOverlay = document.getElementById('chat-overlay')
+// 
+// exitBtn?.addEventListener('click', e => {
+//     exitArea.classList.remove('display-none');
+//     chatOverlay.classList.add('active')
+// }) 
+// 
+// document.getElementById('no').addEventListener('click', e => {
+//     exitArea.classList.add('display-none')
+//     chatOverlay.classList.remove('active')
+// })
+// 
+// 
+// 
+// /* 채팅방 나가기 버튼 클릭 ㅅ ㅣ로직 추가 */
+// document.getElementById('yes').addEventListener('click', e => {
+//     exitArea.classList.add('display-none')
+//     chatOverlay.classList.remove('active')
+// 
+// 
+// 
+//     /* 비동기 로직 추가 */
+// })
 
-searchBtn.addEventListener('click', e => {
-    e.stopPropagation();
 
-    menuPanel?.classList.remove('is-open');
-    searchPanel.classList.toggle('is-open')
-})
+/* ===========================================
+    채팅 UI 이벤트 바인딩
+    fragment 로딩 후 반드시 호출
+=========================================== */
+function bindChatUIEvents() {
 
+    /* ---------- 검색 / 메뉴 슬라이드 ---------- */
 
+    const searchPanel  = document.querySelector('.chat-search-panel');
+    const menuPanel    = document.querySelector('.chat-menu-panel');
+    const searchBtn    = document.getElementById('text-search-btn');
+    const chatMenuBtn  = document.getElementById('chat-menu-btn');
 
-chatMenuBtn.addEventListener('click', e => {
-    e.stopPropagation()
-    searchPanel?.classList.remove('is-open');
-    
-    menuPanel.classList.toggle('is-open');
-})
+    if (searchBtn && searchPanel && menuPanel) {
+        searchBtn.addEventListener('click', e => {
+            e.stopPropagation();
 
+            menuPanel.classList.remove('is-open');
+            searchPanel.classList.toggle('is-open');
+        });
+    }
 
-/* ----------------------------------- */
-/* 채팅방 나가기 버튼 클릭 시 */
-const exitBtn = document.getElementById('exit-btn');
-const exitArea = document.querySelector('.exit-check')
-const chatOverlay = document.getElementById('chat-overlay')
+    if (chatMenuBtn && searchPanel && menuPanel) {
+        chatMenuBtn.addEventListener('click', e => {
+            e.stopPropagation();
 
-exitBtn?.addEventListener('click', e => {
-    exitArea.classList.remove('display-none');
-    chatOverlay.classList.add('active')
-}) 
+            searchPanel.classList.remove('is-open');
+            menuPanel.classList.toggle('is-open');
+        });
+    }
 
-document.getElementById('no').addEventListener('click', e => {
-    exitArea.classList.add('display-none')
-    chatOverlay.classList.remove('active')
-})
+    /* ---------- 채팅방 나가기 ---------- */
 
+    const exitBtn     = document.getElementById('exit-btn');
+    const exitArea    = document.querySelector('.exit-check');
+    const chatOverlay = document.getElementById('chat-overlay');
+    const noBtn       = document.getElementById('no');
+    const yesBtn      = document.getElementById('yes');
 
+    if (exitBtn && exitArea && chatOverlay) {
+        exitBtn.addEventListener('click', () => {
+            exitArea.classList.remove('display-none');
+            chatOverlay.classList.add('active');
+        });
+    }
 
-/* 채팅방 나가기 버튼 클릭 ㅅ ㅣ로직 추가 */
-document.getElementById('yes').addEventListener('click', e => {
-    exitArea.classList.add('display-none')
-    chatOverlay.classList.remove('active')
+    if (noBtn && exitArea && chatOverlay) {
+        noBtn.addEventListener('click', () => {
+            exitArea.classList.add('display-none');
+            chatOverlay.classList.remove('active');
+        });
+    }
 
+    if (yesBtn && exitArea && chatOverlay) {
+        yesBtn.addEventListener('click', () => {
+            exitArea.classList.add('display-none');
+            chatOverlay.classList.remove('active');
 
-
-    /* 비동기 로직 추가 */
-})
+            // TODO: 채팅방 나가기 비동기 요청
+            // leaveChatRoom();
+        });
+    }
+}
 
 
 /* ------------------------------------------- */
 /* 수정하기 버튼 클릭 시 입력 폼 변화 */
 
-const sendArea = document.querySelector('.send-area');
-const editArea = document.querySelector('.edit-area');
-
-const editCancelBtn = document.getElementById('edit-cancle-btn');
-
-const msgEditBtn = document.querySelectorAll('.msg-edit-btn')
-
-for (let editBtn of msgEditBtn) {
-
-    editBtn.addEventListener('click', e => {
-
-        const messageContainer = editBtn.closest('.message-content');
-
-        const bubble = messageContainer.querySelector('.bubble');
-        
-        const originText = bubble.innerText;
-
-        console.log("원본 메세지 : ", originText)
-
-        openEditMode(originText);
-        
-        
-
-        const opt = editBtn.closest('.msg-option')
-
-        opt.classList.add('display-none')
-
-
-    })
-    
-}
-
-
-/* 편입 입력으로 전환 */
-function openEditMode(originText) {
-    // 기존 입력창 숨김
-    sendArea.classList.add('display-none');
-
-    // 수정창 표시
-    editArea.classList.remove('display-none');
-
-    // 기존 메시지 내용 세팅
-    document.getElementById('edit-message').value = originText
-    document.getElementById('edit-message').focus();
-}
-
-editCancelBtn.addEventListener('click', () => {
-    closeEditMode();
-});
-
-/* 다시 본 입력창 전환 */
-function closeEditMode() {
-    // 수정창 숨김
-    editArea.classList.add('display-none');
-
-    // 기존 입력창 표시
-    sendArea.classList.remove('display-none');
-
-    // 수정 textArea 초기화
-    document.getElementById('edit-message').value = '';
-}
+// const sendArea = document.querySelector('.send-area');
+// const editArea = document.querySelector('.edit-area');
+// 
+// const editCancelBtn = document.getElementById('edit-cancle-btn');
+// 
+// const msgEditBtn = document.querySelectorAll('.msg-edit-btn')
+// 
+// for (let editBtn of msgEditBtn) {
+// 
+//     editBtn.addEventListener('click', e => {
+// 
+//         const messageContainer = editBtn.closest('.message-content');
+// 
+//         const bubble = messageContainer.querySelector('.bubble');
+//         
+//         const originText = bubble.innerText;
+// 
+//         console.log("원본 메세지 : ", originText)
+// 
+//         openEditMode(originText);
+//         
+//         
+// 
+//         const opt = editBtn.closest('.msg-option')
+// 
+//         opt.classList.add('display-none')
+// 
+// 
+//     })
+//     
+// }
+// 
+// 
+// /* 편입 입력으로 전환 */
+// function openEditMode(originText) {
+//     // 기존 입력창 숨김
+//     sendArea.classList.add('display-none');
+// 
+//     // 수정창 표시
+//     editArea.classList.remove('display-none');
+// 
+//     // 기존 메시지 내용 세팅
+//     document.getElementById('edit-message').value = originText
+//     document.getElementById('edit-message').focus();
+// }
+// 
+// editCancelBtn.addEventListener('click', () => {
+//     closeEditMode();
+// });
+// 
+// /* 다시 본 입력창 전환 */
+// function closeEditMode() {
+//     // 수정창 숨김
+//     editArea.classList.add('display-none');
+// 
+//     // 기존 입력창 표시
+//     sendArea.classList.remove('display-none');
+// 
+//     // 수정 textArea 초기화
+//     document.getElementById('edit-message').value = '';
+// }
 
 
 /* 수정보튼 클릭 or 엔터 입력 시 서버에 전송 ?  */
@@ -664,51 +755,107 @@ function closeEditMode() {
     closeEditMode();
 }); */
 
+/* 메세지 수정 함수 */
+function bindMessageEditEvents() {
+
+    const sendArea = document.querySelector('.send-area');
+    const editArea = document.querySelector('.edit-area');
+    const editCancelBtn = document.getElementById('edit-cancle-btn');
+    const chatArea = document.getElementById('chattingArea');
+
+    if (!sendArea || !editArea || !chatArea) return;
+
+    chatArea.addEventListener('click', e => {
+
+        const editBtn = e.target.closest('.msg-edit-btn');
+        if (!editBtn) return;
+
+        const messageContainer = editBtn.closest('.message-content');
+        if (!messageContainer) return;
+
+        const bubble = messageContainer.querySelector('.bubble');
+        if (!bubble) return;
+
+        const originText = bubble.innerText;
+
+        openEditMode(originText, sendArea, editArea);
+
+        const opt = editBtn.closest('.msg-option');
+        if (opt) opt.classList.add('display-none');
+    });
+
+    if (editCancelBtn) {
+        editCancelBtn.addEventListener('click', () => {
+            closeEditMode(sendArea, editArea);
+        });
+    }
+}
+
+
+function openEditMode(originText, sendArea, editArea) {
+    sendArea.classList.add('display-none');
+    editArea.classList.remove('display-none');
+
+    const input = document.getElementById('edit-message');
+    if (!input) return;
+
+    input.value = originText;
+    input.focus();
+}
+
+function closeEditMode(sendArea, editArea) {
+    editArea.classList.add('display-none');
+    sendArea.classList.remove('display-none');
+
+    const input = document.getElementById('edit-message');
+    if (input) input.value = '';
+}
+
 
 
 /* 유저 초대 */
 /* 초대 버튼 클릭 시 비동기로 회원 목록 조회후 fragment 써서 렌더링 예정 */
 /*  */
 
-const inviteBtn = document.getElementById('invite-btn');
-const inviteList = document.getElementsByName('roomInvite')
-const selectedArea = document.querySelector('.select-user-area');
-
-
-inviteBtn?.addEventListener('click', e=> {
-    for (let item of inviteList) {
-        item.checked = false
-        
-    }
-    selectedArea.innerHTML = ""
-    chatOverlay.classList.add('active')
-    document.getElementsByClassName('user-invite-box')[0].classList.remove('display-none')
-
-})
-
-
-
-/* 유저 리스트 체크박스 하나씩 */
-for (let checkbox of inviteList) {
-    checkbox.addEventListener('change', e => {
-
-        const listBox = e.target.closest('.user-list');
-
-        const nameEl =
-            listBox.querySelector('.user-name') ||
-            listBox.querySelector('span');
-
-        const userName = nameEl.innerText;
-
-        if (e.target.checked) {
-            if (!inviteExist(userName)) {
-                inviteAddUser(userName, e.target);
-            }
-        } else {
-            inviteDeleteUser(userName);
-        }
-    });
-}
+// const inviteBtn = document.getElementById('invite-btn');
+// const inviteList = document.getElementsByName('roomInvite')
+// const selectedArea = document.querySelector('.select-user-area');
+// 
+// 
+// inviteBtn?.addEventListener('click', e=> {
+//     for (let item of inviteList) {
+//         item.checked = false
+//         
+//     }
+//     selectedArea.innerHTML = ""
+//     chatOverlay.classList.add('active')
+//     document.getElementsByClassName('user-invite-box')[0].classList.remove('display-none')
+// 
+// })
+// 
+// 
+// 
+// /* 유저 리스트 체크박스 하나씩 */
+// for (let checkbox of inviteList) {
+//     checkbox.addEventListener('change', e => {
+// 
+//         const listBox = e.target.closest('.user-list');
+// 
+//         const nameEl =
+//             listBox.querySelector('.user-name') ||
+//             listBox.querySelector('span');
+// 
+//         const userName = nameEl.innerText;
+// 
+//         if (e.target.checked) {
+//             if (!inviteExist(userName)) {
+//                 inviteAddUser(userName, e.target);
+//             }
+//         } else {
+//             inviteDeleteUser(userName);
+//         }
+//     });
+// }
 
 /* 선택 되면 태그 형식으로 추가 */
 function inviteAddUser(userName, checkbox) {
@@ -755,96 +902,150 @@ function inviteDeleteUser(userName) {
 
 
 /* 취소 클릭 시 초대창 닫기 */
-document.getElementById('invite-cancel').addEventListener('click', e => {
-    document.getElementsByClassName('user-invite-box')[0].classList.add('display-none')  
-    chatOverlay.classList.remove('active')
-})
+// document.getElementById('invite-cancel')?.addEventListener('click', e => {
+//     document.getElementsByClassName('user-invite-box')[0].classList.add('display-none')  
+//     chatOverlay.classList.remove('active')
+// })
 
-/* 초대 버튼 클릭 시  */
-document.getElementById('invite-user').addEventListener('click', e => {
-    document.getElementsByClassName('user-invite-box')[0].classList.add('display-none');
-    chatOverlay.classList.remove('active');
 
-    /* 비동기 요청 ------------------------------------ */
+function bindInviteEvents() {
 
-    alert("초대 되었습니다 ! ");
-})
+    const inviteBtn = document.getElementById('invite-btn');
+    const inviteList = document.getElementsByName('roomInvite');
+    const selectedArea = document.querySelector('.select-user-area');
+    const chatOverlay = document.getElementById('chat-overlay');
+
+    inviteBtn?.addEventListener('click', () => {
+        for (let item of inviteList) item.checked = false;
+        selectedArea.innerHTML = '';
+        chatOverlay.classList.add('active');
+        document.querySelector('.user-invite-box')
+            ?.classList.remove('display-none');
+    });
+
+    for (let checkbox of inviteList) {
+        checkbox.addEventListener('change', e => {
+            const listBox = e.target.closest('.user-list');
+            const nameEl =
+                listBox.querySelector('.user-name') ||
+                listBox.querySelector('span');
+
+            const userName = nameEl.innerText;
+
+            if (e.target.checked) {
+                if (!inviteExist(userName)) {
+                    inviteAddUser(userName, e.target);
+                }
+            } else {
+                inviteDeleteUser(userName);
+            }
+        });
+    }
+
+    document.getElementById('invite-cancel')
+        ?.addEventListener('click', () => {
+            document.querySelector('.user-invite-box')
+                ?.classList.add('display-none');
+            chatOverlay.classList.remove('active');
+        });
+
+        /* 초대 버튼 클릭 시  */
+        document.getElementById('invite-user')?.addEventListener('click', e => {
+            document.getElementsByClassName('user-invite-box')[0].classList.add('display-none');
+            chatOverlay.classList.remove('active');
+        
+            /* 비동기 요청 ------------------------------------ */
+        
+            alert("초대 되었습니다 ! ");
+        })
+}
+
 
 
 
 
 /* 방 이름 수정 버튼 클릭 시 */
-const editBtn = document.getElementById('team-name-change');
-const teamNameSpan = document.querySelector('.team-name');
-const panelTitle = document.querySelector('.member-panel-title');
+function bindTeamNameEditEvent() {
 
-editBtn.addEventListener('click', () => {
-    // 이미 input 상태면 중복 생성 방지
-    if (panelTitle.querySelector('input')) return;
+    /* 방 이름 수정 버튼 */
+    const editBtn = document.getElementById('team-name-change');
+    const teamNameSpan = document.querySelector('.team-name');
+    const panelTitle = document.querySelector('.member-panel-title');
 
-    const currentName = teamNameSpan.innerText;
+    if (!editBtn || !teamNameSpan || !panelTitle) return;
 
-    // span 숨김
-    teamNameSpan.classList.add('display-none');
+    editBtn.addEventListener('click', () => {
 
-    // input 생성
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.classList.add('team-name-input');
-    input.value = currentName;
+        /* 이미 input 상태면 중복 생성 방지 */
+        if (panelTitle.querySelector('input')) return;
 
-    /* 
-        insertBefore 지정한 요소 앞에 삽입 
-        editBtn 요소 앞에 input 삽입
-    */
-    panelTitle.insertBefore(input, editBtn);
-    input.focus();
+        const currentName = teamNameSpan.innerText;
 
-    // 완료 처리 함수
-    const finishEdit = () => {
-        const newName = input.value.trim();
-        if (newName) {
-            teamNameSpan.innerText = newName;
-        }
-        
-        /* 팀 이름 변경 비동기 요청 추가 */
+        /* 기존 span 숨김 */
+        teamNameSpan.classList.add('display-none');
 
+        /* input 생성 */
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.classList.add('team-name-input');
+        input.value = currentName;
 
-        input.remove();
-        teamNameSpan.classList.remove('display-none');
+        /*
+            insertBefore(새요소, 기준요소)
+            → editBtn 앞에 input 삽입
+        */
+        panelTitle.insertBefore(input, editBtn);
+        input.focus();
 
-    };
+        /* 편집 완료 처리 함수 */
+        const finishEdit = () => {
 
-    // Enter로 완료
-    input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-            finishEdit();
-        }
+            const newName = input.value.trim();
+
+            if (newName) {
+                teamNameSpan.innerText = newName;
+            }
+
+            /* 
+                TODO: 
+                팀 이름 변경 비동기 요청 (서버 업데이트)
+            */
+
+            input.remove();
+            teamNameSpan.classList.remove('display-none');
+        };
+
+        /* Enter 키 입력 시 완료 */
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                finishEdit();
+            }
+        });
+
+        /* 포커스 해제 시 완료 */
+        input.addEventListener('blur', finishEdit);
     });
-
-    // 포커스 잃으면 완료
-    input.addEventListener('blur', finishEdit);
-});
-
-
-/* 고정 핀 클릭 시 */
-const pinnedBtn = document.getElementById('pinned-btn');
-const unpinnedBtn = document.getElementById('unpinned-btn');
-
-
-/* 각각 db 상태값 변경 후 채팅방 목록 재정렬 해야함*/
-pinnedBtn.addEventListener('click', e => {
-    pinChange()
-})
-
-unpinnedBtn.addEventListener('click', e => {
-    pinChange()
-})
-
-function pinChange() {
-    pinnedBtn.classList.toggle('display-none')
-    unpinnedBtn.classList.toggle('display-none')
 }
+
+
+// /* 고정 핀 클릭 시 */
+// const pinnedBtn = document.getElementById('pinned-btn');
+// const unpinnedBtn = document.getElementById('unpinned-btn');
+// 
+// 
+// /* 각각 db 상태값 변경 후 채팅방 목록 재정렬 해야함*/
+// pinnedBtn.addEventListener('click', e => {
+//     pinChange()
+// })
+// 
+// unpinnedBtn.addEventListener('click', e => {
+//     pinChange()
+// })
+// 
+// function pinChange() {
+//     pinnedBtn.classList.toggle('display-none')
+//     unpinnedBtn.classList.toggle('display-none')
+// }
 
 
 
@@ -852,42 +1053,96 @@ function pinChange() {
 /* ------------------------------------------ */
 /* 메세지 삭제 버튼 클릭 시 */
 
-const msgDeleteBtn = document.querySelectorAll('.msg-delete-btn');
-const delCheck = document.querySelector('.del-check')
+// const msgDeleteBtn = document.querySelectorAll('.msg-delete-btn');
+// const delCheck = document.querySelector('.del-check')
+// 
+// for (let delBtn of msgDeleteBtn) {
+// 
+//     delBtn.addEventListener('click', e => {
+// 
+//         const opt = delBtn.closest('.msg-option');
+// 
+//         opt.classList.add('display-none');
+// 
+//         delCheck.classList.remove('display-none');
+// 
+//         chatOverlay.classList.toggle('active')
+//     })
+//     
+// }
+// 
+// 
+// const msgDelYes = document.getElementById("msg-del-yes");
+// const msgDelNo = document.getElementById("msg-del-no");
+// 
+// msgDelYes.addEventListener('click', e => {
+//     delCheck.classList.add('display-none');
+//     chatOverlay.classList.toggle('active');
+// 
+//     /* 비동기로 화면 삭제 로직 처리 */
+// 
+// 
+// })
+// 
+// msgDelNo.addEventListener('click', e => {
+//     delCheck.classList.add('display-none');
+//     chatOverlay.classList.toggle('active');
+// 
+// })
 
-for (let delBtn of msgDeleteBtn) {
+function bindMessageDeleteEvents() {
 
-    delBtn.addEventListener('click', e => {
+    const chatArea = document.getElementById('chattingArea');
+    const delCheck = document.querySelector('.del-check');
+    const msgDelYes = document.getElementById("msg-del-yes");
+    const msgDelNo = document.getElementById("msg-del-no");
+
+    if (!chatArea || !delCheck || !msgDelYes || !msgDelNo) return;
+
+    let targetMessageNo = null;
+
+    // 삭제 버튼 클릭 (이벤트 위임)
+    chatArea.addEventListener('click', e => {
+
+        const delBtn = e.target.closest('.msg-delete-btn');
+        if (!delBtn) return;
 
         const opt = delBtn.closest('.msg-option');
+        opt?.classList.add('display-none');
 
-        opt.classList.add('display-none');
+        const msgItem = delBtn.closest('.message-item');
+        targetMessageNo = msgItem?.dataset.messageNo;
 
         delCheck.classList.remove('display-none');
+        chatOverlay?.classList.add('active');
+    });
 
-        chatOverlay.classList.toggle('active')
-    })
-    
+    // 삭제 확인 - 예
+    msgDelYes.onclick = () => {
+
+        if (!targetMessageNo) return;
+
+        delCheck.classList.add('display-none');
+        chatOverlay?.classList.remove('active');
+
+        /*
+            TODO:
+            서버에 삭제 요청 보내기
+            성공하면:
+            document.querySelector(`[data-message-no="${targetMessageNo}"]`) 제거
+        */
+
+        targetMessageNo = null;
+    };
+
+    // 삭제 확인 - 아니오
+    msgDelNo.onclick = () => {
+        delCheck.classList.add('display-none');
+        chatOverlay?.classList.remove('active');
+        targetMessageNo = null;
+    };
 }
 
-
-const msgDelYes = document.getElementById("msg-del-yes");
-const msgDelNo = document.getElementById("msg-del-no");
-
-msgDelYes.addEventListener('click', e => {
-    delCheck.classList.add('display-none');
-    chatOverlay.classList.toggle('active');
-
-    /* 비동기로 화면 삭제 로직 처리 */
-
-
-})
-
-msgDelNo.addEventListener('click', e => {
-    delCheck.classList.add('display-none');
-    chatOverlay.classList.toggle('active');
-
-})
 
 
 
@@ -959,9 +1214,384 @@ document.addEventListener('keydown', e => {
 
 async function loadChatRoom(roomNo) {
 
-    const html = fetch('/devtalk/')
+    const resp = await fetch('/devtalk/roomInfoLoad?roomNo='+ roomNo)
+
+    if (!resp.ok) {
+        console.error('채팅방 로드 실패');
+        return;
+    }
+
+    const html = await resp.text(); 
+
+    const chattingArea = document.querySelector('#chatting-space');
+    chattingArea.outerHTML  = html;
+
+    afterFuncLoad();
+    console.log("roomNo : ",roomNo)
+
+    bindChatSendInputEvents(roomNo)
 
     
 
+
+}
+
+// 함수 재바인딩
+function afterFuncLoad(){
+    bindMessageEditEvents();
+    bindMessageContextMenu();
+    bindTeamNameEditEvent();
+    bindMessageDeleteEvents();
+    bindChatUIEvents();
+    bindInviteEvents();
+    scrollToBottom();
+};
+
+function showChatRoomUI() {
+    document.querySelector('.room-empty')?.classList.add('display-none');
+    document.querySelector('.room-exist')?.classList.remove('display-none');
+}
+
+
+let stompClient = null;
+
+
+// 웹소켓 + STOMP 연결
+function connectSocket(){
+
+    // 서버 WebSocket 엔드포인트(/ws-chat)로 연결 생성
+    const socket = new SockJS('/ws-chat');
+
+    // webSocket 위에 STOMP 프로토콜을 올려서 메세지 통신 구조 생성
+    // websocket위에 STOMP  규칙을 얹어서 메세지 교환 규칙을 만듦
+    stompClient= Stomp.over(socket);
+
+
+    // STOMP 연셜 요청
+    // 연결 성공 시 console창
+    stompClient.connect({}, () => {
+        console.log('STOMP connected');
+    })
+}
+
+// 현재 구독중인 채팅방 관리 변수
+let currentSubscription = null;
+let currentRoomNo = null;
+
+// 채팅방 입장시 해당 채팅방 구독
+function subscribeRoom(roomNo) {
+
+    // 이전방 퇴장
+    if(currentRoomNo !== null) {
+        const data = {
+            room_no : currentRoomNo,
+            member_no : myNo
+
+        }
+        stompClient.send(
+            '/devtalk/chat.leave',
+            {},
+            JSON.stringify(data)
+        );
+    }
+
+    // 이미 다른 채팅방을 보고 있다면
+    // 이전 채팅방 구독 해제
+    if (currentSubscription) {
+
+        currentSubscription.unsubscribe();
+    }
+
+    // 선택한 채팅방의 topic을 구독
+    // topic 이란 ? -> 여러 클라이언트가 동시에 구독할 수 있는 메세지 채널
+    // topic -> 브로드캐스트 채널 1:n
+    // queue -> 1:1
+    // 이 순간부터 해당 채팅방의 메세지만 수신
+    currentSubscription = stompClient.subscribe(
+        '/topic/room/' + roomNo, // 채팅방 고유 주소
+        onMessageReceived // 이 채팅방으로 들어오는 모든 메세지 수신 처리기
+    );
+
+    enterRoomCount(roomNo);
+
+
+
+    currentRoomNo = roomNo;
+    
+
+    console.log('subscribed to room:', roomNo);
+    console.log('subscription object:', currentSubscription);
+}
+
+
+function enterRoomCount(roomNo) {
+
+    
+
+    const data = {
+        room_no : roomNo,
+        member_no : myNo
+
+    }
+    stompClient.send(
+        '/devtalk/chat.enter',{},
+        JSON.stringify(data)
+    )
+}
+
+
+
+function sendMessage(chatRoomNo, content) {
+    const totalMember = document.querySelector('.member-counting').innerText;
+    const msg = {
+        chatRoomNo : chatRoomNo,
+        sender : myNo,
+        content : content,
+        total_count : Number(totalMember)
+    };
+
+    console.log("msg : ", msg);
+
+    stompClient.send('/devtalk/chat.send', {}, JSON.stringify(msg));
+}
+
+
+// 채팅 전송 함수
+
+function bindChatSendInputEvents(chatRoomNo) {
+    const textArea = document.getElementById("send-message");
+    const sendBtn = document.getElementById("send-btn");
+
+    if(!textArea || !sendBtn) return;
+
+    sendBtn.addEventListener('click', e => {
+        const content = textArea.value.trim();
+        if(!content) return;
+
+        sendMessage(chatRoomNo, content);
+        textArea.value = '';
+    })
+
+    
+    textArea.addEventListener('keydown', e => {
+        if(e.key === 'Enter'){
+            if(!e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+                textArea.value = '';
+            }
+        }
+    })
+}
+
+// 메세지 수신기
+function onMessageReceived(payload) {
+    const msg = JSON.parse(payload.body);
+    console.log('RECEIVED:', msg);
+    appendMessage(msg);
+
+    sendReadSignal(msg.room_no);
+}
+
+
+
+function appendMessage(msg) {
+    const isMine = msg.sender_no === myNo;
+    const el = isMine ? createMyMessage(msg) : createOtherMessage(msg);
+
+    const area = document.querySelector('.message-list');
+    area.appendChild(el);
+    area.scrollTop = area.scrollHeight;
+}
+
+
+function createLiBase(className, msg) {
+    const li = document.createElement('li');
+    li.className = `message-item flex gap-12 ${className}`;
+    li.dataset.memberNo = msg.sender_no;
+    li.dataset.messageNo = msg.message_no;
+    return li;
+}
+
+/* 내 메세지 */
+function createMyMessage(msg) {
+
+    const li = document.createElement('li');
+    li.className = 'message-item flex gap-12 my';
+    li.dataset.messageNo = msg.message_no;
+
+    const content = document.createElement('div');
+    content.className = 'message-content flex-col gap-12';
+
+    // bubble
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerText = msg.content;
+
+    // reaction badge
+    const reaction = document.createElement('div');
+    reaction.className = 'reaction-badge';
+
+    // options
+    const option = document.createElement('ul');
+    option.className = 'list-none msg-option display-none';
+
+    option.innerHTML = `
+        <li class="msg-edit-btn">수정하기</li>
+        <li class="msg-delete-btn">삭제하기</li>
+        <li class="msg-reaction-btn">공감하기</li>
+    `;
+
+    // emoji area
+    const emoji = document.createElement('div');
+    emoji.className = 'emoji-area flex display-none';
+    emoji.innerHTML = `<span>❤️</span><span>👍</span><span>😀</span><span>😂</span><span>😮</span><span>😡</span>`;
+
+    // 안 읽은 사람 수
+    
+    let unreadCount = null;
+    if(msg.unread_count > 0) {
+
+        unreadCount = document.createElement('span');
+        unreadCount.className = 'unread-people fs-12'
+        unreadCount.innerText = msg.unread_count;
+
+    }
+
+
+    // time (⚠️ bubble 밖)
+    const time = document.createElement('span');
+    time.className = 'fs-12 send-time';
+    time.innerText = formatTime(msg.sendtime);
+
+
+    if (unreadCount) {
+    content.append(bubble, reaction, option, emoji, unreadCount, time);
+    } else {
+        content.append(bubble, reaction, option, emoji, time);
+    }
+    li.appendChild(content);
+
+    return li;
+}
+
+
+/* 쟤 메세지 */
+function createOtherMessage(msg) {
+
+    const li = createLiBase('other', msg);
+
+    // 프로필 이미지
+    const img = document.createElement('img');
+    img.className = 'profile-img';
+    img.src = msg.profile_img ?? '/images/logo.png';
+    li.appendChild(img);
+
+    const content = document.createElement('div');
+    content.className = 'message-content flex-col gap-12';
+
+    // 이름
+    const name = document.createElement('span');
+    name.className = 'fw-600';
+    name.innerText = msg.sender_name;
+
+    // bubble
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerText = msg.content;
+
+    // reaction badge
+    const reaction = document.createElement('div');
+    reaction.className = 'reaction-badge';
+
+    // options
+    const option = document.createElement('ul');
+    option.className = 'list-none msg-option display-none';
+    option.innerHTML = `
+        <li class="msg-reaction-btn">공감하기</li>
+        <li class="msg-report-btn">신고하기</li>
+    `;
+
+    // emoji area
+    const emoji = document.createElement('div');
+    emoji.className = 'emoji-area flex display-none';
+    emoji.innerHTML = `
+        <span>❤️</span><span>👍</span><span>😀</span>
+        <span>😂</span><span>😮</span><span>😡</span>
+    `;
+
+    let unreadCount = null;
+    if(msg.unread_count > 0) {
+
+        unreadCount = document.createElement('span');
+        unreadCount.className = 'unread-people fs-12'
+        unreadCount.innerText = msg.unread_count;
+
+    }
+
+    // time (⚠️ bubble 밖)
+    const time = document.createElement('span');
+    time.className = 'fs-12 send-time';
+    time.innerText = formatTime(msg.sendtime);
+
+    if (unreadCount) {
+    content.append(bubble, reaction, option, emoji, unreadCount, time);
+    } else {
+        content.append(bubble, reaction, option, emoji, time);
+    }
+    li.appendChild(content);
+
+    return li;
+}
+
+
+
+
+
+
+// 시간 변환 함수
+function formatTime(timeStr) {
+    if (!timeStr) return '';
+
+    // 소수점 3자리까지만 남기기 → JS Date 안정화
+    const safe = timeStr.replace(/\.(\d{3})\d*/, '.$1');
+
+    const d = new Date(safe);
+
+    if (isNaN(d)) {
+        console.error('Invalid Date:', timeStr);
+        return '';
+    }
+
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+
+    return `${hh}:${mm}`;
+}
+
+
+
+/* 채팅방 입장 or 채팅방 참여 시 마지막 읽은 메세지 업데이트 */
+function sendReadSignal(roomNo) {
+
+    if (!stompClient || !stompClient.connected) {
+        console.warn('stomp 연결 x');
+        return;
+    }
+
+    const payload = {
+        room_no: roomNo,
+        member_no : myNo
+    };
+
+    console.log(payload.room_no);
+    console.log(payload.member_no);
+
+    stompClient.send(
+        '/devtalk/chat.read',
+        {},
+        JSON.stringify(payload)
+        
+    );
 
 }

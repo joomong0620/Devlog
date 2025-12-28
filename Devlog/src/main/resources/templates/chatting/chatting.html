@@ -6,15 +6,17 @@
     <title>DevTalk</title>
 
     <link rel="stylesheet" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" th:href="@{/css/chatting/chatting.css}">
     <link rel="stylesheet" th:href="@{/css/common/common.css}">
     <link rel="stylesheet" th:href="@{/css/common/notification.css}">
-    <link rel="stylesheet" th:href="@{/css/chatting/chatting.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
 </head>
 <body>
     <th:block th:replace="~{common/header}">header.html</th:block>
     
+    
+
     <script th:src="@{/js/notification/noti.js}"></script>
     <script th:src="@{/js/common/header.js}"></script>
 
@@ -132,10 +134,10 @@
                             </div>
 
                             <div class="flex-col gap-8">
-                                <span style="padding-left: 8px;" th:text="${crl.lastMessageAt}">마지막 메세지 보낸 시간</span>
+                                <span style="padding-left: 8px;" th:text="${crl.formatTime}">마지막 메세지 보낸 시간</span>
                                 <div class="count-pin">
                                     
-                                    <span th:if="${crl.unreadCount != 0}" class="unreadCount fw-600 fs-14" th:text="${crl.unread_count}">안 읽은 메세지 개수</span>
+                                    <span th:if="${crl.unreadCount != 0}" class="unread-count fw-600 fs-14" th:text="${crl.unreadCount}">안 읽은 메세지 개수</span>
                                     <img th:if="${crl.pinnedYn == 'Y'}" class="pinned" th:src="@{/images/chatting/pin.svg}">
                                 </div>
                             </div>
@@ -152,17 +154,18 @@
 
 
         <!-- 채팅 영역 -->
-        <section class="right" id = "chatting-space">
+        
+<!--         <div class="flex-col room-empty">
+            <img th:src="@{/images/logo.png}" >
+            <h1>대화가 시작되길 기다리고 있어요</h1>
+        </div>  --> 
+        <div class="right" id = "chatting-space">
+            
 
-            <div class="chatting-area">
-                <!-- 방이 없을 경우 -->
-                <div class="flex-col flex-center room-empty">
-                    <img th:src="@{/images/logo.png}" >
-                    <h1>대화가 시작되길 기다리고 있어요</h1>
-                </div>  
+            <section th:if="${roomInfo != null}" class="chatting-area" id="chattingArea">
 
                 <!-- 방이 있을 경우 -->
-                <div class="flex-col room-exist display-none">
+                <div class="flex-col room-exist">
 
                     <!-- 굿 -->
                     <div class="overlay" id="chat-overlay"></div>
@@ -251,20 +254,21 @@
                         <div class="flex gap-12">
 
                             <div class="group-profile">
-                                <img th:src="@{/images/logo.png}">
-                                <img th:src="@{/images/logo.png}">
-                                <img th:src="@{/images/logo.png}">
+                                <img th:src="${roomInfo.roomProfile}">
                             </div>
 
                             <div class="flex-col gap-8">
-                                <span class="fw-700 fs-24">Zero-Boost</span>
+                                <span class="fw-700 fs-24" th:text="${roomInfo.roomName}">팀명</span>
 
                                 <!-- 멤버 수 표시 -->
-                                <span class="member-counting flex gap-12 fw-600">
-                                    <!-- 멤버 아이콘 -->
-                                    <img th:src="@{/images/chatting/member.svg}">
-                                    6
-                                </span>
+                                <div class="flex gap-12" style="align-items: center;">
+
+                                    <img id="memberCounting" th:src="@{/images/chatting/member.svg}">
+                                    <span class="member-counting flex gap-12 fw-600" th:text="${roomInfo.participantCount}">
+                                        <!-- 멤버 아이콘 -->
+                                        참여 인원 수
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -325,7 +329,7 @@
                     <div class="chat-menu-panel">
 
                         <div class="member-panel-title">
-                            <span class="team-name">Zero-Boost</span>
+                            <span class="team-name" th:text="${roomInfo.roomName}">Zero-Boost</span>
                             <img class="edit-icon" id="team-name-change" th:src="@{/images/chatting/edit.svg}">
                         </div>
 
@@ -340,45 +344,14 @@
 
                             <ul class="member-list flex-col gap-16">
 
-                                <!-- 멤버 아이템 -->
-                                <li class="member-item flex gap-12">
+                                <!-- 멤버 아이템 -->                                
+                                <li th:each="user : ${roomInfo.users}" class="member-item flex gap-12" th:data-chatuser-no="${user.memberNo}">
                                     <img class="profile-img"
-                                        th:src="@{/images/chatting/박보검.png}">
-                                    <span class="fw-600">소연님</span>
-                                </li>
+                                        th:src="${user.profileImage != null ? user.profileImage : '/images/logo.png'}">
+                                    <span class="fw-600" th:text="${user.nickname}">회원 이름</span>
 
-                                <li class="member-item flex gap-12">
-                                    <img class="profile-img"
-                                        th:src="@{/images/chatting/박보검.png}">
-                                    <span class="fw-600">종구님</span>
-                                </li>
-
-                                <!-- 방장 표시 (왕관 아이콘) -->
-                                <li class="member-item flex gap-12">
-                                    <img class="profile-img"
-                                        th:src="@{/images/chatting/박보검.png}">
-                                    <span class="fw-600">주연님</span>
-
-                                    <!-- 방장 아이콘 -->
-                                    <img th:src="@{/images/chatting/crown.svg}">
-                                </li>
-
-                                <li class="member-item flex gap-12">
-                                    <img class="profile-img"
-                                        th:src="@{/images/chatting/박보검.png}">
-                                    <span class="fw-600">율영님</span>
-                                </li>
-
-                                <li class="member-item flex gap-12">
-                                    <img class="profile-img"
-                                        th:src="@{/images/chatting/박보검.png}">
-                                    <span class="fw-600">희준님</span>
-                                </li>
-
-                                <li class="member-item flex gap-12">
-                                    <img class="profile-img"
-                                        th:src="@{/images/chatting/박보검.png}">
-                                    <span class="fw-600">홀리식</span>
+                                    <!-- 방장 표시 (왕관 아이콘) -->
+                                    <img th:if="${user.owner}" th:src="@{/images/chatting/crown.svg}">
                                 </li>
                             </ul>
                         </div>
@@ -407,9 +380,19 @@
                     <!-- 메세지 -->
                     <ul class="message-list flex-col gap-24">
                         <!-- 상대방 메시지 -->
-                        <li class="flex message-item other gap-12">
+                        <li th:each="msg : ${roomInfo.messageList}" 
+                            th:class="'message-item flex gap-12 ' 
+                            + (${msg.type == 'SYSTEM'} ? 'system' 
+                            : (${msg.mine} ? 'my' : 'other'))"
+                            th:data-member-no="${msg.memberNo}">
+                            
 
-                            <img class="profile-img" th:src="@{/images/logo.png}">
+                            <img class="profile-img"
+                                th:if="${!msg.mine and msg.type != 'SYSTEM'}"
+                                th:src="${msg.senderProfile != null 
+                                    ? msg.senderProfile 
+                                    : '/images/logo.png'}">
+
 
                             <!-- 유저 프로필 카드 -->
                             <div class="profile-card flex-col display-none">
@@ -434,13 +417,68 @@
                                 </div>
                             </div>
 
-                            <div class="message-content flex-col gap-12">
-                                <span class="fw-600">소연님</span>
-                                <div class="bubble">한 줄 길이</div>
+                            <div th:if="${msg.type == 'SYSTEM'}" class="system-message">
+                                <span th:text="${msg.content}"></span>
+                            </div>
 
-                                <ul class="list-none msg-option display-none">
-                                    <li class="msg-report-btn">신고하기</li>
+                            <div th:if="${msg.type != 'SYSTEM'}" class="message-content flex-col gap-12">
+                                <span th:if="${!msg.mine}" class="fw-600" th:text="${msg.senderName}">메세지 작성자</span>
+                                <div class="bubble deleted"
+                                    th:if="${msg.status == 'DELETE'}">
+                                    삭제된 메세지입니다.
+                                </div>
+                                <!-- type = text -->
+                                <th:block th:if="${msg.status != 'DEL'}">
+
+                                    <!-- text -->
+                                    <th:block th:if="${msg.type == 'TEXT'}">
+
+                                        <div class="bubble"
+                                            th:text="${msg.content}">
+                                            메세지 내용
+                                            <!-- <span class="edited"
+                                                th:if="${msg.status == 'MOD'}">
+                                                (수정됨)
+                                            </span> -->
+                                            <span class="fs-12 send-time" th:text="${#temporals.format(msg.sendTime, 'HH:mm')}"></span>
+                                        </div>
+                                    </th:block>
+                                    <!-- type = img -->
+                                    <th:block th:if="${msg.type == 'IMG'}">
+                                        <div class="bubble image">
+                                            <img th:src="${msg.imgPath}">
+                                        </div>
+
+                                        
+                                    </th:block>
+                                </th:block>
+                                <div class="reaction-badge"
+                                th:if="${msg.status != 'DEL' and msg.reactions != null}">
+                                    <span class="flex-center gap-4" th:each="r : ${msg.reactions}">
+                                        <span th:text="${r.key}"></span>
+                                        <span th:text="${r.value}"></span>
+                                    </span>
+                                </div>
+
+
+
+                                <ul th:if="${msg.status != 'DELETE'}" class="list-none msg-option display-none">
+                                    <!-- 본인 + 텍스트만 수정 가능 -->
+                                    <li th:if="${msg.mine and msg.type == 'TEXT'}"
+                                        class="msg-edit-btn">
+                                        수정하기
+                                    </li>
+                                    <!-- 본인은 삭제 가능 -->
+                                    <li th:if="${msg.mine}"
+                                        class="msg-delete-btn">
+                                        삭제하기
+                                    </li>
+
+                                    <!-- 공통 -->
                                     <li class="msg-reaction-btn">공감하기</li>
+
+                                    <!-- 상대방 -->
+                                    <li th:if="${!msg.mine}" class="msg-report-btn">신고하기</li>
                                 </ul>
 
                                 <div class="emoji-area flex display-none">
@@ -452,105 +490,14 @@
                                     <span>😡</span>
                                 </div>
 
-                                <span class="unread-people fs-12">1</span>
-                                <span class="fs-12 send-time">2025-12-10</span>
+                                <span class="unread-people fs-12"
+                                    th:if="${msg.unreadCount > 0 and msg.status != 'DELETE'}"
+                                    th:text="${msg.unreadCount}">
+                                    1
+                                </span>
+                                <span class="fs-12 send-time" th:if="${msg.type != 'SYSTEM'}" th:text="${#temporals.format(msg.sendTime, 'HH:mm')}"></span>
                             </div>
                         </li>
-
-                        <!-- 본인이 보낸 텍스트 메시지 -->
-                        <li class="message-item flex my gap-12">
-                            <div class="message-content flex-col gap-12">
-                                <div class="bubble">
-                                    ㄴㄴㄴㄴㄴㄴㄴㄴssssssss
-                                </div>
-
-                                <ul class="list-none msg-option display-none">
-                                    <li class="msg-edit-btn">수정하기</li>
-                                    <li class="msg-delete-btn">삭제하기</li>
-                                    <li class="msg-reaction-btn">공감하기</li>
-                                </ul>
-
-                                <div class="emoji-area flex display-none">
-                                    <span>❤️</span><span>👍</span><span>😀</span>
-                                    <span>😂</span><span>😮</span><span>😡</span>
-                                </div>
-
-                                <span class="unread-people fs-12">1</span>
-                                <span class="fs-12">00:26</span>
-                            </div>
-                        </li>
-
-                        <!-- 본인이 보낸 이미지 메시지 -->
-                        <li class="message-item flex my gap-12">
-                            <div class="message-content flex-col gap-12">
-                                <div class="bubble image">
-
-                                    <img th:src="@{/images/chatting/테스트 이미지.jpg}">
-                                </div>
-
-                                <ul class="list-none msg-option display-none">
-                                    <li class="msg-delete-btn">삭제하기</li>
-                                    <li class="msg-reaction-btn">공감하기</li>
-                                </ul>
-
-                                <div class="emoji-area flex display-none">
-                                    <span>❤️</span><span>👍</span><span>😀</span>
-                                    <span>😂</span><span>😮</span><span>😡</span>
-                                </div>
-
-                                <span class="unread-people fs-12">1</span>
-                                <span class="fs-12">00:35</span>
-                            </div>
-                        </li>
-
-                        <li class="flex message-item other gap-12">
-
-                            <img class="profile-img" th:src="@{/images/logo.png}">
-
-                            <div class="profile-card flex-col display-none">
-                                <div class="flex-center">
-                                    <img class="profile-card-img"
-                                        th:src="@{/images/chatting/박보검.png}"
-                                        alt="profile">
-                                </div>
-
-                                <div class="profile-info">
-                                    <span class="name">주연님</span>
-                                    <span class="level">LV4</span>
-                                </div>
-
-                                <p class="job-title">프론트엔드 개발자</p>
-
-                                <div class="button-group">
-                                    <button class="btn fw-600 fs-14">프로필 보기</button>
-                                    <button class="btn fw-600 fs-14">1:1 채팅 시작</button>
-                                    <button class="btn fw-600 fs-14">팔로우 하기</button>
-                                </div>
-                            </div>
-
-                            <div class="message-content flex-col gap-12">
-                                <span class="fw-600">주연님</span>
-
-                                <div class="bubble image">
-                                    <img src="https://t1.daumcdn.net/news/202512/11/ZDNetKorea/20251211174314543vjbe.gif">
-                                </div>
-
-                                <ul class="list-none msg-option display-none">
-                                    <li class="msg-report-btn">신고하기</li>
-                                    <li class="msg-reaction-btn">공감하기</li>
-                                </ul>
-
-                                <div class="emoji-area flex display-none">
-                                    <span>❤️</span><span>👍</span><span>😀</span>
-                                    <span>😂</span><span>😮</span><span>😡</span>
-                                </div>
-
-                                <span class="unread-people fs-12">1</span>
-                                <span class="fs-12 send-time">00:59</span>
-                            </div>
-                        </li>
-
- 
                     </ul>
 
 
@@ -603,16 +550,26 @@
                     
 
                 </div>
-            </div>
-            
+            </section>
 
-        </section>
+        </div>
         
         
     </main>
 
 
     <th:block th:replace="~{common/footer}">header.html</th:block>
+
+    <!-- ------------------------------------------- -->
+    <!-- 채팅에 필요한 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script th:inline="javascript">
+
+        // 로그인한 회원 번호
+        const myNo = /*[[${session.loginMember.memberNo}]]*/ "로그인한 회원 번호";
+
+    </script>
 
     <script th:src="@{/js/chatting/chatting.js}"></script>
 </body>

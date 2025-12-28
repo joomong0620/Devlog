@@ -30,6 +30,7 @@ public class ChattingDTO {
 	    private String roomImg;
 	    private String lastMessage;
 	    private LocalDateTime lastMessageAt;
+	    private String formatTime;
 	    private Long unreadCount;
 
 
