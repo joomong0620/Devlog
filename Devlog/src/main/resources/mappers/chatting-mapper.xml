@@ -41,6 +41,26 @@
 			FROM MESSAGE m
 			WHERE m.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO)
 			WHERE CU.MEMBER_NO =${memberNo}
+			<if test="query != null and query != ''">
+			    AND (
+			        (
+			            CR.ROOM_TYPE = 'PRIVATE'
+			            AND EXISTS (
+			                SELECT 1
+			                FROM MEMBER M2
+			                JOIN CHATTING_USER U2 ON M2.MEMBER_NO = U2.MEMBER_NO
+			                WHERE U2.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO
+			                AND U2.MEMBER_NO != #{memberNo}
+			                AND M2.MEMBER_NICKNAME LIKE '%' || #{query} || '%'
+			            )
+			        )
+			        OR
+			        (
+			            CR.ROOM_TYPE != 'PRIVATE'
+			            AND CR.CHATTING_ROOM_NAME LIKE '%' || #{query} || '%'
+			        )
+			    )
+			</if>
 			ORDER BY PINNED_YN DESC, M.SEND_TIME DESC NULLS LAST
 	</select>
 	

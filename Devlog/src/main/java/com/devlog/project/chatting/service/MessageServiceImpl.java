@@ -50,5 +50,12 @@ public class MessageServiceImpl implements MessageService {
 		
 		return MessageDTO.ChatMessageResponse.toDto(message);
 	}
+	
+	
+	// 안 읽은 메세지 계산
+	@Override
+	public Long countUnreadMsg(Long memberNo, Long roomNo) {
+		return msgRepository.countUnreadMsg(memberNo, roomNo);
+	}
 
 }

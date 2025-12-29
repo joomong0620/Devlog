@@ -1,5 +1,6 @@
 package com.devlog.project.chatting.controller;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.devlog.project.chatting.dto.MessageDTO;
 import com.devlog.project.chatting.dto.MessageDTO.ChatMessageResponse;
+import com.devlog.project.chatting.dto.ParticipantDTO.ChatListUpdateDTO;
 import com.devlog.project.chatting.service.ChattingService;
 import com.devlog.project.chatting.service.MessageService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
@@ -52,6 +54,27 @@ public class MessageController {
 				res
 				);
 		
+		
+		
+		List<Long> memberNos = chatService.selectUsers(res.getRoomNo());
+		
+		log.info("회원 번호 조회 결과 : {}", memberNos);
+		
+		for (Long memberNo : memberNos) {
+			
+			ChatListUpdateDTO updateDto = new ChatListUpdateDTO(); 
+			
+			updateDto.setLastMessage(res.getContent());
+			updateDto.setSendtime(res.getSendtime());
+			updateDto.setRoomNo(res.getRoomNo());
+			updateDto.setUnreadCount(service.countUnreadMsg(memberNo, res.getRoomNo()));
+			
+			log.info("채팅방 업데이트용 DTO 확인 : {}", updateDto);
+			templete.convertAndSend( "/topic/chat-list/" + memberNo,
+					updateDto);
+		}
+		
+		 
 		log.info("msg 응답 확인 : {}", res);
 		
 	}

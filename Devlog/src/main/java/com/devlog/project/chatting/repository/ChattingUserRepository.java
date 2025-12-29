@@ -1,5 +1,6 @@
 package com.devlog.project.chatting.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.devlog.project.chatting.dto.ParticipantDTO;
+import com.devlog.project.chatting.dto.ParticipantDTO.ChatListUpdateDTO;
 import com.devlog.project.chatting.entity.ChattingUser;
 import com.devlog.project.chatting.entity.ChattingUserId;
 
@@ -71,6 +73,20 @@ public interface ChattingUserRepository extends JpaRepository<ChattingUser, Chat
 			and cu.chattingRoom.roomNo = :roomNo		
 			""")
 	void updateLastReadMessageNo(Long roomNo, Long memberNo);
+
+
+	
+	
+	@Query("""
+			select cu.member.memberNo
+			from ChattingUser cu
+			where cu.chattingRoom.roomNo = :roomNo
+			""")
+	List<Long> selectUsers(@Param("roomNo") Long roomNo);
+
+	
+	
+
 	
 	
 	

@@ -40,9 +40,23 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 			WHERE m.chattingRoom.roomNo = :roomNo
 			ORDER BY m.messageNo
 			""")
-
-
 	List<MessageDTO> findByMessageList(Long roomNo, Long memberNo);
+	
+	
+	
+	// 안 읽은 메세지 수 계산
+	@Query("""
+			select count(m)
+			from Message m
+			where m.chattingRoom.roomNo = :roomNo
+			and m.messageNo >
+			    (select cu.lastReadNo
+			     from ChattingUser cu
+			     where cu.member.memberNo = :memberNo
+			     and cu.chattingRoom.roomNo = :roomNo
+			    )
+			""")
+	Long countUnreadMsg(Long memberNo, Long roomNo);
 	
 	
 }

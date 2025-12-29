@@ -26,6 +26,7 @@ import com.devlog.project.chatting.dto.ChattingDTO.RoomInfoDTO;
 import com.devlog.project.chatting.dto.EmojiDTO;
 import com.devlog.project.chatting.dto.MessageDTO;
 import com.devlog.project.chatting.dto.ParticipantDTO;
+import com.devlog.project.chatting.dto.ParticipantDTO.ChatListUpdateDTO;
 import com.devlog.project.chatting.entity.ChatRoom;
 import com.devlog.project.chatting.entity.ChattingUser;
 import com.devlog.project.chatting.entity.ChattingUserId;
@@ -66,9 +67,9 @@ public class ChattingServiceImpl implements ChattingService {
 
 	// 채팅방 목록 조회
 	@Override
-	public List<com.devlog.project.chatting.dto.ChattingDTO.ChattingListDTO> selectChatList(Long memberNo) {
+	public List<com.devlog.project.chatting.dto.ChattingDTO.ChattingListDTO> selectChatList(Long memberNo, String query) {
 
-		return chatMapper.selectChatList(memberNo);
+		return chatMapper.selectChatList(memberNo, query);
 	}
 
 
@@ -323,6 +324,20 @@ public class ChattingServiceImpl implements ChattingService {
 		
 		chattingUserRepository.updateLastReadMessageNo(roomNo, memberNo);
 	}
+
+
+	
+	
+	
+	// 채팅방 참여회원 번호 조회
+	@Override
+	public List<Long> selectUsers(Long roomNo) {
+		
+		return chattingUserRepository.selectUsers(roomNo);
+	}
+
+	
+	
 
 
 

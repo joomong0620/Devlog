@@ -8,5 +8,8 @@ public interface MessageService {
 	
 	// 채팅 메세지 삽입
 	ChatMessageResponse insertMsg(ChatMessage msg);
+	
+	// 안 읽은 메세지 계산
+	Long countUnreadMsg(Long memberNo, Long roomNo);
 
 }

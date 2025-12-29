@@ -12,7 +12,7 @@ public interface ChattingMapper {
 	
 	
 	// 채팅방 목록 조회
-	List<ChattingListDTO> selectChatList(Long memberNo);
+	List<ChattingListDTO> selectChatList(Long memberNo, String query);
 	
 	
 	// 팔로우 회원 목록 조회

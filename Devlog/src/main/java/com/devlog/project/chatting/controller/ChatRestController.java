@@ -36,11 +36,13 @@ public class ChatRestController {
 	@GetMapping("/devtalk/chatList")
 	public String selectChatList(
 			Model model,
-			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember){
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember,
+			@RequestParam String query){
 		
-		int memberNo = 1;
+		System.out.println("검색어 확인 : " + query);
 		
-		List<ChattingDTO.ChattingListDTO> chatList = chattingService.selectChatList(loginMember.getMemberNo());
+		
+		List<ChattingDTO.ChattingListDTO> chatList = chattingService.selectChatList(loginMember.getMemberNo(), query);
 		
 		for (ChattingListDTO dto : chatList) {
 			dto.setFormatTime(Util.formatChatTime(dto.getLastMessageAt()));

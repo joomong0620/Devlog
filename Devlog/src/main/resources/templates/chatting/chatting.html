@@ -134,7 +134,7 @@
                             </div>
 
                             <div class="flex-col gap-8">
-                                <span style="padding-left: 8px;" th:text="${crl.formatTime}">마지막 메세지 보낸 시간</span>
+                                <span style="padding-left: 8px;" class="chat-time" th:text="${crl.formatTime}">마지막 메세지 보낸 시간</span>
                                 <div class="count-pin">
                                     
                                     <span th:if="${crl.unreadCount != 0}" class="unread-count fw-600 fs-14" th:text="${crl.unreadCount}">안 읽은 메세지 개수</span>

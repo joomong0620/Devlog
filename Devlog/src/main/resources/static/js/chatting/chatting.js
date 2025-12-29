@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', e => {
 
 })
 
-async function selectChatList(){
+async function selectChatList(query = null){
 
     try {
-        const resp = await fetch('/devtalk/chatList');
+        const resp = await fetch('/devtalk/chatList?query='+query);
         const html = await resp.text();
 
         document.getElementById('roomList').outerHTML = html;
@@ -433,18 +433,21 @@ function enterChatRoom(roomNo) {
 
     target.classList.add('is-selected');
 
+    const unreadCountEl = document.querySelector('.unread-count');
+    if(unreadCountEl) unreadCountEl.remove();
+
     // 2. 채팅 UI 생성
     showChatRoomUI();
 
     // 3. 채팅 정보 로딩
     loadChatRoom(roomNo);
 
+    // 5. 채팅방 입장 시 마지막 읽은 메세지 업데이트
+    sendReadSignal(roomNo);
     // 4. STOMP 구독
     subscribeRoom(roomNo);
 
 
-    // 5. 채팅방 입장 시 마지막 읽은 메세지 업데이트
-    sendReadSignal(roomNo);
 }
 
 
@@ -560,57 +563,6 @@ function emojiClickClose(emojiArea) {
 }
 
 
-/* ---------------------------------------- */
-/* 검색, 메뉴 슬라이드 효과 */
-// const searchPanel = document.querySelector('.chat-search-panel');
-// const searchBtn = document.getElementById('text-search-btn');
-// const chatMenuBtn = document.getElementById('chat-menu-btn')
-// const menuPanel = document.querySelector('.chat-menu-panel');
-// 
-// searchBtn.addEventListener('click', e => {
-//     e.stopPropagation();
-// 
-//     menuPanel?.classList.remove('is-open');
-//     searchPanel.classList.toggle('is-open')
-// })
-// 
-// 
-// 
-// chatMenuBtn.addEventListener('click', e => {
-//     e.stopPropagation()
-//     searchPanel?.classList.remove('is-open');
-//     
-//     menuPanel.classList.toggle('is-open');
-// })
-// 
-// 
-// /* ----------------------------------- */
-// /* 채팅방 나가기 버튼 클릭 시 */
-// const exitBtn = document.getElementById('exit-btn');
-// const exitArea = document.querySelector('.exit-check')
-// const chatOverlay = document.getElementById('chat-overlay')
-// 
-// exitBtn?.addEventListener('click', e => {
-//     exitArea.classList.remove('display-none');
-//     chatOverlay.classList.add('active')
-// }) 
-// 
-// document.getElementById('no').addEventListener('click', e => {
-//     exitArea.classList.add('display-none')
-//     chatOverlay.classList.remove('active')
-// })
-// 
-// 
-// 
-// /* 채팅방 나가기 버튼 클릭 ㅅ ㅣ로직 추가 */
-// document.getElementById('yes').addEventListener('click', e => {
-//     exitArea.classList.add('display-none')
-//     chatOverlay.classList.remove('active')
-// 
-// 
-// 
-//     /* 비동기 로직 추가 */
-// })
 
 
 /* ===========================================
@@ -1271,8 +1223,19 @@ function connectSocket(){
     // 연결 성공 시 console창
     stompClient.connect({}, () => {
         console.log('STOMP connected');
+
+
+        stompClient.subscribe(
+            '/topic/chat-list/' + myNo,
+            onChatListUpdate
+        );
     })
+
+
+
 }
+
+
 
 // 현재 구독중인 채팅방 관리 변수
 let currentSubscription = null;
@@ -1340,6 +1303,65 @@ function enterRoomCount(roomNo) {
 }
 
 
+// 채팅방 리스트 정보 최신화
+function onChatListUpdate(payload) {
+    
+    const updateInfo = JSON.parse(payload.body);
+    console.log("채팅방 리스트 업데이트용 : " + payload.body);
+
+        
+    const listItem = document.querySelector(`[data-room-no="${updateInfo.room_no}"]`)
+
+
+
+    if(!listItem) return;
+    
+    // 마지막 보낸 메세지, 시간 업데이트
+    listItem.querySelector('.last-message').innerText = updateInfo.last_message;
+    listItem.querySelector('.chat-time').innerText = formatTime(updateInfo.sendtime);
+
+    moveTop(updateInfo.room_info);
+
+    // 현재 보고 있는 방과 같으면 함수 종료
+    if(currentRoomNo === updateInfo.room_no) return;
+
+    // 안 읽은 메세지 개수 
+    const countPin = listItem.querySelector('.count-pin')
+    const unreadCount = listItem.querySelector('.unread-count');
+
+    if(unreadCount) {
+        unreadCount.innerText = updateInfo.unread_count;
+    } else {
+
+        const span = document.createElement('span');
+        span.className = 'unread-count fw-600 fs-14';
+        span.innerText = updateInfo.unread_count;
+
+        countPin.append(span);
+        
+    }
+
+
+
+
+
+}
+
+// 채팅방 상단 이동 함수
+function moveTop(roomNo) {
+
+    const list = document.querySelector('.room-list');
+    const item = list.querySelector(`[data-room-no="${roomNo}"]`);
+
+
+    if(!item) return;
+
+
+    list.prepend(item);
+
+}
+
+
 
 function sendMessage(chatRoomNo, content) {
     const totalMember = document.querySelector('.member-counting').innerText;
@@ -1383,6 +1405,8 @@ function bindChatSendInputEvents(chatRoomNo) {
         }
     })
 }
+
+
 
 // 메세지 수신기
 function onMessageReceived(payload) {
@@ -1459,7 +1483,7 @@ function createMyMessage(msg) {
     }
 
 
-    // time (⚠️ bubble 밖)
+    // time 
     const time = document.createElement('span');
     time.className = 'fs-12 send-time';
     time.innerText = formatTime(msg.sendtime);
@@ -1535,9 +1559,9 @@ function createOtherMessage(msg) {
     time.innerText = formatTime(msg.sendtime);
 
     if (unreadCount) {
-    content.append(bubble, reaction, option, emoji, unreadCount, time);
+    content.append(name, bubble, reaction, option, emoji, unreadCount, time);
     } else {
-        content.append(bubble, reaction, option, emoji, time);
+        content.append(name, bubble, reaction, option, emoji, time);
     }
     li.appendChild(content);
 
@@ -1595,3 +1619,24 @@ function sendReadSignal(roomNo) {
     );
 
 }
+
+
+/* ------------------------------------------- */
+/* 채팅방 검색 */
+const searchChat = document.getElementById("chatting-search-area");
+    
+
+searchChat.addEventListener("keydown", e => {
+
+    if (e.key === 'Enter') {
+        const keyword = searchChat.value.trim();
+
+        if (!keyword) return;   // 비어있으면 종료
+
+        console.log("검색어:", keyword);
+        selectChatList(keyword);
+    }
+
+}); 
+
+
