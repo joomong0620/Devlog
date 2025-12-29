@@ -74,6 +74,14 @@ if (loginFrm != null) {
 }
 
 
+// 카카오 소셜로그인
+const kakaoLoginBtn = document.getElementById("kakaoLoginBtn");
+
+kakaoLoginBtn.addEventListener("click", function () {
+            // DevLog 서비스 서버로 이동
+            window.location.href = "/app/login/kakao";
+});
+
 
 // 자바스크립트 쿠키 얻어오기: key를 전달하면, value얻는 JS함수
 function getCookie(key) {
