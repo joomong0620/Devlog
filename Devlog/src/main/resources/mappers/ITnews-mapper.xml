@@ -29,8 +29,8 @@
 	<!-- 좋아요 여부 확인 -->
 	<select id="newsLikeCheck" resultType="_int">
 		SELECT COUNT(*) FROM BOARD_LIKE
-		WHERE BOARD_NO = ${boardNo}
-		AND MEMBER_NO = ${memberNo}
+		WHERE BOARD_NO = #{boardNo}
+		AND MEMBER_NO = #{memberNo}
 	</select>
 
 	<!--조회수 증가-->

@@ -1,3 +1,9 @@
+<!-- 댓글 입력 창  -->
+<div class="comment-write-area">
+  <textarea id="commentContent" placeholder="지식뉴스에 대한 댓글을 달아보세요!"></textarea>
+  <button id="addComment">등록하기</button>
+</div>
+
 <div id="commentArea">
   <div class="comment-list-area">
     <ul id="commentList">
@@ -5,41 +11,39 @@
         th:classappend="${comment.parentCommentNo != 0} ? 'reply'" th:data-comment-id="${comment.commentNo}">
 
         <p class="comment-writer">
-          <img class="comment-profile" th:src="${comment.profileImg ?: '/images/common/user.png'}">
+          <img class="comment-profile" th:src="${comment.profileImg ?: '/images/user.png'}">
           <span class="comment-nickname" th:text="${comment.memberNickname}">닉네임</span>
           <span class="comment-date" th:text="${comment.commentCreateDate}">작성일</span>
         </p>
 
         <p class="comment-content" th:text="${comment.commentContent}">내용</p>
 
+
         <div class="comment-actions">
-          <span class="reaction-area">
-            <i class="fa-heart comment-like-btn"
-              th:classappend="${comment.likeCheck == 1} ? 'fa-solid' : 'fa-regular'"></i>
-            <span class="count" th:text="${comment.likeCount}">0</span>
-          </span>
+          <button class="comment-good-btn" data-type="good">
+            <img th:src="@{/images/board/ITnews/comment_good.svg}" alt="좋아요" class="comment-icon" />
+            <span class="good-count">0</span>
+          </button>
 
-          <span class="reaction-area">
-            <img th:src="@{/images/board/ITnews/comment_bad.svg}" class="comment-bad-btn"
-              th:style="${comment.badCheck == 1} ? 'filter:grayscale(0%)' : 'filter:grayscale(100%)'">
-            <span class="count" th:text="${comment.badCount}">0</span>
-          </span>
+          <!-- 싫어요 -->
+          <button class="comment-bad-btn" data-type="bad">
+            <img th:src="@{/images/board/ITnews/comment_bad.svg}" alt="싫어요" class="comment-icon" />
+          </button>
 
-          <th:block th:if="${session.loginMember != null and session.loginMember.memberNo == comment.memberNo}">
-            <button class="edit-btn">수정</button>
-            <button class="delete-btn">삭제</button>
-          </th:block>
-
-          <button th:if="${comment.parentCommentNo == 0}" class="reply-btn">답글</button>
-        </div>
+          <!-- 버튼 영역 -->
+          <div class="comment-btn-area">
+            
+            <th:block th:if="${session.loginMember?.memberNo == comment.memberNo}">
+              <button th:if="${session.loginMember}"
+                th:onclick="|showInsertComment(${comment.commentNo}, this)|">답글</button>
+              <button th:onclick="|showUpdateComment(${comment.commentNo}, this)|">수정</button>
+              <button th:onclick="|deleteComment(${comment.commentNo})|">삭제</button>
+            </th:block>
+          </div>
       </li>
     </ul>
   </div>
 
-  <div class="comment-write-area">
-    <textarea id="commentContent" placeholder="지식뉴스에 대한 댓글을 달아보세요!"></textarea>
-    <button id="addComment">등록하기</button>
-  </div>
 </div>
 
 

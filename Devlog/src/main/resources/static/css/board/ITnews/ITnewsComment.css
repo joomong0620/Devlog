@@ -216,3 +216,55 @@
   color: #aaa;
   font-style: italic;
 }
+
+
+/* 수정, 삭제, 답글 */
+/* 버튼 영역 전체 컨테이너 */
+/* 수정, 삭제, 답글 버튼을 감싸는 영역 */
+.comment-btn-area {
+    display: flex;      /* 가로 정렬의 핵심 */
+    flex-wrap: wrap;    /* 영역이 좁아지면 자연스럽게 다음 줄로 넘어가도록 설정 */
+    gap: 8px;           /* 버튼 사이의 간격 */
+    margin-top: 12px;   /* 내용(content)과의 상단 간격 */
+    margin-left: 44px;  /* 프로필 이미지 너비만큼 왼쪽 여백을 주어 텍스트 라인에 맞춤 */
+    
+}
+
+/* 개별 버튼 공통 스타일 */
+.comment-btn-area button,
+.reply-btn {
+    border: 1px solid #e3d7f4;
+    background-color: #fff;
+    color: #9f74d4;
+    
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    /* 버튼 텍스트가 세로로 찌그러지지 않게 방지 */
+    white-space: nowrap; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;                /* 기존 마진 제거 */
+    white-space: nowrap;      /* 글자가 길어져도 줄바꿈 방지 */
+}
+
+/* 마우스 올렸을 때 효과 */
+.comment-btn-area button:hover,
+.reply-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #b18bdc;
+    color: #b18bdc;
+}
+
+/* 삭제 버튼에만 마우스 호버 시 붉은색 포인트 */
+.comment-btn-area button:last-child:hover {
+    border-color: #ff8a8a;
+    color: #ff5f5f;
+    background-color: #fff5f5;
+}
