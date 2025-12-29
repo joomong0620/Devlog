@@ -5,12 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>블로그 목록 조회</title>
-    <link rel="stylesheet" th:href="@{/css/board/blog/blogList.css}">
+    
     <link rel="stylesheet" as="style" crossorigin
-        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    
+    <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+
+    <link rel="stylesheet" th:href="@{/css/board/blog/blogList.css}">
 </head>
 
 <body>
+
+    <div th:replace="~{common/header :: header}"></div>
+
     <main class="container">
         <div class="list-control">
             <div class="filter-group">
@@ -61,7 +69,10 @@
     <button id="scrollTopBtn" class="scroll-top-btn">
         <img src="https://cdn-icons-png.flaticon.com/512/2985/2985150.png" alt="up">
     </button>
-
+    
+    <div th:replace="~{common/footer :: footer}"></div>
+    <script th:src="@{/js/notification/noti.js}"></script>
+    <script th:src="@{/js/common/header.js}"></script>
     <script th:src="@{/js/board/blog/blogList.js}"></script>
 
     <!-- <script th:inline="javascript">

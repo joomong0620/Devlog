@@ -7,14 +7,13 @@
     <title>DEVLOG - 글 작성</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
-    <link rel="stylesheet" th:href="@{/css/board/blog/blogWrite.css}">
-
+    
     <link rel="stylesheet" th:href="@{/css/common/common.css}">
-    <link rel="stylesheet" th:href="@{/css/common/header.css}">
-    <link rel="stylesheet" th:href="@{/css/common/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+
+    <link rel="stylesheet" th:href="@{/css/board/blog/blogWrite.css}">
 </head>
 
 <body>
@@ -153,9 +152,10 @@
     <div th:replace="~{common/footer :: footer}"></div>
 
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
+    
     <script th:src="@{/js/common/header.js}"></script>
-
+    <script th:src="@{/js/notification/noti.js}"></script>
+    
     <script th:src="@{/js/board/blog/blogWrite.js}"></script>
 </body>
 
