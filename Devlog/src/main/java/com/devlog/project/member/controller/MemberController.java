@@ -252,6 +252,49 @@ public class MemberController {
 		return path;
     }		
 	
+
 	
+	// 필수 회원정보 입력 페이지(전용화면) 이동: GET방식
+	@GetMapping("/signUpKakao")
+	public String signUpKakaoPage() {
+	    return "member/signUpKakao"; //  Thymeleaf
+	}
+	
+	
+	// 필수 회원정보 입력 진행 // 아이디(이메일), 비밀번호, 이름, 닉네임, 전화번호, 경력사항, 이메일 수신동의
+	// 카카오 로그인한 유저가 SOCIAL_LOGIN DB에 레코드없을 경우(최초 카카오로그인경우), 회원가입 절차진행 
+	@PostMapping("/signUpKakao")  
+    public String signUpKakao( 
+    		 @ModelAttribute  MemberSignUpRequestDTO request  
+    		 , RedirectAttributes ra
+    		 , HttpSession session
+    ) {
+		log.info("signUp email = {}", request.getMemberEmail());
+		log.info("###@@@%%% CONTROLLER DTO = {}", request);
+
+		String path = "redirect:";
+		String message = null;
+		int result=0; // placeholder
+		
+		try { // 회원가입 성공
+			String kakaoId = (String)session.getAttribute("kakaoId");
+			MemberLoginResponseDTO loginMemberKakao = service.signUpKakao(request, kakaoId); // MemberService2에서 signUp 처리, signUp 실패시 예외 발생 -> controller에서 성공(1) 실패(0)처리 반환
+			session.setAttribute("loginMember", loginMemberKakao);
+			result = 1;
+			
+			path += "/"; //메인페이지로 (JS에서?)
+			message = request.getMemberNickname() + "님, 회원정보를 입력해 주셔서 감사합니다.";	 // (JS에서?)
+		} catch(Exception e) { // 회원가입 실패
+			log.error("회원가입 실패", e);
+			result = 0;
+			path += "/member/signUpKakao"; //다시 회원가입 페이지로 
+			message = "서버 오류로 회원 정보입력에 실패했습니다.\n 잠시후 다시 이용해 주세요.";				
+		}
+		
+		ra.addFlashAttribute("message", message);
+		
+		return path;
+    }	
+		
 	
 }

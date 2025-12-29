@@ -84,6 +84,7 @@ public class SecurityConfig {
 	                ,"/checkCode/**"
 	                ,"/board/freeboard/**"
 	                ,"/app/login/**"
+	                ,"/member/signUpKakao"	                
 	                ///// PYY API Addition End: /////	                
 	                ,"/blog/**"
 	                ,"/api/blog/**"
@@ -95,6 +96,8 @@ public class SecurityConfig {
 	                // [글쓰기 경로 테스트 임시 추가]
 	                ,"/blog/write"
 	                ,"/api/blog/write"
+	                ,"/api/blog/imageUpload"
+	                
 	            ).permitAll()
 	            .anyRequest().authenticated()
 	        )

@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService {
+public class MemberService {  // 로그인(login) 서비스 전용
 
     @Transactional(readOnly = true)
     public MemberLoginResponseDTO toLoginResponse(Member member,
