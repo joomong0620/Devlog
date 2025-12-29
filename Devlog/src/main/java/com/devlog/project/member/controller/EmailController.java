@@ -25,7 +25,7 @@ public class EmailController {
 
 	@GetMapping("/signUp")
 	@ResponseBody
-	public int signUp(String email) {
+	public int signUp(@RequestParam("email") String email) {
 		return emailServiceJpa.signUp(email, "회원 가입") ? 1 :0;
 	}
 
