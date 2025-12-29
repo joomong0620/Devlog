@@ -384,7 +384,9 @@
                             th:class="'message-item flex gap-12 ' 
                             + (${msg.type == 'SYSTEM'} ? 'system' 
                             : (${msg.mine} ? 'my' : 'other'))"
-                            th:data-member-no="${msg.memberNo}">
+                            th:data-member-no="${msg.memberNo}"
+                            th:data-message-no = "${msg.messageNo}">
+                            
                             
 
                             <img class="profile-img"
@@ -434,13 +436,14 @@
                                     <th:block th:if="${msg.type == 'TEXT'}">
 
                                         <div class="bubble"
-                                            th:text="${msg.content}">
-                                            메세지 내용
-                                            <!-- <span class="edited"
+                                            >
+                                            <span class="msg-content" th:text="${msg.content}">
+
+                                            </span>
+                                            <span class="edited fs-12"
                                                 th:if="${msg.status == 'MOD'}">
                                                 (수정됨)
-                                            </span> -->
-                                            <span class="fs-12 send-time" th:text="${#temporals.format(msg.sendTime, 'HH:mm')}"></span>
+                                            </span>
                                         </div>
                                     </th:block>
                                     <!-- type = img -->

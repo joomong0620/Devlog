@@ -68,11 +68,19 @@ public class ChattingServiceImpl implements ChattingService {
 	// 채팅방 목록 조회
 	@Override
 	public List<com.devlog.project.chatting.dto.ChattingDTO.ChattingListDTO> selectChatList(Long memberNo, String query) {
+		
+		log.info("query param = [{}]", query);
 
-		return chatMapper.selectChatList(memberNo, query);
+		
+		if (query == null || query.trim().isEmpty() || "null".equalsIgnoreCase(query)) {
+		    return chatMapper.selectChatList(memberNo);
+		} else {
+		    return chatMapper.selectQueryChatList(memberNo, query.trim());
+		}	
+	
 	}
 
-
+	
 	// 팔로우 목록 조회
 	@Override
 	public List<FollowListDTO> selectFollowList(Long memberNo) {

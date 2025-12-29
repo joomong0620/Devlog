@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.devlog.project.chatting.chatenums.MsgEnums;
+import com.devlog.project.chatting.chatenums.MsgEnums.MsgStatus;
 import com.devlog.project.chatting.entity.Message;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -128,9 +129,37 @@ public class MessageDTO {
 	@Getter
 	@Setter
 	@ToString
+	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class messageReadRequest {
 		private Long roomNo;
 		private Long memberNo;
+	}
+	
+	
+	
+	@Getter
+	@Setter
+	@ToString
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class MessageEdit {
+		
+		private Long messageNo;
+		private String content;
+		
+	}
+	
+	
+	@Getter
+	@Setter
+	@ToString
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class MessageEditResp {
+		private Long messageNo;
+		private MsgEnums.MsgStatus status;
+		private String content;
 	}
 	
 }

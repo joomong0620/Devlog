@@ -12,10 +12,13 @@ public interface ChattingMapper {
 	
 	
 	// 채팅방 목록 조회
-	List<ChattingListDTO> selectChatList(Long memberNo, String query);
+	List<ChattingListDTO> selectChatList(Long memberNo);
 	
+	// 검색어 일치하는 채팅방 목록 조회
+	List<ChattingListDTO> selectQueryChatList(Long memberNo, String query);
 	
 	// 팔로우 회원 목록 조회
 	List<FollowListDTO> selectFollowList(Long memberNo);
+
 
 }

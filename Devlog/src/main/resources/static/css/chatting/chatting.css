@@ -1231,3 +1231,10 @@ input[name='msgSearch'] {
     bottom: 20px;
     left: -40px;
 }
+
+
+
+/* 수정됨 글씨 */
+.edited {
+    color: #666;
+}

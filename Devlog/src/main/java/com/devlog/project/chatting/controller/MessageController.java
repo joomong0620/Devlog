@@ -1,5 +1,6 @@
 package com.devlog.project.chatting.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,10 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.devlog.project.chatting.dto.MessageDTO;
@@ -35,7 +40,28 @@ public class MessageController {
 	
 	private final Map<Long, Set<Long>> roomViewers = new ConcurrentHashMap<>();
 	
+	// 유저 채팅방 구독 시 Map에 추가
+	@MessageMapping("/chat.enter")
+	public void enter(@Payload MessageDTO.messageReadRequest req
+	                  ) {
+
+	    roomViewers
+	        .computeIfAbsent(req.getRoomNo(), k -> ConcurrentHashMap.newKeySet())
+	        .add(req.getMemberNo());
+	}
 	
+	
+	@MessageMapping("/chat.leave")
+	public void leave(@Payload MessageDTO.messageReadRequest req
+	                  ) {
+
+	    Set<Long> viewers = roomViewers.get(req.getRoomNo());
+	    if (viewers != null) {
+	        viewers.remove(req.getMemberNo());
+	    }
+	}
+	
+	// 
 	@MessageMapping("/chat.send")
 	public void send(@Payload MessageDTO.ChatMessage msg) {
 		// @Payload : STOMP 메시지의 body 부분을 이 파라미터에 직접 매핑
@@ -90,25 +116,22 @@ public class MessageController {
 		
 	}
 	
-	@MessageMapping("/chat.enter")
-	public void enter(@Payload MessageDTO.messageReadRequest req
-	                  ) {
-
-	    roomViewers
-	        .computeIfAbsent(req.getRoomNo(), k -> ConcurrentHashMap.newKeySet())
-	        .add(req.getMemberNo());
-	}
 	
 	
-	@MessageMapping("/chat.leave")
-	public void leave(@Payload MessageDTO.messageReadRequest req
-	                  ) {
-
-	    Set<Long> viewers = roomViewers.get(req.getRoomNo());
-	    if (viewers != null) {
-	        viewers.remove(req.getMemberNo());
-	    }
+	@PostMapping("/devtalk/message/edit")
+	@ResponseBody
+	public void messageUpdate(
+			@RequestBody MessageDTO.MessageEdit edit
+			){
+		
+		;
+		
+		log.info("수정 파라미터 확인 : {}", edit);
+		
+		service.editMessage(edit);
+		
 	}
+
 
 
 	

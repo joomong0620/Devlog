@@ -631,81 +631,8 @@ function bindChatUIEvents() {
 
 
 /* ------------------------------------------- */
-/* 수정하기 버튼 클릭 시 입력 폼 변화 */
-
-// const sendArea = document.querySelector('.send-area');
-// const editArea = document.querySelector('.edit-area');
-// 
-// const editCancelBtn = document.getElementById('edit-cancle-btn');
-// 
-// const msgEditBtn = document.querySelectorAll('.msg-edit-btn')
-// 
-// for (let editBtn of msgEditBtn) {
-// 
-//     editBtn.addEventListener('click', e => {
-// 
-//         const messageContainer = editBtn.closest('.message-content');
-// 
-//         const bubble = messageContainer.querySelector('.bubble');
-//         
-//         const originText = bubble.innerText;
-// 
-//         console.log("원본 메세지 : ", originText)
-// 
-//         openEditMode(originText);
-//         
-//         
-// 
-//         const opt = editBtn.closest('.msg-option')
-// 
-//         opt.classList.add('display-none')
-// 
-// 
-//     })
-//     
-// }
-// 
-// 
-// /* 편입 입력으로 전환 */
-// function openEditMode(originText) {
-//     // 기존 입력창 숨김
-//     sendArea.classList.add('display-none');
-// 
-//     // 수정창 표시
-//     editArea.classList.remove('display-none');
-// 
-//     // 기존 메시지 내용 세팅
-//     document.getElementById('edit-message').value = originText
-//     document.getElementById('edit-message').focus();
-// }
-// 
-// editCancelBtn.addEventListener('click', () => {
-//     closeEditMode();
-// });
-// 
-// /* 다시 본 입력창 전환 */
-// function closeEditMode() {
-//     // 수정창 숨김
-//     editArea.classList.add('display-none');
-// 
-//     // 기존 입력창 표시
-//     sendArea.classList.remove('display-none');
-// 
-//     // 수정 textArea 초기화
-//     document.getElementById('edit-message').value = '';
-// }
-
-
-/* 수정보튼 클릭 or 엔터 입력 시 서버에 전송 ?  */
-/* editBtn?.addEventListener('click', () => {
-    const editedText = document.getElementById('edit-message').value;
-
-    if (!editedText.trim()) return;
-
-    
-
-    closeEditMode();
-}); */
+let currentEditMessageNo = null;
+let currentEditRoomNo = null;
 
 /* 메세지 수정 함수 */
 function bindMessageEditEvents() {
@@ -714,6 +641,8 @@ function bindMessageEditEvents() {
     const editArea = document.querySelector('.edit-area');
     const editCancelBtn = document.getElementById('edit-cancle-btn');
     const chatArea = document.getElementById('chattingArea');
+    const editTextarea = document.getElementById("edit-message");
+    const editBtn = document.getElementById('edit-btn');
 
     if (!sendArea || !editArea || !chatArea) return;
 
@@ -722,7 +651,7 @@ function bindMessageEditEvents() {
         const editBtn = e.target.closest('.msg-edit-btn');
         if (!editBtn) return;
 
-        const messageContainer = editBtn.closest('.message-content');
+        const messageContainer = editBtn.closest('.message-item');
         if (!messageContainer) return;
 
         const bubble = messageContainer.querySelector('.bubble');
@@ -730,6 +659,13 @@ function bindMessageEditEvents() {
 
         const originText = bubble.innerText;
 
+        currentEditMessageNo = messageContainer.dataset.messageNo;
+        currentEditRoomNo = currentRoomNo;
+
+        console.log("=========================")
+        console.log(currentEditMessageNo);
+        console.log(currentEditRoomNo)
+        console.log("=========================")
         openEditMode(originText, sendArea, editArea);
 
         const opt = editBtn.closest('.msg-option');
@@ -741,7 +677,54 @@ function bindMessageEditEvents() {
             closeEditMode(sendArea, editArea);
         });
     }
+
+
+    // 메세지 클릭 or 엔터 입력 시 제출
+    editBtn.addEventListener('click', e=> {
+        submitEdit();
+    })
+
+    editTextarea.addEventListener('keydown', e => {
+        
+        if(e.key ==='Enter') submitEdit();
+    })
 }
+
+async function submitEdit() {
+
+    console.log("메세지 수정 함수 호출 확인 ");
+
+    if (!currentEditMessageNo) return;
+    
+    const newText = document.getElementById('edit-message').value.trim();
+
+    if(!newText) return;
+
+    console.log(newText);
+    console.log(currentEditMessageNo    );
+    const data = {
+        message_no : currentEditMessageNo,
+        content : newText
+    }
+    const resp = await fetch('/devtalk/message/edit', {
+                    method:'POST',
+                    headers: {'Content-Type' : 'application/json'},
+                    body : JSON.stringify(data)
+                });
+            
+    if(!resp.ok) {
+        console.log('메세지 수정 실패 ');
+    }
+    
+    newText.innerHTML = '';
+
+    closeEditMode(
+        document.querySelector('.send-area'),
+        document.querySelector('.edit-area')
+    )
+
+}
+
 
 
 function openEditMode(originText, sendArea, editArea) {
@@ -767,47 +750,7 @@ function closeEditMode(sendArea, editArea) {
 
 /* 유저 초대 */
 /* 초대 버튼 클릭 시 비동기로 회원 목록 조회후 fragment 써서 렌더링 예정 */
-/*  */
 
-// const inviteBtn = document.getElementById('invite-btn');
-// const inviteList = document.getElementsByName('roomInvite')
-// const selectedArea = document.querySelector('.select-user-area');
-// 
-// 
-// inviteBtn?.addEventListener('click', e=> {
-//     for (let item of inviteList) {
-//         item.checked = false
-//         
-//     }
-//     selectedArea.innerHTML = ""
-//     chatOverlay.classList.add('active')
-//     document.getElementsByClassName('user-invite-box')[0].classList.remove('display-none')
-// 
-// })
-// 
-// 
-// 
-// /* 유저 리스트 체크박스 하나씩 */
-// for (let checkbox of inviteList) {
-//     checkbox.addEventListener('change', e => {
-// 
-//         const listBox = e.target.closest('.user-list');
-// 
-//         const nameEl =
-//             listBox.querySelector('.user-name') ||
-//             listBox.querySelector('span');
-// 
-//         const userName = nameEl.innerText;
-// 
-//         if (e.target.checked) {
-//             if (!inviteExist(userName)) {
-//                 inviteAddUser(userName, e.target);
-//             }
-//         } else {
-//             inviteDeleteUser(userName);
-//         }
-//     });
-// }
 
 /* 선택 되면 태그 형식으로 추가 */
 function inviteAddUser(userName, checkbox) {
@@ -1411,10 +1354,16 @@ function bindChatSendInputEvents(chatRoomNo) {
 // 메세지 수신기
 function onMessageReceived(payload) {
     const msg = JSON.parse(payload.body);
-    console.log('RECEIVED:', msg);
-    appendMessage(msg);
+    
 
-    sendReadSignal(msg.room_no);
+    if(msg.status == 'MOD'){
+
+        applyModify(msg);
+    } else{
+        appendMessage(msg);
+
+        sendReadSignal(msg.room_no);
+    }
 }
 
 
@@ -1437,6 +1386,26 @@ function createLiBase(className, msg) {
     return li;
 }
 
+function applyModify(msg) {
+    const li = document.querySelector(`[data-message-no="${msg.message_no}"]`);
+
+    const bubble = li.querySelector('.bubble');
+
+    const msgContent = bubble.querySelector('.msg-content');
+
+    msgContent.innerText = msg.content
+
+    const edited = bubble.querySelector('.edited');
+    if(edited) return;
+
+
+    const span = document.createElement('span');
+    span.className = 'edited fs-12';
+    span.innerText = '(수정됨)';
+
+    bubble.append(span);
+}
+
 /* 내 메세지 */
 function createMyMessage(msg) {
 
@@ -1450,7 +1419,10 @@ function createMyMessage(msg) {
     // bubble
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
-    bubble.innerText = msg.content;
+    const msgSpan = document.createElement('span');
+    msgSpan.className = 'msg-content'
+    msgSpan.innerText = msg.content;
+    bubble.appendChild(msgSpan);
 
     // reaction badge
     const reaction = document.createElement('div');
@@ -1522,7 +1494,10 @@ function createOtherMessage(msg) {
     // bubble
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
-    bubble.innerText = msg.content;
+    const msgSpan = document.createElement('span');
+    msgSpan.className = 'msg-content'
+    msgSpan.innerText = msg.content;
+    bubble.appendChild(msgSpan);
 
     // reaction badge
     const reaction = document.createElement('div');
