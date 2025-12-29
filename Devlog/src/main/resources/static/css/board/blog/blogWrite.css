@@ -1,3 +1,5 @@
+/* blogWrite.css */
+
 /* 기본 설정 */
 * {
     box-sizing: border-box;
@@ -11,11 +13,16 @@ body {
     color: #333;
 }
 
-/* 메인 컨테이너 */
+/* [수정] 메인 컨테이너 */
 .write-container {
     max-width: 1440px;
     margin: 0 auto;
-    padding: 40px 20px;
+
+    /* 중요: 헤더(약 100px)가 가리지 않도록 위쪽 여백을 140px로 늘림 */
+    padding: 140px 20px 60px;
+
+    /* 푸터가 바닥에 붙도록 최소 높이 설정 */
+    min-height: calc(100vh - 200px);
 }
 
 /* 제목 섹션 */
@@ -44,7 +51,7 @@ body {
     width: 150px;
 }
 
-/* [수정] 태그 스타일 */
+/* 태그 스타일 */
 .tag-wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -66,7 +73,6 @@ body {
     color: #495057;
     padding: 5px 12px;
     border-radius: 20px;
-    /* 알약 모양 */
     font-size: 0.95rem;
     font-weight: 500;
 }
@@ -93,7 +99,7 @@ body {
     padding: 5px 0;
 }
 
-/* 맞춤법 검사, 토글 스위치 (기존 동일) */
+/* 맞춤법 검사, 토글 스위치 */
 .spell-check-area {
     display: flex;
     justify-content: flex-end;
@@ -149,9 +155,26 @@ input:checked+.slider:before {
     transform: translateX(20px);
 }
 
-/* 에디터 */
+/* [수정] 에디터 영역 */
 #editor {
     margin-bottom: 40px;
+    position: relative;
+    /* z-index를 0에서 1로 높여 다른 요소 위에 확실히 표시되도록 함 */
+    z-index: 1;
+    /* 배경색을 흰색으로 지정 (투명해서 안 보이는 문제 방지) */
+    background-color: #fff;
+}
+
+/* [중요] Toast UI Editor 스타일 충돌 방지 (강제 적용) */
+.toastui-editor-defaultUI,
+.toastui-editor-defaultUI * {
+    /* !important를 붙여 전체 선택자(*)의 border-box 속성을 확실히 덮어씌움 */
+    box-sizing: content-box !important;
+}
+
+/* 에디터 내부의 폰트가 Pretendard로 인해 깨지는 현상 방지 (선택 사항) */
+.toastui-editor-defaultUI {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif !important;
 }
 
 /* 하단 섹션 */
@@ -173,7 +196,7 @@ input:checked+.slider:before {
 }
 
 .crown-icon {
-    color: #9d6bf3; 
+    color: #9d6bf3;
     font-size: 1.2rem;
 }
 
@@ -311,17 +334,19 @@ input:checked+.slider:before {
     opacity: 0.9;
 }
 
-/* [추가] 모달 스타일 (와이어프레임 참고) */
+/* [수정] 모달 스타일 */
 .modal-overlay {
     display: none;
-    /* 기본 숨김 */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+
+    /* 중요: 헤더(z-index: 1000)보다 위에 오도록 2000으로 상향 */
+    z-index: 2000;
+
     justify-content: center;
     align-items: center;
 }

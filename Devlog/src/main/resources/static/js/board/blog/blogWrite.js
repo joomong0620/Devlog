@@ -8,7 +8,21 @@ const editor = new toastui.Editor({
     hooks: {
         addImageBlobHook: (blob, callback) => {
             console.log('이미지 업로드:', blob);
-            // 여기에 백엔드 이미지 업로드 로직 추가 필요
+            // 1. FormData에 이미지 파일 담기
+            const formData = new FormData();
+            formData.append('image', blob);
+
+            // 2. 서버로 이미지 업로드 요청
+            fetch('/api/blog/image-upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text()) // 저장된 이미지의 URL을 응답으로 받음
+            .then(url => {
+                // 3. 에디터에 이미지 URL 전달 (이미지 태그 삽입됨)
+                callback(url, '이미지 설명');
+            })
+            .catch(error => console.error('이미지 업로드 실패:', error));
         }
     }
 });
@@ -195,57 +209,3 @@ document.querySelector('.btn-draft').addEventListener('click', () => {
 document.querySelector('.btn-publish').addEventListener('click', () => {
     savePost(false);
 });
-
-
-const notiBtn = document.getElementById('noti-btn')
-const alarmArea = document.querySelector('.alarm-panel')
-const notiMenuBtn = document.querySelector('.noti-menu-btn')
-const notiMenuArea = document.querySelector('.noti-menu-dropdown')
-
-
-/* 알림창 */
-notiBtn.addEventListener('click', e => {
-    alarmArea.classList.toggle('display-none')
-})
-
-
-/* 전체 읽음 삭제 메뉴 드롭다운 */
-notiMenuBtn.addEventListener('click', e => {
-    notiMenuArea.classList.toggle('display-none')
-})
-
-
-
-/* 알림 필터 선택 */
-
-const alarmFilters = document.querySelectorAll('.filter');
-
-
-for (let filter of alarmFilters) {
-
-    filter.addEventListener('click', e => {
-
-        for (let item of alarmFilters) {
-            item.classList.remove('is-active');
-        }
-
-        filter.classList.add('is-active')
-
-    })
-
-}
-
-
-/* 해당 알림 클릭 시 읽은 느낌  */
-const alarmItems = document.querySelectorAll('.alarm-item')
-
-
-
-for (let alarmItem of alarmItems) {
-    alarmItem.addEventListener('click', e => {
-
-        alarmItem.classList.add('read-noti')
-    })
-
-}
-
