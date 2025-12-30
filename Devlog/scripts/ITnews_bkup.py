@@ -123,23 +123,22 @@ if final_list:
                 continue
 
             #  새 게시글 번호 생성
-            #cursor.execute("SELECT NVL(MAX(BOARD_NO), 0) + 1 FROM BOARD")
-            #board_no = cursor.fetchone()[0]
+            cursor.execute("SELECT NVL(MAX(BOARD_NO), 0) + 1 FROM BOARD")
+            board_no = cursor.fetchone()[0]
 
             # BOARD 테이블 저장 
-            #cursor.setinputsizes(None, None, None, oracledb.CLOB, None, None, None)
-            cursor.setinputsizes(None, None, oracledb.CLOB, None, None, None)
+            cursor.setinputsizes(None, None, None, oracledb.CLOB, None, None, None)
             
             sql_board = """
                 INSERT INTO BOARD (
                     BOARD_NO, BOARD_TITLE, BOARD_CODE, BOARD_CONTENT, 
                     NEWS_REPORTER, B_CREATE_DATE, BOARD_DEL_FL, MEMBER_NO
-                ) VALUES (SEQ_BOARD_NO.NEXTVAL, :1, :2, :3, :4, SYSDATE, :5, :6)
+                ) VALUES (:1, :2, :3, :4, :5, SYSDATE, :6, :7)
             """
             
             # 데이터 리스트 삽입/ 날자 제외
             cursor.execute(sql_board, [
-                #board_no,              # :1
+                board_no,              # :1
                 data['BOARD_TITLE'],    # :2
                 data['BOARD_CODE'],     # :3
                 data['BOARD_CONTENT'],  # :4
@@ -147,25 +146,19 @@ if final_list:
                 data['BOARD_DEL_FL'],   # :6
                 2    # :7
             ])
-            
-            # 현재 게시글 번호 조회 => BOARD_IMG에 FK 전달용
-            cursor.execute("SELECT NVL(MAX(BOARD_NO), 0) FROM BOARD")
-            board_no = cursor.fetchone()[0]            
 
             # 이미지 테이블 저장
             if data['IMAGE_URL'] and data['IMAGE_URL'] != "이미지 없음":
                 cursor.execute("SELECT NVL(MAX(IMG_NO), 0) + 1 FROM BOARD_IMG")
-                img_no = cursor.fetchone()[0] # "news_{img_no}.jpg" 에만 사용.
+                img_no = cursor.fetchone()[0]
 
                 sql_img = """
                     INSERT INTO BOARD_IMG (
                         IMG_NO, IMG_PATH, IMG_ORIG, IMG_RENAME, IMG_ORDER, BOARD_NO
-                    ) VALUES (SEQ_IMAGE_NO.NEXTVAL, :1, :2, :3, :4, :5)
-                    
+                    ) VALUES (:1, :2, :3, :4, :5, :6)
                 """
                 cursor.execute(sql_img, [
-                    #img_no, 
-                    data['IMAGE_URL'], "daum_news", 
+                    img_no, data['IMAGE_URL'], "daum_news", 
                     f"news_{img_no}.jpg", 0, board_no
                 ])
                 print(f"저장 완료: {board_no} (이미지 포함)")
