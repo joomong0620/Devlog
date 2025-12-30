@@ -46,7 +46,6 @@ overlay?.addEventListener("click", () => {
   overlay?.classList.remove("active");
 });
 
-
 /* 다크모드 */
 const darkModeBtn = document.getElementById("darkModeBtn");
 

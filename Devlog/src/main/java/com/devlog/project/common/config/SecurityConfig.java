@@ -75,7 +75,9 @@ public class SecurityConfig {
 	                "/jobposting/**",
 	                "/job-crawler",
 	                "/ITnews/**",
-	                "/ITnews"
+	                "/ITnews",
+	                "/coffeebeans/**"
+	                
 	                
 	                
 	                ///// PYY API Addition Start: /////
