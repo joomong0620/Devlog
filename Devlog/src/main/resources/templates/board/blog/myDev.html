@@ -33,8 +33,8 @@
                         <div class="dropdown-owner" th:if="${isOwner}">
                             <i class="fa-solid fa-ellipsis-vertical" id="menuBtn"></i>
                             <div class="dropdown-box" id="dropdownMenu">
-                                <a href="#"><i class="fa-solid fa-clock-rotate-left"></i> 내 활동</a>
-                                <a href="#"><i class="fa-solid fa-user-gear"></i> 프로필 설정</a>
+                                <a href="/myPage/activity"><i class="fa-solid fa-clock-rotate-left"></i> 내 활동</a>
+                                <a href="/myPage/settings"><i class="fa-solid fa-user-gear"></i> 프로필 설정</a>
                                 <hr>
                                 <a href="/logout">로그아웃</a>
                             </div>
@@ -153,12 +153,13 @@
     <script th:src="@{/js/board/blog/myDev.js}"></script>
 
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        // IDE 에러 방지를 위해 주석 문법 사용
-        // userProfile.id가 들어오면 그 값으로 대체되고, 없으면 ""(빈값)이 들어감
-        const blogOwnerId = /*[[${userProfile.id}]]*/ ""; 
-        /*]]>*/
-    </script>
+    /* 컨트롤러에서 model.addAttribute("userProfile", profile); 을 했으므로
+        userProfile 안에 있는 id(이메일)를 가져옵니다.
+    */
+    const blogOwnerId = [[${userProfile.id}]]; 
+    
+    console.log("현재 블로그 주인 ID:", blogOwnerId); // 확인용 로그
+</script>
 </body>
 
 </html>
