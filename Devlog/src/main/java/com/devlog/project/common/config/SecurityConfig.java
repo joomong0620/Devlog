@@ -90,13 +90,11 @@ public class SecurityConfig {
 	                ,"/api/blog/**"
 	                ,"/board/qna/**"
                 
-                  ////* YHJ *////  
+	                ////* YHJ *////  
 	                ,"/blog/list"
 	                ,"/api/blog/list"
-	                // [글쓰기 경로 테스트 임시 추가]
-	                ,"/blog/write"
-	                ,"/api/blog/write"
-	                ,"/api/blog/imageUpload"
+	                ,"/blog/*"
+	                ,"/api/blog/*/list"
 	                
 	            ).permitAll()
 	            .anyRequest().authenticated()

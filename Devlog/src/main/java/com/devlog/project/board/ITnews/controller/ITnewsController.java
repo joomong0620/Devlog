@@ -125,8 +125,10 @@ public class ITnewsController {
 	    
 	    // 로그인 안 되어 있으면 바로 -1 반환
 	    if (loginMember == null) return -1;
+	    System.out.println(paramMap);
 	    
 	    paramMap.put("memberNo", loginMember.getMemberNo());
 	    return itnewsService.like(paramMap);
+	    
 	}
 }

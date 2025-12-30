@@ -13,7 +13,7 @@ boardLike.addEventListener("click", (e) => {
   let check; // 기존에 좋아요 X(빈하트) : 0, 기존에 좋아요 O(꽉찬하트) : 1
 
   // contains("클래스명") : 클래스가 있으면 true, 없으면 false
-  if (e.target.classList.contains("fa-regular")) {
+  if (boardLike.classList.contains("fa-regular")) {
     // 좋아요 X(빈하트)
     check = 0;
   } else {

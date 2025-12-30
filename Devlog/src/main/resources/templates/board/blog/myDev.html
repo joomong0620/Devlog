@@ -1,85 +1,100 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>DevLog - My Blog</title>
+    <title th:text="${userProfile.nickname + ' - DevLog'}">DevLog - My Blog</title>
+    
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../../static/css/board/blog/myDev.css">
+    
+    <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+    
+    <link rel="stylesheet" th:href="@{/css/board/blog/myDev.css}">
 </head>
 
-<body data-user-type="owner">
+<body>
+
+    <div th:replace="~{common/header :: header}"></div>
+
     <div class="container">
         <header class="blog-header">
             <div class="header-left">
                 <div class="profile-main-img">
-                    <img src="https://placehold.co/180x180/333/fff?text=Profile" alt="Profile">
-                    <button id="tempModeSwitcher" class="temp-mode-btn">[임시] 모드 전환 (현재: 주인)</button>
+                    <img th:src="${userProfile.profileImgUrl != null ? userProfile.profileImgUrl : 'https://placehold.co/180x180/333/fff?text=Profile'}"
+                        alt="Profile">
                 </div>
                 <div class="profile-content">
                     <div class="nickname-area">
-                        <h1>GwanSik_Yang</h1>
-                        <div class="dropdown-owner owner-only">
+                        <h1 th:text="${userProfile.nickname}">Nickname</h1>
+
+                        <div class="dropdown-owner" th:if="${isOwner}">
                             <i class="fa-solid fa-ellipsis-vertical" id="menuBtn"></i>
                             <div class="dropdown-box" id="dropdownMenu">
                                 <a href="#"><i class="fa-solid fa-clock-rotate-left"></i> 내 활동</a>
                                 <a href="#"><i class="fa-solid fa-user-gear"></i> 프로필 설정</a>
                                 <hr>
-                                <a href="#">로그아웃</a>
+                                <a href="/logout">로그아웃</a>
                             </div>
                         </div>
                     </div>
                     <div class="lv-row">
-                        <span class="user-name">양관식</span>
-                        <div class="exp-container owner-only">
-                            <div class="exp-fill" style="width: 70%;"></div>
-                            <span class="lv-text">Lv.12</span>
+                        <span class="user-name" th:text="${userProfile.username}">실명</span>
+                        <div class="exp-container" th:if="${isOwner}">
+                            <div class="exp-fill" style="width: 70%;"></div> <span class="lv-text">Lv.12</span>
                         </div>
                     </div>
-                    <p class="job-tag">백엔드 N년차</p>
+                    <p class="job-tag" th:text="${userProfile.job} ?: '개발자'">직업 태그</p>
                     <div class="social-links">
-                        <i class="fa-brands fa-github" onclick="window.open('https://github.com')"></i>
-                        <i class="fa-solid fa-house" onclick="window.open('https://homepage.com')"></i>
+                        <i class="fa-brands fa-github" th:onclick="|window.open('${userProfile.githubUrl}')|"
+                            th:if="${userProfile.githubUrl}"></i>
+                        <i class="fa-solid fa-house" th:onclick="|window.open('${userProfile.blogUrl}')|"
+                            th:if="${userProfile.blogUrl}"></i>
                     </div>
-                    <p class="bio">사실 저 양배추 알러지 있습니다. <br> I prefer development to cabbage.</p>
+                    <p class="bio" th:utext="${userProfile.bio} ?: '소개가 없습니다.'">Bio</p>
                 </div>
             </div>
 
             <div class="header-center">
                 <div class="top-stat-row">
-                    <div class="stat-btn">팔로워 <strong>28</strong></div>
-                    <div class="stat-btn">팔로잉 <strong>1</strong></div>
-                    <div class="stat-btn owner-only">구독 <strong>1</strong></div>
+                    <div class="stat-btn">팔로워 <strong th:text="${followerCount}">0</strong></div>
+                    <div class="stat-btn">팔로잉 <strong th:text="${followingCount}">0</strong></div>
+                    <div class="stat-btn" th:if="${isOwner}">구독 <strong th:text="${subscriberCount}">0</strong></div>
                 </div>
                 <div class="action-row">
-                    <button class="btn-purple visitor-only">팔로우</button>
-                    <button class="btn-white visitor-only">메시지</button>
-                    <button class="btn-purple visitor-only">구독</button>
-                    <button class="btn-white owner-only"><i class="fa-solid fa-plus"></i> 새 글 작성</button>
+                    <th:block th:unless="${isOwner}">
+                        <button class="btn-purple">팔로우</button>
+                        <button class="btn-white">메시지</button>
+                        <button class="btn-purple">구독</button>
+                    </th:block>
+
+                    <button class="btn-white" th:if="${isOwner}" onclick="location.href='/blog/write'">
+                        <i class="fa-solid fa-plus"></i> 새 글 작성
+                    </button>
                 </div>
                 <div class="visit-summary">
-                    <p>전체 방문자 <strong>1,254</strong></p>
-                    <p>전체 글 <strong class="purple-txt">4</strong></p>
-                    <p class="visit-today">오늘 <span>23</span></p>
+                    <p>전체 방문자 <strong th:text="${totalVisit}">0</strong></p>
+                    <p>전체 글 <strong class="purple-txt" th:text="${postCount}">0</strong></p>
+                    <p class="visit-today">오늘 <span th:text="${todayVisit}">0</span></p>
                 </div>
             </div>
 
             <div class="header-right">
                 <p class="pick-title">유저 PICK 인기 글🔥</p>
-                <div class="pick-card-item" onclick="location.href='post_detail.html'" style="cursor:pointer;">
-                    <img src="https://placehold.co/180x100/9b5de5/fff?text=PICK" alt="Pick Thumb">
+                <div class="pick-card-item" th:if="${pickPost != null}"
+                    th:onclick="|location.href='@{/blog/detail/{id}(id=${pickPost.id})}'|" style="cursor:pointer;">
+                    <img th:src="${pickPost.thumbnailUrl}" alt="Pick Thumb">
                     <div class="pick-info">
-                        <h4 class="pick-card-title">2024 백엔드 로드맵</h4>
-                        <span class="tag-pill">Backend</span>
+                        <h4 class="pick-card-title" th:text="${pickPost.title}">제목</h4>
+                        <span class="tag-pill" th:text="${pickPost.category}">Category</span>
                         <div class="pick-meta-row">
                             <div class="p-meta">
-                                <i class="fa-solid fa-heart"></i> 12
-                                <i class="fa-solid fa-comment"></i> 5
-                                <i class="fa-solid fa-eye"></i> 1.2k
+                                <i class="fa-solid fa-heart"></i> <span th:text="${pickPost.likeCount}">0</span>
                             </div>
-                            <span class="p-date">2023.12.20</span>
+                            <span class="p-date"
+                                th:text="${#temporals.format(pickPost.createdAt, 'yyyy.MM.dd')}">날짜</span>
                         </div>
                     </div>
                 </div>
@@ -90,7 +105,8 @@
 
         <nav class="main-tabs">
             <div class="tab-btn active" data-type="all" title="일반 글"><i class="fa-solid fa-book"></i></div>
-            <div class="tab-btn owner-only" data-type="scrap" title="스크랩한 글"><i class="fa-solid fa-bookmark"></i></div>
+            <div class="tab-btn" data-type="scrap" title="스크랩한 글" th:if="${isOwner}"><i
+                    class="fa-solid fa-bookmark"></i></div>
             <div class="tab-btn" data-type="paid" title="유료 콘텐츠"><i class="fa-solid fa-crown"></i></div>
         </nav>
 
@@ -102,16 +118,11 @@
                         <i class="fa-solid fa-magnifying-glass" id="searchBtn"></i>
                     </div>
                     <div class="filter-options">
-                        <span class="filter-item active" data-sort="최신순">최신순</span>
-                        <span class="filter-item" data-sort="조회순">조회순</span>
-                        <span class="filter-item" data-sort="인기순">인기순</span>
-                        <span class="filter-item" data-sort="댓글순">댓글순</span>
+                        <span class="filter-item active" data-sort="latest">최신순</span>
+                        <span class="filter-item" data-sort="view">조회순</span>
+                        <span class="filter-item" data-sort="like">인기순</span>
+                        <span class="filter-item" data-sort="comment">댓글순</span>
                     </div>
-                </div>
-
-                <div id="active-filter-bar" class="active-filter-bar" style="display:none;">
-                    <div id="filter-tags-container" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
-                    <i class="fa-solid fa-xmark" id="clear-filter" title="전체 해제"></i>
                 </div>
 
                 <div id="post-list-wrap"></div>
@@ -122,33 +133,32 @@
             </main>
 
             <aside class="side-area">
-                <h3>태그 <span>(10)</span></h3>
+                <h3>태그 <span th:text="'(' + ${#lists.size(tags)} + ')'">(0)</span></h3>
                 <ul class="tag-cat-list" id="tag-list">
-                    <li class="tag-item" data-tag="React">React <small>3</small></li>
-                    <li class="tag-item" data-tag="Java">Java <small>5</small></li>
-                    <li class="tag-item" data-tag="Docker">Docker <small>2</small></li>
-                    <li class="tag-item" data-tag="디버깅">디버깅 <small>1</small></li>
+                    <li class="tag-item" th:each="tag : ${tags}" th:data-tag="${tag.name}">
+                        <span th:text="${tag.name}">TagName</span>
+                        <small th:text="${tag.count}">0</small>
+                    </li>
                 </ul>
             </aside>
         </div>
     </div>
-    
-<button id="goTopBtn" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
 
-    <div id="modal-overlay" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">목록</h3>
-                <i class="fa-solid fa-xmark close-modal"></i>
-            </div>
-            <ul id="modal-list" class="user-list">
-            </ul>
-        </div>
-    </div>
+    <button id="goTopBtn" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
 
-    <button id="goTopBtn"><i class="fa-solid fa-arrow-up"></i></button>
+    <div th:replace="~{common/footer :: footer}"></div>
+    <script th:src="@{/js/notification/noti.js}"></script>
+    <script th:src="@{/js/common/header.js}"></script>
 
-    <script src="../../../static/js/board/blog/myDev.js"></script>
+    <script th:src="@{/js/board/blog/myDev.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // IDE 에러 방지를 위해 주석 문법 사용
+        // userProfile.id가 들어오면 그 값으로 대체되고, 없으면 ""(빈값)이 들어감
+        const blogOwnerId = /*[[${userProfile.id}]]*/ ""; 
+        /*]]>*/
+    </script>
 </body>
 
 </html>

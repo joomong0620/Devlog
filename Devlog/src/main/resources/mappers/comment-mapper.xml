@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.devlog.project.board.ITnews.mapper.CommentMapper">
 
-    <resultMap type="Comment" id="comment_rm">
+	<resultMap type="Comment" id="comment_rm">
 		<id property="commentNo" column="COMMENT_NO" />
 		<result property="memberNo" column="MEMBER_NO" />
 		<result property="boardNo" column="BOARD_NO" />
@@ -20,57 +19,57 @@
 		<result property="badCount" column="BAD_COUNT" />
 		<result property="likeCheck" column="LIKE_CHECK" />
 		<result property="badCheck" column="BAD_CHECK" />
-   </resultMap>
+	</resultMap>
 
-    <select id="select" resultMap="comment_rm">
-        SELECT LEVEL, C.* FROM(
-            SELECT COMMENT_NO, COMMENT_CONTENT
-            , TO_CHAR(C_CREATE_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분" SS"초"') C_CREATE_DATE
-            , BOARD_NO, MEMBER_NO, MEMBER_NICKNAME, PROFILE_IMG, PARENTS_COMMENT_NO, COMMENT_DEL_FL
-            
-            , (SELECT COUNT(*) FROM "COMMENT_LIKE" R WHERE R.COMMENT_NO = "COMMENT".COMMENT_NO AND STATUS = 1) LIKE_COUNT
-            , (SELECT COUNT(*) FROM "COMMENT_LIKE" R WHERE R.COMMENT_NO = "COMMENT".COMMENT_NO AND STATUS = 2) BAD_COUNT
-            
-            , (SELECT COUNT(*) FROM "COMMENT_LIKE" R 
-               WHERE R.COMMENT_NO = "COMMENT".COMMENT_NO AND STATUS = 1 
-               AND MEMBER_NO = 
-               <choose>
-                   <when test="loginMemberNo != null">#{loginMemberNo}</when>
-                   <otherwise>0</otherwise>
-               </choose>
-              ) LIKE_CHECK
-              
-            , (SELECT COUNT(*) FROM "COMMENT_LIKE" R 
-               WHERE R.COMMENT_NO = "COMMENT".COMMENT_NO AND STATUS = 2 
-               AND MEMBER_NO = 
-               <choose>
-                   <when test="loginMemberNo != null">#{loginMemberNo}</when>
-                   <otherwise>0</otherwise>
-               </choose>
-              ) BAD_CHECK
-              
-            FROM "COMMENT"
-            JOIN MEMBER USING(MEMBER_NO)
-            WHERE BOARD_NO = #{boardNo}) C
-        WHERE COMMENT_DEL_FL = 'N'
-        START WITH PARENTS_COMMENT_NO IS NULL
-        CONNECT BY PRIOR COMMENT_NO = PARENTS_COMMENT_NO
-        ORDER SIBLINGS BY COMMENT_NO
-    </select>
+     <!-- 특정 게시글 댓글 조회(계층형 쿼리) -->
+	<select id="select" resultMap="comment_rm">
+		SELECT LEVEL, C.* FROM(
+		    SELECT COMMENT_NO, COMMENT_CONTENT
+		    , TO_CHAR(C_CREATE_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분" SS"초"') C_CREATE_DATE
+		    , BOARD_NO, MEMBER_NO, MEMBER_NICKNAME, PROFILE_IMG, PARENTS_COMMENT_NO, COMMENT_DEL_FL
+		    FROM "COMMENT"
+		    JOIN MEMBER USING(MEMBER_NO)
+		    WHERE BOARD_NO = ${boardNo}) C 
+		WHERE COMMENT_DEL_FL = 'N'
+		START WITH PARENTS_COMMENT_NO IS NULL
+		CONNECT BY PRIOR COMMENT_NO = PARENTS_COMMENT_NO
+		ORDER SIBLINGS BY COMMENT_NO
+	</select>
 
-	<insert id="insert">
-		<selectKey order="BEFORE" resultType="int" keyProperty="commentNo">
-		SELECT SEQ_COMMENT_NO.NEXTVAL FROM DUAL
+	<insert id="insert" parameterType="Comment">
+		<selectKey order="BEFORE" resultType="int"
+			keyProperty="commentNo">
+			SELECT SEQ_COMMENT_NO.NEXTVAL FROM DUAL
 		</selectKey>
 		INSERT INTO "COMMENT" ( COMMENT_NO, COMMENT_CONTENT, C_CREATE_DATE,
 		COMMENT_DEL_FL, SECRET_YN, MODIFY_YN, BOARD_NO, MEMBER_NO,
-		PARENTS_COMMENT_NO ) VALUES ( #{commentNo}, #{commentContent}, SYSDATE,
-		'N', 'N', 'N', #{boardNo}, #{memberNo}, 
+		PARENTS_COMMENT_NO ) VALUES ( #{commentNo}, #{commentContent},
+		SYSDATE,
+		'N', 'N', 'N', #{boardNo}, #{memberNo},
 		<choose>
 			<when test="parentCommentNo == 0">NULL</when>
 			<otherwise>#{parentCommentNo}</otherwise>
-		</choose> ) 
+		</choose>
+		)
 	</insert>
+
+
+	<!-- 댓글 삭제 -->
+	<update id="delete">
+		UPDATE "COMMENT" SET
+		COMMENT_DEL_FL = 'Y'
+		WHERE
+		COMMENT_NO = ${commentNo}
+	</update>
+
+	<!-- 댓글 수정 -->
+	<update id="update">
+		UPDATE "COMMENT" SET
+		    COMMENT_CONTENT = #{commentContent},
+		    MODIFY_YN = 'Y'
+		    WHERE COMMENT_NO = #{commentNo}
+
+	</update>
 
 
 </mapper>

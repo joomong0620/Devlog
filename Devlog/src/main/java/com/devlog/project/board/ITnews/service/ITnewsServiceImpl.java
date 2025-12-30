@@ -31,7 +31,7 @@ public class ITnewsServiceImpl implements ITnewsService {
 		return ITnewsmapper.selectNewsDetail(boardNo);
 	}
 
-	// 좋아요 여부 확인
+	// 뉴스 크롤링
 	@Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
 	public void ITnewsCrawler() {
 		System.out.println(">>> ITnewsCrawler() 메서드 진입 성공!");
