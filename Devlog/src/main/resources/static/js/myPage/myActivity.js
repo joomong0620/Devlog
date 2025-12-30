@@ -1,3 +1,6 @@
+console.log("myActivity.js loaded");
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('.tab-item');
     const listContainer = document.getElementById('list-container');

@@ -1,3 +1,5 @@
+console.log("mySetting.js loaded");
+
 document.addEventListener('DOMContentLoaded', () => {
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.profile-section');

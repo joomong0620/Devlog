@@ -1,5 +1,7 @@
+console.log("myDev.js loaded");
+
 // 상태 관리 변수들
-let currentSort = 'latest'; // 정렬 기준 (기본값 수정)
+let currentSort = 'id'; // 정렬 기준 (기본값 수정)
 let page = 0;
 const PAGE_SIZE = 6;
 let isLoading = false;
@@ -12,8 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterItems = document.querySelectorAll('.filter-item');
     const searchInput = document.getElementById('searchInput');
     const goTopBtn = document.getElementById('goTopBtn');
-
-    // [수정됨] 모드 전환 버튼 관련 로직 삭제됨 (modeBtn)
 
     // [기능 1] TOP 버튼
     window.addEventListener('scroll', () => {

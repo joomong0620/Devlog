@@ -23,7 +23,7 @@ public class BlogWriteRequestDto {
 	private Boolean isTemp; // (true : 임시저장, false: 발행)
 	
 	// DTO -> Entity 변환 메서드
-	public Blog toEntity(String authorName) {
+	public Blog toEntity(String authorName, Long memberNo) {
 		// List<String> 태그를 "태그1, 태그2" 형태의 문자열로 변환
 		String tagsString = (tags != null) ? String.join(",", tags) : "";
 		
@@ -31,6 +31,8 @@ public class BlogWriteRequestDto {
 				.title(this.title)
 				.content(this.content)
 				.authorName(authorName) // 작성자는 로그인 정보나 파라미터로 받음
+				.memberNo(memberNo)
+				.boardCode(1)
                 .thumbnailUrl(null)     // 썸네일 로직은 추후 구현 (일단 null)
                 .tags(tagsString)
                 .isPaid(this.isPaid != null && this.isPaid)
