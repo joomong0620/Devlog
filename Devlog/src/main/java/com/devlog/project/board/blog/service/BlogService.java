@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication; // 추가
@@ -36,7 +37,7 @@ public class BlogService {
         return blogPage.map(BlogListResponseDto::new);
     }
     
-    // [수정됨] 글 작성 저장
+    // 글 작성 저장
     @Transactional
     public Long writeBlog(BlogWriteRequestDto dto) {
         
@@ -62,27 +63,30 @@ public class BlogService {
         
         return savedBlog.getId();
     }
+    @Value("${my.blogWrite.location}")
+    private String uploadLocation; 
     
-    private final String baseUploadPath = "C:/DevlogImg";
+    @Value("${my.blogWrite.webpath}")
+    private String uploadWebPath;
+    
     
     // 이미지 업로드 로직
     public String uploadImage(MultipartFile image) {
         if(image == null || image.isEmpty()) return null;
         
-        String subFolder = "board/blog/blogWriteImg/";
-        String fullPath = baseUploadPath + subFolder;
         
         String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
         
-        File folder = new File(fullPath);
+        File folder = new File(uploadLocation);
         if (!folder.exists()) {
             folder.mkdirs();
         }
         
         try {
-            File saveFile = new File(fullPath, fileName);
+            File saveFile = new File(uploadLocation, fileName);
             image.transferTo(saveFile);
-            return "/images/" + subFolder + fileName;
+            return uploadWebPath + fileName;
+            
         } catch(IOException e) {
             throw new RuntimeException("이미지 업로드 중 오류 발생", e);
         }
