@@ -1305,7 +1305,7 @@ function moveTop(roomNo) {
 }
 
 
-
+// 메세지 전송 함수
 function sendMessage(chatRoomNo, content) {
     const totalMember = document.querySelector('.member-counting').innerText;
     const msg = {
@@ -1321,7 +1321,7 @@ function sendMessage(chatRoomNo, content) {
 }
 
 
-// 채팅 전송 함수
+// 채팅 전송 이벤트
 
 function bindChatSendInputEvents(chatRoomNo) {
     const textArea = document.getElementById("send-message");

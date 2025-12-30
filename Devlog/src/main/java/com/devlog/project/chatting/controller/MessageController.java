@@ -124,7 +124,7 @@ public class MessageController {
 			@RequestBody MessageDTO.MessageEdit edit
 			){
 		
-		;
+		
 		
 		log.info("수정 파라미터 확인 : {}", edit);
 		
