@@ -78,7 +78,9 @@ public class SecurityConfig {
 	                "/jobposting/**",
 	                "/job-crawler",
 	                "/ITnews/**",
-	                "/ITnews"
+	                "/ITnews",
+	                "/coffeebeans/**"
+	                
 	                
 	                
 	                ///// PYY API Addition Start: /////
@@ -89,12 +91,11 @@ public class SecurityConfig {
 	                ,"/app/login/**"
 	                ,"/member/signUpKakao"	                
 	                ///// PYY API Addition End: /////	                
-	                ,"/blog/**"
-	                ,"/api/blog/**"
 	                ,"/board/qna/**"
                 
 	                ////* YHJ *////  
 	                ,"/blog/list"
+	                ,"/blog/detail/**"
 	                ,"/api/blog/list"
 	                ,"/blog/*"
 	                ,"/api/blog/*/list"

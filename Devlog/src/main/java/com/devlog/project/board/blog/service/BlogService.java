@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication; // 추가
 import org.springframework.security.core.context.SecurityContextHolder; // 추가
 import org.springframework.stereotype.Service;
@@ -49,16 +50,20 @@ public class BlogService {
             // 로그인 상태라면 실제 이메일 사용
             currentAuthorEmail = auth.getName(); 
         } else {
-            // [테스트용] 로그인 안 했을 경우 임시로 이메일 지정 (URL과 일치시켜야 목록이 나옴)
-            // 나중에 로그인 기능 완벽하면 else 부분은 예외처리(throw new Exception) 해야 함
-            currentAuthorEmail = "test@naver.com"; 
+        	
+        	// 로그인하지 않은 경우 예외 발생
+        	// AccessDeniedException은 스프링 시큐리티에서 제공하는 "권한 없음" 예외.
+        	throw new AccessDeniedException("로그인이 필요한 서비스입니다.");
         }
-
-        // 2. 엔티티 변환 (작성자 이메일 주입)
+        
+        // 2. 회원 정보 조회 (이메일로 memberNo 찾기)
+        String finalEmail = currentAuthorEmail;
+        Member member = memberRepository.findByMemberEmailAndMemberDelFl(finalEmail, CommonEnums.Status.N)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        
+        // 3. 엔티티 변환 -> 저장 (작성자 이메일 주입)
         // 주의: DB의 authorName 컬럼에 이제 '이메일'이 저장됩니다.
-        Blog blog = dto.toEntity(currentAuthorEmail);
-            
-        // 3. DB 저장
+        Blog blog = dto.toEntity(finalEmail, member.getMemberNo());
         Blog savedBlog = blogRepository.save(blog);
         
         return savedBlog.getId();

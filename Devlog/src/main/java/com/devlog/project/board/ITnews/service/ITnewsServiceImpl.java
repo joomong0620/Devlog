@@ -49,14 +49,26 @@ public class ITnewsServiceImpl implements ITnewsService {
 		System.out.println(">>> ITnewsCrawler() 메서드 진입 성공!");
 		try {
 			String projectPath = System.getProperty("user.dir");
-
 			String scriptPath = projectPath + File.separator + "scripts" + File.separator + "ITnews.py";
 
-			System.out.println("크롤링 프로세스 시작: " + scriptPath);
+			// OS 판별
+	        String os = System.getProperty("os.name").toLowerCase();
+	        String pythonCmd;
 
-			// ProcessBuilder 설정
-			ProcessBuilder pb = new ProcessBuilder("python", scriptPath);
-			pb.redirectErrorStream(true);
+	        if (os.contains("win")) {
+	            // Windows
+	            pythonCmd = "python";
+	        } else {
+	            // Linux / Ubuntu / Mac
+	            pythonCmd = "/home/yypark/miniconda3/bin/python3";
+	        }
+
+	        System.out.println("OS: " + os);
+	        System.out.println("Python Command: " + pythonCmd);
+	        System.out.println("크롤링 프로세스 시작: " + scriptPath);
+
+	        ProcessBuilder pb = new ProcessBuilder(pythonCmd, scriptPath);
+	        pb.redirectErrorStream(true);
 
 			Process process = pb.start();
 

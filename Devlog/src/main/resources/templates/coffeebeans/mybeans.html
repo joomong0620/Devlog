@@ -1,25 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mybeans</title>
-  <link rel="stylesheet" href="../../static/css/coffeebeans/mybeans.css">
+  <link rel="stylesheet" th:href="@{/css/coffeebeans/mybeans.css}">
+  <link rel="stylesheet" th:href="@{/css/common/common.css}" />
+  <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+
 </head>
+
+<div th:replace="common/header :: header"></div>
+<script th:src="@{/js/common/header.js}"></script>
 
 <body>
   <div class="mybeans-container">
     <div class="main-beans">
       <div class="title-group">
-        <img src="../../static/images/common/coffebean.png" alt="커피콩">
+        <img th:src="@{/images/common/coffebean.png}" alt="커피콩">
         <h2 class="mybeans">내 커피콩</h2>
       </div>
       <div class="beans-count">
-        <!-- <span th:text="${memberBeanCount}">0</span> -->
-        <span>12,450 콩</span>
-        <!-- <span th:text="${memberBeanCount}">0</span> -->
-        <span>약 12,450 상당</span>
+        <span th:text="|${#numbers.formatInteger(myBeans.beansAmount, 0, 'COMMA')} 콩|">12,450 콩</span>
+        <span th:text="|약 ${#numbers.formatInteger(myBeans.beansAmount, 0, 'COMMA')}원 상당|">12,450 콩</span>
 
         <div class="btn-group">
           <button class="charge-btn" id="charge-btn">
@@ -35,7 +40,7 @@
       <div class="info-cards">
         <div class="beans-info">
           <div class="info-title-group">
-            <img src="../../static/images/common/1bean.png" alt="단가">
+            <img th:src="@{/images/common/1bean.png}" alt="단가">
             <h3 class="info-title">커피콩 단가 안내</h3>
           </div>
           <ul class="info-list">
@@ -47,7 +52,7 @@
 
         <div class="beans-info">
           <div class="info-title-group">
-            <img src="../../static/images/common/2bean.png" alt="환전">
+            <img th:src="@{/images/common/2bean.png}" alt="환전">
             <h3 class="info-title">커피콩 환전 정책</h3>
           </div>
           <ul class="info-list">
@@ -87,34 +92,23 @@
             </tr>
           </thead>
           <tbody id="history-tbody">
-            <tr data-type="use">
-              <td>사용</td>
-              <td>블로그 글 구매</td>
-              <td class="minus">-3,000</td>
-              <td>2025.12.09</td>
+            <tr th:each="history : ${historyList}" th:data-type="${history.payAmount > 0 ? 'charge' : 'use'}">
+
+              <td th:text="${history.contentType}">유형</td>
+
+              <td th:text="${history.contentId != 0 ? history.contentType : '커피콩 충전'}">내역</td>
+
+              <td th:class="${history.payAmount > 0 ? 'plus' : 'minus'}"
+                th:text="${history.payAmount > 0 ? '+' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA') : '-' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA')}">
+                금액
+              </td>
+
+              <td th:text="${history.payDate}">2025.12.31</td>
             </tr>
 
-            <tr data-type="charge">
-              <td>충전</td>
-              <td>커피콩 충전</td>
-              <td class="plus">+30,000</td>
-              <td>2025.12.08</td>
+            <tr th:if="${#lists.isEmpty(historyList)}">
+              <td colspan="4" style="text-align: center;">내역이 존재하지 않습니다.</td>
             </tr>
-
-            <tr data-type="use">
-              <td>사용</td>
-              <td>유료 구독</td>
-              <td class="minus">-30,000</td>
-              <td>2025.12.01</td>
-            </tr>
-
-
-            <!-- <tr data-type="cancel">
-              <td>취소</td>
-              <td>결제 취소</td>
-              <td class="plus">+10,000</td>
-              <td>2025.12.01</td>
-            </tr> -->
           </tbody>
         </table>
       </div>
@@ -123,10 +117,10 @@
 
   <div class="modal" id="charge-modal">
     <div class="charge-modal-content">
-      <img src="../../static/images/common/coffebean.png" alt="커피콩" class="modal-icon">
+      <img th:src="@{/images/common/coffebean.png}" alt="커피콩" class="modal-icon">
       <h2>커피콩 충전</h2>
       <div class="input-wrapper">
-        <input type="text" placeholder="금액을 입력하세요">
+        <input type="text" id="charge-amount-input" placeholder="금액을 입력하세요" value="10000">
         <span>원</span>
       </div>
       <div class="amount-options">
@@ -135,14 +129,14 @@
         <button>30,000</button>
         <button>50,000</button>
       </div>
-      <button class="charge-submit-btn">충전하기</button>
+      <button class="charge-submit-btn" id="final-charge-submit">충전하기</button>
     </div>
   </div>
 
   <div class="modal" id="exchange-modal">
     <div class="exchange-modal-content">
       <div class="modal-header-section">
-        <img src="../../static/images/common/coffebean.png" alt="커피콩" class="modal-icon">
+        <img th:src="@{/images/common/coffebean.png}" alt="커피콩" class="modal-icon">
         <h2>커피콩 환전</h2>
       </div>
 
@@ -193,7 +187,7 @@
   </div>
   <div class="modal" id="exchange-complete-modal">
     <div class="complete-modal-content">
-      <img src="../../static/images/common/coffebean.png" alt="커피콩" class="complete-icon">
+      <img src="@{/images/common/coffebean.png}" alt="커피콩" class="complete-icon">
       <div class="complete-text">
         <p class="main-msg">회원님의 환전 요청이 관리자에게 정상적으로 전송되었습니다!</p>
         <p class="sub-msg">해당 요청 처리 건은 1~3일 정도 소요됩니다.</p>
@@ -207,7 +201,7 @@
 <div class="modal" id="cancel-modal">
   <div class="cancel-modal-content">
     <div class="modal-header-section">
-      <img src="../../static/images/common/coffebean.png" alt="커피콩" class="modal-icon">
+      <img th:src="@{/images/common/coffebean.png}" alt="커피콩" class="modal-icon">
       <h2>커피콩 결제 취소</h2>
     </div>
     <div class="calculation-section">
@@ -230,7 +224,7 @@
 
 <div class="modal" id="cancel-success-modal">
   <div class="complete-modal-content">
-    <img src="../../static/images/common/coffebean.png" alt="커피콩" class="complete-icon">
+    <img th:src="@{/images/common/coffebean.png}" alt="커피콩" class="complete-icon">
     <div class="complete-text">
       <p class="main-msg">결제 취소가 정상적으로 처리되었습니다!</p>
     </div>
@@ -240,7 +234,7 @@
 
 <div class="modal" id="cancel-fail-modal">
   <div class="complete-modal-content">
-    <img src="../../static/images/common/coffebean.png" alt="커피콩" class="complete-icon">
+    <img th:src="@{/images/common/coffebean.png}" alt="커피콩" class="complete-icon">
     <div class="complete-text">
       <p class="main-msg">회원님은 이미 커피콩 사용 내역이 있습니다.<br>취소가 불가능합니다.</p>
     </div>
@@ -248,8 +242,10 @@
   </div>
 </div>
 
-
-
-<script src="../../static/js/coffeebeans/mybeans.js"></script>
+<div th:replace="common/footer :: footer"></div>
+<script th:src="@{/js/notification/noti.js}"></script>
+<script th:src="@{/js/coffeebeans/mybeans.js}"></script>
+<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
+<script th:src="@{/js/pay/mybeans.js}"></script>
 
 </html>
