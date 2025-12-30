@@ -1,5 +1,6 @@
 package com.devlog.project.board.ITnews.controller;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
@@ -11,9 +12,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.devlog.project.board.ITnews.dto.ITnewsDTO;
@@ -46,13 +51,14 @@ public class ITnewsController {
 	@GetMapping("/ITnews/{boardNo:[0-9]+}")
 	public String ITnewsDetail(@PathVariable("boardNo") int boardNo, Model model,
 			@SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember,
-			RedirectAttributes ra,
-			HttpServletRequest req, 
-			HttpServletResponse resp,
-			HttpSession session) throws ParseException {
+			RedirectAttributes ra, HttpServletRequest req, HttpServletResponse resp, HttpSession session)
+			throws ParseException {
 
 		// 1. 상세 데이터 조회
 		ITnewsDTO news = itnewsService.selectNewsDetail(boardNo);
+
+		int likeCount = itnewsService.countBoardLike(boardNo);
+		model.addAttribute("likeCount", likeCount);
 
 		if (news == null) {
 			ra.addFlashAttribute("message", "해당 뉴스가 존재하지 않습니다.");
@@ -104,6 +110,14 @@ public class ITnewsController {
 		}
 
 		model.addAttribute("news", news);
+
+		boolean isAdmin = false;
+		if (loginMember != null && loginMember.getMemberAdmin() != null) {
+			// Enum의 상수 이름이 'Y'인지 확인
+			isAdmin = loginMember.getMemberAdmin().name().equals("Y");
+		}
+		model.addAttribute("isAdmin", isAdmin);
+
 		return "board/ITnews/ITnewsDetail";
 	}
 
@@ -115,20 +129,86 @@ public class ITnewsController {
 
 	}
 
-	
 	// 좋아요 처리
 	@PostMapping("/ITnews/like")
 	@ResponseBody
-	public int like(
-	    @RequestBody Map<String, Object> paramMap, 
-	    @SessionAttribute(value="loginMember", required=false) MemberLoginResponseDTO loginMember) {
-	    
-	    // 로그인 안 되어 있으면 바로 -1 반환
-	    if (loginMember == null) return -1;
-	    System.out.println(paramMap);
-	    
-	    paramMap.put("memberNo", loginMember.getMemberNo());
-	    return itnewsService.like(paramMap);
-	    
+	public int like(@RequestBody Map<String, Object> paramMap,
+			@SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember) {
+
+		// 로그인 안 되어 있으면 바로 -1 반환
+		if (loginMember == null)
+			return -1;
+		System.out.println(paramMap);
+
+		paramMap.put("memberNo", loginMember.getMemberNo());
+		return itnewsService.like(paramMap);
+
 	}
+
+	// 관리자 게시글 삭제
+	@PutMapping("/ITnews/{boardNo}/delete")
+	@ResponseBody
+	public int boardDelete(@PathVariable int boardNo,
+			@SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember) {
+		if (loginMember == null)
+			return -1;
+
+		// 관리자 체크 필요하면 여기서
+		// if(!loginMember.isAdmin()) return -1;
+
+		return itnewsService.boardDelete(boardNo);
+	}
+
+	// 관리자 게시글 수정 화면 전환
+	@GetMapping("/ITnews/{boardNo}/update")
+	public String boardUpdate(@PathVariable int boardNo,
+			@SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember,
+			Model model) {
+
+		if (loginMember == null) {
+			return "redirect:/ITnews";
+		}
+
+		ITnewsDTO itnews = itnewsService.selectNewsDetail(boardNo);
+
+		if (itnews == null) {
+			return "redirect:/ITnews";
+		}
+
+		model.addAttribute("itnews", itnews);
+		return "board/ITnews/ITnewsUpdate";
+
+	}
+
+	// 게시글 수정
+	@PostMapping("/ITnews/{boardNo}/update")
+	public String boardUpdate(
+		@PathVariable int boardNo,
+		ITnewsDTO itnews, 
+		@RequestParam(value="imageFile", required=false) MultipartFile imageFile, // 새 이미지
+        @SessionAttribute("loginMember") MemberLoginResponseDTO loginMember // 관리자 체크용
+		) throws IllegalStateException, IOException {
+		 
+		itnews.setBoardNo(boardNo);
+		
+		// 3. 서비스 호출 (기사 수정 및 이미지 처리)
+		// Note: 서비스에서 itnews.getBoardCode() 등으로 접근할 수 있도록 구성
+		int result = itnewsService.boardUpdate(itnews, imageFile);
+				
+		     
+		String message = null;
+		String path = "redirect:/ITnews/";    
+	 
+		if(result > 0) { // 게시글 수정 성공 시
+			message = "게시글이 수정되었습니다.";
+			return "redirect:/ITnews";
+			
+		}else { // 실패 시 
+			message = "게시글 수정 실패 ㅠㅠ";
+			path += "update";
+		}
+		
+		return path;
+	}
+
 }

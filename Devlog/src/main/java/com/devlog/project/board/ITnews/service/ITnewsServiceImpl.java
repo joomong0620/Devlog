@@ -2,23 +2,35 @@ package com.devlog.project.board.ITnews.service;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.board.ITnews.dto.ITnewsDTO;
 import com.devlog.project.board.ITnews.mapper.ITnewsMapper;
+import com.devlog.project.common.utility.Util;
 
 @Service
+@PropertySource("classpath:/config.properties")
 public class ITnewsServiceImpl implements ITnewsService {
 
 	@Autowired
 	private ITnewsMapper ITnewsmapper;
+	
+	@Value("${my.news.webpath}")
+    private String webPath;
 
+    @Value("${my.news.location}")
+    private String filePath;
 	// 뉴스 목록 조회
 	@Override
 	public List<ITnewsDTO> selectITnewsList() {
@@ -102,5 +114,39 @@ public class ITnewsServiceImpl implements ITnewsService {
 			return -1;
 		return ITnewsmapper.countBoardLike(paramMap.get("boardNo"));
 
+	}
+
+	@Override
+	public int countBoardLike(int boardNo) {
+		return ITnewsmapper.countBoardLike(boardNo);
+	}
+
+	@Override
+	public int boardDelete(int boardNo) {
+		return ITnewsmapper.boardDelete(boardNo);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public int boardUpdate(ITnewsDTO itnews, MultipartFile imageFile) throws IllegalStateException, IOException {
+
+	    int result = ITnewsmapper.boardUpdate(itnews);
+
+	    if (result > 0 && imageFile != null && !imageFile.isEmpty()) {
+	        
+	        String rename = Util.fileRename(imageFile.getOriginalFilename());
+	        itnews.setImgPath(webPath);
+	        itnews.setImgRename(rename);
+
+	        imageFile.transferTo(new File(filePath + rename));
+
+	        int imgResult = ITnewsmapper.imageUpdate(itnews);
+
+	        if (imgResult == 0) {
+	            ITnewsmapper.imageInsert(itnews);
+	        }
+	    }
+
+	    return result;
 	}
 }

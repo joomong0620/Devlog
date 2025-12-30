@@ -62,3 +62,56 @@ p {
   align-items: center;
   justify-content: center;
 }
+
+
+
+/* 수정/삭제버튼 */
+/* 하단 버튼 영역 */
+.button-area {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 40px;
+}
+
+
+#delete-btn #update-btn {
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+
+}
+
+
+/* 삭제 버튼 */
+.delete-btn {
+  background-color: #eee;
+  color: #888;
+  border: none;
+  box-shadow: 0 4px 10px rgba(209, 163, 255, 0.3);
+  width: 100px;
+  height: 30px;
+  font-size: 15px;
+}
+
+.delete-btn:hover {
+  background-color: #e5e5e5;
+}
+
+/* 수정하기 버튼 (보라색 포인트) */
+.update-btn {
+  background-color: #d1a3ff;
+  color: white;
+  box-shadow: 0 4px 10px rgba(209, 163, 255, 0.3);
+  border: none;
+  width: 100px;
+  height: 30px;
+  font-size: 15px;
+}
+
+.update-btn:hover {
+  background-color: #ba85ff;
+}

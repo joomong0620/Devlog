@@ -9,6 +9,7 @@
 		FROM BOARD B
 		LEFT JOIN BOARDTYPE T ON B.BOARD_CODE = T.BOARD_CODE
 		LEFT JOIN BOARD_IMG I ON B.BOARD_NO = I.BOARD_NO
+		WHERE BOARD_DEL_FL = 'N'
 	</select>
 
 	<!-- 뉴스 상세 조회 -->
@@ -57,5 +58,37 @@
 	<select id="countBoardLike" resultType="_int">
 		SELECT COUNT(*) FROM BOARD_LIKE WHERE BOARD_NO = ${boardNo}
 	</select>
+
+
+	<!-- 게시글 삭제 -->
+	<update id="boardDelete">
+		UPDATE BOARD SET
+		BOARD_DEL_FL = 'Y'
+		WHERE
+		BOARD_NO = ${boardNo}
+	</update>
+
+
+	<update id="boardUpdate" parameterType="ITnewsDTO">
+    UPDATE BOARD SET
+        BOARD_TITLE   = #{boardTitle},
+        BOARD_CONTENT = #{boardContent},
+        NEWS_REPORTER = #{newsReporter},
+        BOARD_CODE    = #{boardCode},
+        B_UPDATE_DATE = SYSDATE
+      WHERE BOARD_NO = #{boardNo}
+	</update>
+
+	<update id="imageUpdate" parameterType="ITnewsDTO">
+	    UPDATE BOARD_IMG SET
+	        IMG_PATH   = #{imgPath},
+	        IMG_RENAME = #{imgRename}
+	    WHERE BOARD_NO = #{boardNo}
+	</update>
+	
+	<insert id="imageInsert" parameterType="ITnewsDTO">
+	    INSERT INTO BOARD_IMG (IMG_NO, IMG_PATH, IMG_RENAME, BOARD_NO, IMG_ORDER)
+	    VALUES (SEQ_IMG_NO.NEXTVAL, #{imgPath}, #{imgRename}, #{boardNo}, 0)
+	</insert>
 
 </mapper>

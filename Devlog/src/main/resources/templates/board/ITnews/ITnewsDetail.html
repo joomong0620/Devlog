@@ -34,12 +34,15 @@
       </div>
       <div class="news-info">
         <p>
+          <span>기자명 : </span>
           <span th:text="${news.newsReporter}">기자명</span>
         </p>
         <p>
+          <span>기사 날짜 : </span>
           <span th:text="${news.bCreateDate}">2025-09-29</span>
         </p>
         <p>
+          <span>조회수 : </span>
           <span th:text="${news.boardCount}">2789</span>
         </p>
 
@@ -47,7 +50,7 @@
         <p>
           <span class="like-area">
             <i class="fa-heart" th:classappend="${likeCheck} ? fa-solid : fa-regular" id="boardLike"></i>
-            <span id="likeCount" th:text="${news.likeCount}">0</span> </span>
+            <span id="likeCount" th:text="${likeCount}">0</span> </span>
         </p>
 
         <!-- 스크랩 -->
@@ -78,7 +81,16 @@
         </div>
       </div>
 
+
+      <div class="button-area" th:if="${session.loginMember != null and session.loginMember.memberAdmin.name()=='Y'}">
+        <button type="button" class="delete-btn" id="delete-btn">삭제</button>
+        <button type="button" class="update-btn" id="update-btn">수정하기</button>
+      </div>
+
+
+
       <div id="commentContainer" th:replace="~{board/ITnews/ITnewsComment}"></div>
+
 
 
   </main>
@@ -92,6 +104,9 @@
     const boardNo = /*[[${news?.boardNo}]]*/ 0;
 
     const boardTitle = /*[[${news?.boardTitle}]]*/ "";
+
+
+    const isAdmin = /*[[${session.loginMember?.memberAdmin?.name() == 'Y'}]]*/ false;
   </script>
 
 

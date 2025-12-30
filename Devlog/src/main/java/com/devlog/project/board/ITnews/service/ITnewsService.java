@@ -1,7 +1,10 @@
 package com.devlog.project.board.ITnews.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.board.ITnews.dto.ITnewsDTO;
 
@@ -27,6 +30,19 @@ public interface ITnewsService {
 	
 	// 좋아요 처리
 	int like(Map<String, Object> paramMap);
+
+	// 좋아요 수
+	int countBoardLike(int boardNo);
+
+	
+	// 게시글 삭제
+	int boardDelete(int boardNo);
+
+	
+	// 게시글 수정
+	int boardUpdate(ITnewsDTO itnews, MultipartFile imageFile) throws IllegalStateException, IOException;
+
+	
 
 
 

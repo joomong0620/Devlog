@@ -1,5 +1,3 @@
-console.log("boardDetail.js loaded");
-
 const boardLike = document.getElementById("boardLike");
 // 좋아요 버튼이 클릭 되었을 때
 boardLike.addEventListener("click", (e) => {
@@ -8,7 +6,6 @@ boardLike.addEventListener("click", (e) => {
     alert("로그인 후 이용해주세요.");
     return;
   }
-
 
   let check; // 기존에 좋아요 X(빈하트) : 0, 기존에 좋아요 O(꽉찬하트) : 1
 
@@ -21,8 +18,7 @@ boardLike.addEventListener("click", (e) => {
     check = 1;
   }
 
-
-// ajax로 서버에 제출할 파라미터를 모아둔 JS 객체
+  // ajax로 서버에 제출할 파라미터를 모아둔 JS 객체
   const data = { memberNo: loginMemberNo, boardNo: boardNo, check: check };
 
   // ajax 비동기 통신
@@ -31,31 +27,31 @@ boardLike.addEventListener("click", (e) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   })
-    .then((resp) => resp.text()) 
-   .then((count) => {
-    console.log("서버로부터 받은 최신 좋아요 수 : " + count);
+    .then((resp) => resp.text())
+    .then((count) => {
+      console.log("서버로부터 받은 최신 좋아요 수 : " + count);
 
-    if (count == -1) {
+      if (count == -1) {
         alert("좋아요 처리 실패ㅠㅠ");
         return;
-    }
+      }
 
-    // 1. 하트 아이콘 토글 (빈 하트 <-> 꽉 찬 하트)
-    const boardLike = document.getElementById("boardLike");
-    boardLike.classList.toggle("fa-regular");
-    boardLike.classList.toggle("fa-solid");
+      // 1. 하트 아이콘 토글 (빈 하트 <-> 꽉 찬 하트)
+      const boardLike = document.getElementById("boardLike");
+      boardLike.classList.toggle("fa-regular");
+      boardLike.classList.toggle("fa-solid");
 
-    // 2. 숫자 업데이트 (id="likeCount"인 요소를 직접 찾아서 텍스트 변경)
-    const likeCountSpan = document.getElementById("likeCount");
-    if (likeCountSpan) {
-        likeCountSpan.innerText = count; 
+      // 2. 숫자 업데이트 (id="likeCount"인 요소를 직접 찾아서 텍스트 변경)
+      const likeCountSpan = document.getElementById("likeCount");
+      if (likeCountSpan) {
+        likeCountSpan.innerText = count;
         console.log("화면 업데이트 완료!");
-    } else {
+      } else {
         console.error("오류: id가 'likeCount'인 span 태그를 찾을 수 없습니다.");
-    }
+      }
 
       // if(check == 0){ //기존에 좋아요를 X
-        
+
       //   //게시글 작성자에게 알림 보내기
       //   sendNotification(
       //     "boardLike",
@@ -64,8 +60,40 @@ boardLike.addEventListener("click", (e) => {
       //     `<strong>${memberNickname}</strong>님이 <strong>${boardTitle}</strong> 게시글을 좋아합니다.`
       //   );
       // }
-
     })
-    .catch((err) => { console.log(err);
+    .catch((err) => {
+      console.log(err);
     }); // 예외 발생 시 처리할 코드
 });
+
+// 게시글 삭제 !!!!
+const deleteBtn = document.getElementById("delete-btn");
+
+deleteBtn.addEventListener("click", () => {
+  if (!confirm("정말로 삭제 하시겠습니까?")) return;
+
+  fetch(`/ITnews/${boardNo}/delete`, {
+    method: "PUT",
+  })
+    .then((resp) => resp.text())
+    .then((result) => {
+      if (result > 0) {
+        alert("게시글이 삭제되었습니다.");
+        location.href = "/ITnews"; // 목록 이동
+      } else {
+        alert("삭제 실패");
+      }
+    })
+    .catch((err) => console.log(err));
+});
+
+// 게시글 수정
+const updateBtn = document.getElementById("update-btn");
+
+if (updateBtn != null) {
+  // 버튼이 화면에 있을 때만 (관리자일 때만)
+  updateBtn.addEventListener("click", () => {
+    // GET 방식으로 수정 페이지 요청 (쿼리스트링으로 게시글 번호 전달)
+    location.href = `/ITnews/${boardNo}/update`;
+  });
+}

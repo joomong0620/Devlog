@@ -18,6 +18,20 @@ function selectCommentList() {
 
         commentRow.setAttribute("data-comment-id", comment.commentNo);
 
+        // 삭제된 댓글 처리
+        if (comment.commentDeleteFlag === "Y") {
+          const deleteMsg = document.createElement("p");
+          deleteMsg.classList.add("comment-content");
+          deleteMsg.innerText = "삭제된 댓글입니다.";
+          deleteMsg.style.color = "#999";
+          deleteMsg.style.fontStyle = "italic";
+          deleteMsg.style.padding = "10px 0";
+
+          commentRow.append(deleteMsg);
+          commentList.append(commentRow);
+
+          continue;
+        }
         // --- 작성자 정보---
         const commentWriter = document.createElement("p");
         commentWriter.classList.add("comment-writer");
@@ -33,6 +47,17 @@ function selectCommentList() {
         const commentDate = document.createElement("span");
         commentDate.classList.add("comment-date");
         commentDate.innerText = "(" + comment.commentCreateDate + ")";
+
+        // 댓글이 수정됨일때 옆에 (수정됨)표시
+        if (comment.modifyYN === "Y") {
+          const modifySpan = document.createElement("span");
+          modifySpan.innerText = " (수정됨)";
+          modifySpan.style.fontSize = "0.85em";
+          modifySpan.style.color = "#999";
+          modifySpan.style.marginLeft = "5px";
+          commentDate.append(modifySpan);
+        }
+
         commentWriter.append(profileImage, memberNickname, commentDate);
 
         // 댓글 내용
@@ -69,30 +94,45 @@ function selectCommentList() {
           const btnArea = document.createElement("div");
           btnArea.classList.add("comment-btn-area");
 
+          // 답글
+          if (comment.parentCommentNo == 0) {
+            const replyBtn = document.createElement("button");
+            replyBtn.innerText = "답글";
+            replyBtn.classList.add("reply-btn");
+            replyBtn.onclick = () =>
+              showInsertComment(comment.commentNo, replyBtn);
+
+            btnArea.append(replyBtn);
+          }
+
+          // 수정 버튼
           const updateBtn = document.createElement("button");
           updateBtn.innerText = "수정";
           updateBtn.onclick = () =>
             showUpdateComment(comment.commentNo, updateBtn);
 
+          // 삭제 버튼
           const deleteBtn = document.createElement("button");
           deleteBtn.innerText = "삭제";
           deleteBtn.onclick = () => deleteComment(comment.commentNo);
 
-          const replyBtn = document.createElement("button");
-          replyBtn.innerText = "답글";
-          replyBtn.classList.add("reply-btn");
-          replyBtn.onclick = () =>
-          showInsertComment(comment.commentNo, replyBtn);
-      
+          // if (comment.commentDeleteFlag === "Y") {
+          //   const deleteSpan = document.createElement("span");
+          //   updateBtn.innerText = "";
+          //   deleteBtn.innerText = "";
+          //   deleteSpan.innerText = " (삭제되었습니다.)";
+          //   deleteSpan.style.fontSize = "0.85em";
+          //   deleteSpan.style.color = "#999";
+          //   deleteSpan.style.marginLeft = "5px";
+          //   commentDate.append(deleteSpan);
+          // }
 
-          btnArea.append(replyBtn, updateBtn, deleteBtn);
+          btnArea.append(updateBtn, deleteBtn);
           commentRow.append(btnArea);
-
         }
 
         // 답글 버튼 (부모 댓글일 때만)
         if (comment.parentCommentNo == 0) {
-          
         }
 
         commentList.append(commentRow);

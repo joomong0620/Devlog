@@ -56,7 +56,7 @@ public class Comment {
 	@JsonProperty("likeCheck")
     private int likeCheck;   
 	
-	@JsonProperty("bacCheck")
+	@JsonProperty("badCheck")
     private int badCheck;     
 
 }

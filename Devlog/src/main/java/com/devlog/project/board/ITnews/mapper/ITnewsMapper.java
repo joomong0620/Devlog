@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.board.ITnews.dto.ITnewsDTO;
 
@@ -33,6 +34,18 @@ public interface ITnewsMapper {
 	
 	// 좋아요 수 조회
 	public int countBoardLike(Object object);
+
+	// 게시글 삭제
+	public int boardDelete(int boardNo);
+
+	// 게시글 수정
+	public int boardUpdate(ITnewsDTO itnews);
+	
+	// 이미지 삽입
+	public void imageInsert(ITnewsDTO itnews);
+	
+	// 이미지 수정 
+	public int imageUpdate(ITnewsDTO itnews);
 
 
 
