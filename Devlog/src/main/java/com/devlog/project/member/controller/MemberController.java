@@ -10,6 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -123,10 +124,18 @@ public class MemberController {
 	        if (oldSession != null) {
 	            oldSession.invalidate();
 	        }
-
+	        
+	        // 12-31 YHJ 추가
 	        HttpSession newSession = request.getSession(true);
 	        newSession.setAttribute("loginMember", response);
-				
+	        
+	        newSession.setAttribute(
+	        		HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+	        		SecurityContextHolder.getContext()
+	        		);
+	        
+	        
+	        
 			// 2) 아이디 저장(쿠키에)
 			// 쿠키 생성(K:V로 해당 쿠키에 담을 (로그인멤버의 이메일) 데이터 지정)
 			Cookie cookie = new Cookie("saveId", response.getMemberEmail()); // 로그인 성공시

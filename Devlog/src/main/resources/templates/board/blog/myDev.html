@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${userProfile.nickname + ' - DevLog'}">DevLog - My Blog</title>
-    
+
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <link rel="stylesheet" th:href="@{/css/common/common.css}">
     <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
-    
+
     <link rel="stylesheet" th:href="@{/css/board/blog/myDev.css}">
 </head>
 
@@ -48,10 +48,10 @@
                     </div>
                     <p class="job-tag" th:text="${userProfile.job} ?: '개발자'">직업 태그</p>
                     <div class="social-links">
-                        <i class="fa-brands fa-github" th:onclick="|window.open('${userProfile.githubUrl}')|"
-                            th:if="${userProfile.githubUrl}"></i>
-                        <i class="fa-solid fa-house" th:onclick="|window.open('${userProfile.blogUrl}')|"
-                            th:if="${userProfile.blogUrl}"></i>
+                        <a th:href="${userProfile.githubUrl}" th:if="${userProfile.githubUrl}"><i
+                                class="fa-brands fa-github"></i></a>
+                        <a th:href="${userProfile.blogUrl}" th:if="${userProfile.blogUrl}"><i
+                                class="fa-solid fa-house"></i></a>
                     </div>
                     <p class="bio" th:utext="${userProfile.bio} ?: '소개가 없습니다.'">Bio</p>
                 </div>
@@ -153,13 +153,13 @@
     <script th:src="@{/js/board/blog/myDev.js}"></script>
 
     <script th:inline="javascript">
-    /* 컨트롤러에서 model.addAttribute("userProfile", profile); 을 했으므로
-        userProfile 안에 있는 id(이메일)를 가져옵니다.
-    */
-    const blogOwnerId = [[${userProfile.id}]]; 
-    
-    console.log("현재 블로그 주인 ID:", blogOwnerId); // 확인용 로그
-</script>
+        /* 컨트롤러에서 model.addAttribute("userProfile", profile); 을 했으므로
+            userProfile 안에 있는 id(이메일)를 가져옵니다.
+        */
+        const blogOwnerId = [[${ userProfile.id }]];
+
+        console.log("현재 블로그 주인 ID:", blogOwnerId); // 확인용 로그
+    </script>
 </body>
 
 </html>

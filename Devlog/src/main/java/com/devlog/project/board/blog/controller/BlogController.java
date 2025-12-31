@@ -87,9 +87,10 @@ public class BlogController {
 	@GetMapping("/blog/{blogId}")
     public String blogMain(@PathVariable("blogId") String blogId, Model model) {
         
+		System.out.println("blogId : " + blogId);
         // 1. 프로필 정보 가져오기 (Service에서 DTO 변환 완료됨)
         UserProfileDto profile = blogService.getUserProfile(blogId);
-        model.addAttribute("userProfile", profile);
+        model.addAttribute("userProfile", profile);	
         
         model.addAttribute("followerCount", 0);
         model.addAttribute("followingCount", 0);
