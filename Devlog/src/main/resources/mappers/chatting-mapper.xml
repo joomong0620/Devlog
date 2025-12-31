@@ -24,14 +24,20 @@
 														AND U2.MEMBER_NO != ${memberNo})
 					ELSE CR.ROOM_IMG
 				END AS "roomImg",
-
-				M.MESSAGE_CONTENT AS "lastMessage",
+				
+				CASE
+					WHEN M.MESSAGE_STATUS = 'DEL' THEN '삭제된 메세지입니다.'
+					ELSE M.MESSAGE_CONTENT
+				END AS "lastMessage",
+				
+				
 				TRUNC(M.SEND_TIME, 'MI') AS "lastMessageAt",
 				
 				(SELECT COUNT(*) FROM MESSAGE M2
 					WHERE M2.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO
 					AND M2.MESSAGE_NO > CU.LAST_READ_NO
-					AND M2.MEMBER_NO != CU.MEMBER_NO) AS "unreadCount"
+					AND M2.MEMBER_NO != CU.MEMBER_NO 
+					AND M2.TYPE != 'SYSTEM') AS "unreadCount"
 			
 			FROM CHATTING_ROOM CR
 			JOIN CHATTING_USER CU
@@ -39,7 +45,8 @@
 			LEFT JOIN MESSAGE M ON M.MESSAGE_NO = 
 			(SELECT MAX(m.MESSAGE_NO)
 			FROM MESSAGE m
-			WHERE m.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO)
+			WHERE m.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO
+			AND m.TYPE != 'SYSTEM')
 			WHERE CU.MEMBER_NO =${memberNo}
 			ORDER BY PINNED_YN DESC, M.SEND_TIME DESC NULLS LAST
 	</select>
@@ -62,6 +69,11 @@
 		FROM MEMBER
 		JOIN FOLLOW ON MEMBER_NO = FOLLOWED_ID
 		WHERE FOLLOW_ID = ${memberNo}
+		<if test="roomNo != null">
+			AND MEMBER_NO NOT IN (SELECT MEMBER_NO
+								FROM CHATTING_USER
+								WHERE CHATTING_ROOM_NO = ${roomNo})
+		</if>
 		
 	</select>
 </mapper>

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.chatting.chatenums.MsgEnums;
+import com.devlog.project.chatting.chatenums.MsgEnums.MsgStatus;
 import com.devlog.project.chatting.chatenums.MsgEnums.MsgType;
 import com.devlog.project.chatting.dto.MessageDTO;
 import com.devlog.project.chatting.dto.MessageDTO.ChatMessage;
@@ -170,6 +171,32 @@ public class MessageServiceImpl implements MessageService {
 		res.setImgPath(imgPath);
 		
 		return res;
+		
+	}
+
+	
+	
+	// 메세지 삭제
+	@Override
+	@Transactional
+	public void deleteMessage(Long messageNo) {
+		
+		Message message = msgRepository.findById(messageNo)
+						.orElseThrow();
+		
+		message.setStatus(MsgStatus.DEL);
+		
+		MessageDTO.DeleteMessageResponse delMsg = MessageDTO.DeleteMessageResponse.builder()
+													.messageNo(messageNo)
+													.status(message.getStatus())
+													.build();
+		
+		System.out.println("삭제 메세지 dto 확인 : "+ delMsg);
+		
+		template.convertAndSend(
+				"/topic/room/" + message.getChattingRoom().getRoomNo(),
+					delMsg
+				);
 		
 	}
 

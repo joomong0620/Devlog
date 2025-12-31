@@ -90,8 +90,9 @@ public class ChattingServiceImpl implements ChattingService {
 	
 	// 팔로우 목록 조회
 	@Override
-	public List<FollowListDTO> selectFollowList(Long memberNo) {
-		return chatMapper.selectFollowList(memberNo);
+	public List<FollowListDTO> selectFollowList(Long memberNo,  Long roomNo) {
+		
+		return chatMapper.selectFollowList(memberNo, roomNo);
 	}
 
 
@@ -360,10 +361,13 @@ public class ChattingServiceImpl implements ChattingService {
 		
 		ChattingUserId id = new ChattingUserId(roomNo, memberNo);
 		
+		System.out.println("복합키 확인 id : " + id); 
+		
 		// 아이디 존재하는지 확인 존재하지 않으면 종료
 		if (!chattingUserRepository.existsById(id)) {
 	        return;
 	    }
+		
 		
 		ChatRoom room = roomRepository.findById(roomNo)
 				.orElseThrow();

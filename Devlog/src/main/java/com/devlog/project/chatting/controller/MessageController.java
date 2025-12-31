@@ -13,9 +13,11 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -180,6 +182,19 @@ public class MessageController {
 		            updateDto
 		    );
 		}
+		
+		
+		return ResponseEntity.ok().build();
+		
+	}
+	
+	
+	@GetMapping("/devtalk/delete-msg")
+	public ResponseEntity<Void> deleteMessage(
+			@RequestParam("messageNo") Long messageNo) {
+		
+		
+		service.deleteMessage(messageNo);
 		
 		
 		return ResponseEntity.ok().build();

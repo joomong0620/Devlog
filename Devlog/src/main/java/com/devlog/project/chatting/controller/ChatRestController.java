@@ -61,20 +61,26 @@ public class ChatRestController {
 	// 회원 초대할 팔로우 목록 조회
 	@GetMapping("/devtalk/followSelect")
 	public String selectFollowList(
+			@RequestParam(value = "roomNo", required = false) Long roomNo,
 			// 세션 로그인 멤버
 			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember,
 			Model model
 			) {
 		
+		System.out.println("팔로우 목록 조회 roomNo 확인 : " + roomNo);
 		
-		
-		List<ChattingDTO.FollowListDTO> followList = chattingService.selectFollowList(loginMember.getMemberNo());
+		List<ChattingDTO.FollowListDTO> followList = chattingService.selectFollowList(loginMember.getMemberNo(), roomNo);
 		
 		log.info("팔로우 리스트 조회 결과 : {} ", followList);
 		
 		model.addAttribute("followList", followList);
 		
-		return "chatting/chatting ::#chatFollowList";
+		if(roomNo == null) {
+			
+			return "chatting/chatting :: #chatFollowList";
+		} else {
+			return "chatting/chatting :: #inviteUserList";
+		}
 	}
 	
 	
@@ -139,6 +145,7 @@ public class ChatRestController {
 			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
 			){
 		
+		System.out.println("채팅방 나가기 방 버호 파라미터 확인 : " + roomNo);
 		chattingService.roomExit(roomNo, loginMember.getMemberNo());
 		
 		
@@ -146,5 +153,7 @@ public class ChatRestController {
 		return ResponseEntity.ok().build();
 	}
 	
+	
+	// 채팅방 초대
 	
 }	

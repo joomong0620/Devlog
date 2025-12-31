@@ -193,4 +193,18 @@ public class MessageDTO {
 		private String content;
 		private MsgEnums.MsgType type;
 	}
+	
+	
+	@Getter
+	@Setter
+	@ToString
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class DeleteMessageResponse {
+		
+		private Long messageNo;
+		private MsgEnums.MsgStatus status;
+		
+	}
 }

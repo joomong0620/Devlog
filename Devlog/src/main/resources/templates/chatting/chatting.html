@@ -81,7 +81,7 @@
                         <span class="fw-600">초대할 사람</span>
                         <input id="search-memberName" name="memberName" placeholder="검색" type="search">
 
-                        <ul class="follow-list flex-col gap-12" id="chatFollowList">
+                        <ul class="follow-list flex-col gap-12 chatFollowList" id="chatFollowList">
                             <li th:each="fwl : ${followList}">
                                 <label class="follow-item flex">
                                     <div class="flex gap-12">
@@ -203,7 +203,7 @@
                     </div>
 
                     <!-- 유저 초대 창 -->
-                    <div class="user-invite-box flex-col gap-16 display-none">
+                    <div id="user-invite-box" class="user-invite-box flex-col gap-16 display-none">
 
                         <!-- 초대 아이콘 -->
                         <img th:src="@{/images/chatting/invite.svg}"
@@ -216,23 +216,26 @@
                             placeholder="검색"
                             type="search">
 
-                        <ul class="invite-user-list flex-col gap-12">
-                            <li>
+                        <ul class="invite-user-list flex-col gap-12" id="inviteUserList">
+                            <li th:each="fl : ${followList}">
                                 <label class="flex user-list">
                                     <div class="flex gap-12">
 
                                         <!-- 유저 프로필 이미지 -->
                                         <img class="profile-img"
-                                            th:src="@{/images/logo.png}">
+                                            th:src="${fl.profileImg} ?: @{/images/logo.png}">
 
-                                        <span class="user-name">소연님</span>
+                                        <span class="user-name" th:text="${fl.memberNickname}">멤버 닉네임</span>
                                     </div>
 
                                     <input type="checkbox"
                                         name="roomInvite"
-                                        class="roomInvite">
+                                        class="roomInvite"
+                                        th:data-member-no ="${fl.memberNo}">
                                 </label>
                             </li>
+
+                           
                         </ul>
 
                         <!-- 유저 선택 시 태그 영역 -->
@@ -419,15 +422,15 @@
                                 </div>
                             </div>
 
-                            <div th:if="${msg.type == 'SYSTEM'}" class="system-message">
+                            <div th:if="${msg.type == 'SYSTEM'}" class="system-message flex-center">
                                 <span th:text="${msg.content}"></span>
                             </div>
 
                             <div th:if="${msg.type != 'SYSTEM'}" class="message-content flex-col gap-12">
                                 <span th:if="${!msg.mine}" class="fw-600" th:text="${msg.senderName}">메세지 작성자</span>
                                 <div class="bubble deleted"
-                                    th:if="${msg.status == 'DELETE'}">
-                                    삭제된 메세지입니다.
+                                    th:if="${msg.status == 'DEL'}">
+                                    <span>삭제된 메세지입니다.</span>
                                 </div>
                                 <!-- type = text -->
                                 <th:block th:if="${msg.status != 'DEL'}">
@@ -454,44 +457,45 @@
 
                                         
                                     </th:block>
+                                
+                                    <div class="reaction-badge"
+                                    th:if="${msg.status != 'DEL' and msg.reactions != null}">
+                                        <span class="flex-center gap-4" th:each="r : ${msg.reactions}">
+                                            <span th:text="${r.key}"></span>
+                                            <span th:text="${r.value}"></span>
+                                        </span>
+                                    </div>
+
+
+
+                                    <ul th:if="${msg.status != 'DELETE'}" class="list-none msg-option display-none">
+                                        <!-- 본인 + 텍스트만 수정 가능 -->
+                                        <li th:if="${msg.mine and msg.type == 'TEXT'}"
+                                            class="msg-edit-btn">
+                                            수정하기
+                                        </li>
+                                        <!-- 본인은 삭제 가능 -->
+                                        <li th:if="${msg.mine}"
+                                            class="msg-delete-btn">
+                                            삭제하기
+                                        </li>
+
+                                        <!-- 공통 -->
+                                        <li class="msg-reaction-btn">공감하기</li>
+
+                                        <!-- 상대방 -->
+                                        <li th:if="${!msg.mine}" class="msg-report-btn">신고하기</li>
+                                    </ul>
+
+                                    <div class="emoji-area flex display-none">
+                                        <span>❤️</span>
+                                        <span>👍</span>
+                                        <span>😀</span>
+                                        <span>😂</span>
+                                        <span>😮</span>
+                                        <span>😡</span>
+                                    </div>
                                 </th:block>
-                                <div class="reaction-badge"
-                                th:if="${msg.status != 'DEL' and msg.reactions != null}">
-                                    <span class="flex-center gap-4" th:each="r : ${msg.reactions}">
-                                        <span th:text="${r.key}"></span>
-                                        <span th:text="${r.value}"></span>
-                                    </span>
-                                </div>
-
-
-
-                                <ul th:if="${msg.status != 'DELETE'}" class="list-none msg-option display-none">
-                                    <!-- 본인 + 텍스트만 수정 가능 -->
-                                    <li th:if="${msg.mine and msg.type == 'TEXT'}"
-                                        class="msg-edit-btn">
-                                        수정하기
-                                    </li>
-                                    <!-- 본인은 삭제 가능 -->
-                                    <li th:if="${msg.mine}"
-                                        class="msg-delete-btn">
-                                        삭제하기
-                                    </li>
-
-                                    <!-- 공통 -->
-                                    <li class="msg-reaction-btn">공감하기</li>
-
-                                    <!-- 상대방 -->
-                                    <li th:if="${!msg.mine}" class="msg-report-btn">신고하기</li>
-                                </ul>
-
-                                <div class="emoji-area flex display-none">
-                                    <span>❤️</span>
-                                    <span>👍</span>
-                                    <span>😀</span>
-                                    <span>😂</span>
-                                    <span>😮</span>
-                                    <span>😡</span>
-                                </div>
 
                                 <span class="unread-people fs-12"
                                     th:if="${msg.unreadCount > 0 and msg.status != 'DELETE'}"

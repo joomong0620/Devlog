@@ -18,7 +18,7 @@ public interface ChattingMapper {
 	List<ChattingListDTO> selectQueryChatList(Long memberNo, String query);
 	
 	// 팔로우 회원 목록 조회
-	List<FollowListDTO> selectFollowList(Long memberNo);
+	List<FollowListDTO> selectFollowList(Long memberNo, Long roomNo);
 
 
 }

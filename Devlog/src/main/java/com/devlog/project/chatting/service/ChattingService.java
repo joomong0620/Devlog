@@ -15,7 +15,7 @@ public interface ChattingService {
 	List<ChattingDTO.ChattingListDTO> selectChatList(Long memberNo, String query);
 	
 	// 팔로우 목록 조회
-	List<ChattingDTO.FollowListDTO> selectFollowList(Long long1);
+	List<ChattingDTO.FollowListDTO> selectFollowList(Long long1, Long roomNo);
 	
 	
 	// 개인 채팅방 생성

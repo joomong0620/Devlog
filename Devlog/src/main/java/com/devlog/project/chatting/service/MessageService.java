@@ -23,5 +23,8 @@ public interface MessageService {
 	
 	// 이미지 삽입
 	ChatMessageResponse sendImg(ImageRequest dto) throws IllegalStateException, IOException;
+	
+	// 메세지 삭제
+	void deleteMessage(Long messageNo);
 
 }
