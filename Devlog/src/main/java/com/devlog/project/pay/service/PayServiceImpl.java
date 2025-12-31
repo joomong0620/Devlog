@@ -28,5 +28,12 @@ public class PayServiceImpl implements PayService {
 	public List<PayDTO> selectBeansHistory(Long memberNo) {
 		return paymapper.selectBeansHistory(memberNo);
 	}
+
+
+
+	@Override
+	public int insertPayment(PayDTO payment) {
+		return paymapper.insertPayment(payment);
+	}
 	
 }

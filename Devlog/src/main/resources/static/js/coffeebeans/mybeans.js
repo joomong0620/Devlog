@@ -107,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   finalChargeSubmit?.addEventListener("click", async () => {
     const amount = parseInt(amountInput.value.replace(/[^0-9]/g, ""));
 
+
     if (isNaN(amount) || amount < 100) {
       alert("최소 충전 금액은 100원입니다.");
       return;
@@ -114,8 +115,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const response = await PortOne.requestPayment({
-        storeId: "store-94a58391-60b2-4bc9-8945-0abac194470e",
-        channelKey: "channel-key-13057a15-1545-4aa4-afde-285d3921c6dc",
+        storeId: portoneConfig.storeId,
+        channelKey: portoneConfig.channelKey,
         paymentId: `payment-${crypto.randomUUID()}`,
         orderName: "커피콩 충전",
         totalAmount: amount,
@@ -137,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
           paymentId: response.paymentId,
           price: amount,
           payMethod: "CARD",
+          usedAmount: 0
         }),
       });
 

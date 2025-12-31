@@ -13,6 +13,10 @@ public interface PayService {
 	// 내 커피콩 내역 조회
 	List<PayDTO> selectBeansHistory(Long memberNo);
 
+	
+	// 결제 완료 후
+	int insertPayment(PayDTO payment);
+
 
 
 }

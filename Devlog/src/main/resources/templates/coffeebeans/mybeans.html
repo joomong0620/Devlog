@@ -242,10 +242,22 @@
   </div>
 </div>
 
+<script th:inline="javascript">
+    const portoneConfig = {
+        storeId: [[${storeId}]],
+        channelKey: [[${channelKey}]]
+    };
+</script>
+
+
+
+
 <div th:replace="common/footer :: footer"></div>
 <script th:src="@{/js/notification/noti.js}"></script>
 <script th:src="@{/js/coffeebeans/mybeans.js}"></script>
 <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <script th:src="@{/js/pay/mybeans.js}"></script>
+
+
 
 </html>

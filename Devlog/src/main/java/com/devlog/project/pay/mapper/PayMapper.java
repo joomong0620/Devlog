@@ -16,4 +16,7 @@ public interface PayMapper {
 	// 내 커피콩 내역 조회
 	public List<PayDTO> selectBeansHistory(Long memberNo);
 
+	// 결제 완료
+	public int insertPayment(PayDTO payment);
+
 }

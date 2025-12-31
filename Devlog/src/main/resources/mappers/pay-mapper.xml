@@ -4,35 +4,66 @@
 <mapper namespace="com.devlog.project.pay.mapper.PayMapper">
 
 
-<!-- 내 커피콩 조회-->
-<select id="selectMyBeans" resultType="PayDTO">
-	SELECT MEMBER_NO, BEANS_AMOUNT 
-	FROM MEMBER
-	WHERE MEMBER_NO = #{memberNo}
-</select>
+	<!-- 내 커피콩 조회-->
+	<select id="selectMyBeans" resultType="PayDTO">
+		SELECT MEMBER_NO, BEANS_AMOUNT 
+		FROM MEMBER
+		WHERE MEMBER_NO = #{memberNo}
+	</select>
+	
+	
+	<!-- 내 커피콩 내역 조회-->
+	<select id="selectBeansHistory" resultType="PayDTO">
+	    SELECT 
+	        H.BEANS_HISTORY,
+	        P.BEANS_PAY_NO,
+	        T.TRADE_NO,
+	        COALESCE(T.PRICE, P.PRICE, ABS(H.PAY_AMOUNT)) AS displayPrice,
+	        H.PAY_AMOUNT AS payAmount,
+	        NVL(TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD HH24:MI'), 
+	            TO_CHAR(T.TRADE_AT, 'YYYY-MM-DD HH24:MI')) AS payDate,
+	        CASE 
+	            WHEN H.PAY_AMOUNT > 0 THEN '충전'
+	            WHEN T.CONTENT_TYPE IS NOT NULL THEN T.CONTENT_TYPE 
+	            ELSE '사용'
+	        END AS contentType, 
+	        T.CONTENT_ID AS contentId
+	    FROM COFFEE_BEANS_HISTORY H
+	    LEFT JOIN COFFEE_BEANS_PAY P ON (H.MEMBER_NO = P.MEMBER_NO AND H.PAY_AMOUNT = P.PRICE AND H.TRADE_NO IS NULL)
+	    LEFT JOIN COFFEE_BEANS_TRADE T ON (H.TRADE_NO = T.TRADE_NO)
+	    WHERE H.MEMBER_NO = #{memberNo}
+	    ORDER BY H.BEANS_HISTORY DESC
+	</select>
+	
+	<!-- 결제 정보 저장 -->
+	<insert id = "insertPayment" parameterType="PayDTO">
+		INSERT INTO COFFEE_BEANS_PAY (
+		    BEANS_PAY_NO,
+		    MEMBER_NO,
+		    PAYMENT_ID,
+		    PAY_METHOD,
+		    PRICE,
+		    PAY_DATE,
+		    USED_AMOUNT,
+		    PAY_STATUS
+			) VALUES (
+			    SEQ_BEANS_PAY_NO.NEXTVAL,,
+			    #{memberNo},
+			    #{paymentId},
+			    #{payMethod},
+			    #{price},
+			    SYSDATE,
+			    #{usedAmount},
+			    1
+			)	
+
+	</insert>
+	
+	
+	
 
 
-<!-- 내 커피콩 내역 조회-->
-<select id="selectBeansHistory" resultType="PayDTO">
-    SELECT 
-        H.BEANS_HISTORY,
-        P.BEANS_PAY_NO,
-        T.TRADE_NO,
-        COALESCE(T.PRICE, P.PRICE, ABS(H.PAY_AMOUNT)) AS displayPrice,
-        H.PAY_AMOUNT AS payAmount,
-        NVL(TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD HH24:MI'), 
-            TO_CHAR(T.TRADE_AT, 'YYYY-MM-DD HH24:MI')) AS payDate,
-        CASE 
-            WHEN H.PAY_AMOUNT > 0 THEN '충전'
-            WHEN T.CONTENT_TYPE IS NOT NULL THEN T.CONTENT_TYPE 
-            ELSE '사용'
-        END AS contentType, 
-        T.CONTENT_ID AS contentId
-    FROM COFFEE_BEANS_HISTORY H
-    LEFT JOIN COFFEE_BEANS_PAY P ON (H.MEMBER_NO = P.MEMBER_NO AND H.PAY_AMOUNT = P.PRICE AND H.TRADE_NO IS NULL)
-    LEFT JOIN COFFEE_BEANS_TRADE T ON (H.TRADE_NO = T.TRADE_NO)
-    WHERE H.MEMBER_NO = #{memberNo}
-    ORDER BY H.BEANS_HISTORY DESC
-</select>
+
+
 	
 </mapper>
