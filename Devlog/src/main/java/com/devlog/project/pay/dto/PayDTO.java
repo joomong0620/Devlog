@@ -12,7 +12,9 @@ import lombok.ToString;
 public class PayDTO {
 	
 	// 커피콩 결제
+	@JsonProperty("beansPayNo")
 	private int beansPayNo;
+	
 	private Long memberNo;
 	
 	@JsonProperty("paymentId")
@@ -22,7 +24,7 @@ public class PayDTO {
 	private String payMethod;
 	private int price;
 	private String payDate;
-	private int usedAmount;
+	private Integer usedAmount;
 	private String payStatus;
 	
 	private int beansAmount;

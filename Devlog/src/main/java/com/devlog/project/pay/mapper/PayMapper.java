@@ -20,9 +20,13 @@ public interface PayMapper {
 	public int insertPayment(PayDTO payment);
 
 	// 결제 내역
-	public void insertHistory(PayDTO payment);
+	public int insertHistory(PayDTO payment);
 
 	// 내 커피콩 내역 업데이트
-	public void updateMemberBeans(PayDTO payment);
+	public int updateMemberBeans(PayDTO payment);
+
+	public PayDTO selectPaymentByNo(int beansPayNo);
+
+	public int updatePayStatusCancel(int beansPayNo);
 
 }

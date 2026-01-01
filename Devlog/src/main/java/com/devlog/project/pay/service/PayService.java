@@ -14,8 +14,12 @@ public interface PayService {
 	List<PayDTO> selectBeansHistory(Long memberNo);
 
 	
-	// 결제 완료 후
+	// 결제 요청
 	int insertPayment(PayDTO payment);
+
+	
+	// 결제 취소
+	boolean cancelPayment(PayDTO payDTO, String secretKey);
 
 
 
