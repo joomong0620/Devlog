@@ -9,6 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/chatting/chatting.css}">
     <link rel="stylesheet" th:href="@{/css/common/common.css}">
     <link rel="stylesheet" th:href="@{/css/common/notification.css}">
+    <link rel="stylesheet" th:href="@{/css/common/report.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
 </head>
@@ -16,6 +17,9 @@
     <th:block th:replace="~{common/header}">header.html</th:block>
     
     
+    <div id="modal-root"></div>
+    <script th:src="@{/js/common/report.js}"></script>
+
 
     <script th:src="@{/js/notification/noti.js}"></script>
     <script th:src="@{/js/common/header.js}"></script>
