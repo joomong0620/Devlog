@@ -108,6 +108,8 @@ div.write-btn-box {
 
 /* 페이지네이션 */
 .pagination {
+    list-style: none;   /*  li 태그 dot 제거 */
+
     width: 1210px; /* 1210px 고정 */
     display: flex;
     justify-content: center;
@@ -144,18 +146,39 @@ div.write-btn-box {
     border-color: #BD83CE;
 }
 
-.dots {
-    margin: 0 6px;
-    color: #000;
-}
 
 .arr {
     font-size: 24px;
+    text-decoration: none;
 }
 
 .arr:hover {
     font-size: 24px;
     color: #BD83CE;
     cursor: pointer;
+}
+
+.next {
+    font-size: 24px;
+    text-decoration: none;
+}
+
+.next:hover {
+    font-size: 24px;
+    color: #BD83CE;
+    cursor: pointer;
+    background-color: #fff;
+}
+
+.previous {
+    font-size: 24px;
+    text-decoration: none;    
+}
+
+.previous:hover {
+    font-size: 24px;
+    color: #BD83CE;
+    cursor: pointer;
+    background-color: #fff;    
 }
 

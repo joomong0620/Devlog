@@ -87,7 +87,9 @@ public class SecurityConfig {
 	                ,"/board/freeboard/**"
 	                ,"/app/login/**"
 	                ,"/member/signUpKakao"	                
-	                ///// PYY API Addition End: /////	                
+	                ///// PYY API Addition End: /////	          
+	                
+	                
 	                ,"/board/qna/**"
                 
 	                ////* YHJ *////  

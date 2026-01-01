@@ -1,147 +1,107 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>자유게시판</title>
 
-    <link rel="stylesheet" href="../../../static/css/board/freeboard/freeboardList.css">
-    <link rel="stylesheet" href="../../static/css/common/font.css">
+    <link rel="stylesheet" th:href="@{/css/board/freeboard/freeboardList.css}">
+    <link rel="stylesheet" th:href="@{/css/common/font.css}">
 
 </head>
 
 <body>
 
-    <div class="container-wrapper"> 
-        <h2 class="title-main fw-800">자유게시판</h2>   
+    <!-- <p th:text="${map.pagination}"></p>    
+    <p th:text="${map.freeboardList}"></p>     -->
+    <main th:with="pagination=${map.pagination}, freeboardList=${map.freeboardList}">
+        <!-- 헤더 -->
+        <header class="main-header">header</header>
+        <!-- header.html (fragment) 추가 -->
+        <!-- <th:block th:replace="~{/common/header}">header.html</th:block> -->
+        <!-- 또는 -->
+        <!-- <div th:replace="common/header :: header"></div> -->
 
-        <div class="container">
+        <!-- 네비게이션 -->
+        <nav class="main-nav"></nav>
+        <!--  ###################################################### -->
 
-            <!-- 글쓰기 버튼 -->
-            <div class="write-btn-box">
-                <button class="write-btn">글쓰기</button>
-            </div>
+        <div class="container-wrapper"> 
+            <h2 class="title-main fw-800">자유게시판</h2>   
 
-            <!-- 게시글 리스트 -->
-            <div class="card-list">
+            <div class="container">
 
-                <!-- 카드 1 -->
-                <div class="fbList-card">
-                    <img src="../../../static/images/board/freeboard/fbList_img1.png" class="fbList-card-img" alt="">
-                    <div class="fbList-content">
-                        <h3 class="fbList-title">
-                            <a href="#" class="fbList-title-link">
-                                요즘 개발 동기부여 어떻게 하고 계세요?
-                            </a>
-                        </h3>
-                        <p class="fbList-text">
-                            요즘 사이드 프로젝트만 열면 IDE보다 제 죄책감 로딩바가 먼저 차오릅니다. 시작하려고 자리 잡으면 갑자기 방 구석들이 “정리하면 천국문 열린다”라고 말하는 것 같고, 청소기까지 눈빛 보내는 지경이에요. 운동도 해봤는데 운동 끝나면 ‘이 정도 땀 흘렸으면 오늘은 쉬어도 되지 않나?’ 하는 합리화가 자동 실행됩니다. 커피 세 잔 마셔도 머리는 여전히 오류 404 상태, 심장만 고성능 모터처럼 돌아요. 그래도 기능 하나 완성하면 갑자기 “나 천재인가? 혹시 다음 실리콘밸리 창업주?” 같은 허세 버프가 들어와서 몇 시간은 행복합니다. 여러분은 이 정신 롤러코스터를 어떻게 버티나요? 동기부여 방법이 아니라 부적이라도 있으면 공유해주세요. 요즘 제 동기부여는 HP 1 남은 상태에서 보스전에 들어간 느낌입니다.
-                        </p>
-                    </div>
+                <!-- 글쓰기 버튼 -->
+                <!-- <p th:text="${session.loginMember}"></p>  -->
+                <div class="write-btn-box">
+                    <button th:if="${session.loginMember}" class="write-btn" id="fbWriteBtn">글쓰기</button>
                 </div>
 
-                <div class="fbList-card">
-                    <img src="../../../static/images/board/freeboard/fbList_img2.png" class="fbList-card-img" alt="">
-                    <div class="fbList-content">
-                        <h3 class="fbList-title">
-                            <a href="#" class="fbList-title-link">
-                                내가 만든 기능이 드디어 서비스에 반영됐다!
-                            </a>
-                        </h3>
-                        <p class="fbList-text">
-                            몇 주 동안 제 정신력을 갈아 넣어서 만든 기능이 오늘 드디어 실서비스로 날아갔습니다. 배포 버튼 누르기 직전엔 제 몸이 아니라 제 영혼이 뒤로 빠져나가는 느낌이었어요. 배포 직후엔 로그창 새로고침을 초당 3회 속도로 누르면서 “아무 일도 없게 해주세요… 서버야 제발…” 기도 중입니다. 유저 로그가 하나라도 찍히면 갑자기 감성 폭발해서 ‘내 새끼가 세상에 나왔다…’ 이런 느낌이 들더라고요. 물론 그 감성은 에러 하나 터지면 바로 휘발됩니다. 여러분은 첫 배포 때 어땠나요? 저는 배포 후 10분 동안 숨 쉬는 것도 조심했어요. 혹시 아직도 배포 버튼 보면 손 떨리는 분? 정상입니다. 병이 아니고 그냥 개발자입니다.
-                        </p>
-                    </div>
-                </div>
+                <!-- 게시글 리스트 -->
+                <div class="card-list">
 
-                <div class="fbList-card">
-                    <img src="../../../static/images/board/freeboard/fbList_img3.png" class="fbList-card-img" alt="">
-                    <div class="fbList-content">
-                        <h3 class="fbList-title">
-                            <a href="#" class="fbList-title-link">
-                                요새 핫한 신기술, 뭐 써보셨나요?
-                            </a>
-                        </h3>
-                        <p class="fbList-text">
-                            요즘 신기술 테스트하다 보면 제가 개발자인지 테크 점쟁이인지 헷갈립니다. “이건 뜬다… 아냐 아니다… 아니 근데 또 모르는 거잖아?” 이러다가 탭만 20개 열려 있고 CPU는 100%로 보내고 있어요. 그래도 새 라이브러리 하나 붙여서 돌아가면 갑자기 TED 무대에서 발표할 준비된 사람처럼 어깨가 올라갑니다. 문제는 다음 날 다시 보면 “이거 왜 넣었지?” 하면서 저 자신에게 화난다는 것. 여러분은 요즘 어떤 신기술에 꽂혀 사나요? 혹시 진짜 꿀템 있으면 공유해주시면 바로 시험해봅니다. 제 브라우저 탭들은 이미 포화 상태지만… 일단 더 열어볼게요.
-                        </p>
+                    <!-- 게시글이 없을 때 -->
+                    <div th:if="${#lists.size(freeboardList) == 0}" style="text-align: center; padding: 50px">
+                        <p>작성된 게시글이 없습니다.</p>
                     </div>
-                </div>
 
-                <div class="fbList-card">
-                    <img src="../../../static/images/board/freeboard/fbList_img4.png" class="fbList-card-img" alt="">
-                    <div class="fbList-content">
-                        <h3 class="fbList-title">
-                            <a href="#" class="fbList-title-link">
-                                퇴근 후 코딩… 다들 어떻게 집중하시나요?
-                            </a>
-                        </h3>
-                        <p class="fbList-text">
-                            퇴근하고 노트북 켜면 IDE보다 침대가 먼저 저를 향해 팔 벌립니다. 음악 틀면 갑자기 가사 분석 들어가 있고, 커피 마시면 정신력만 날아가고, 산책하면 ‘오늘은 그냥 쉬자’라는 악마가 옆에서 합창을 부릅니다. 그런데 ‘한 줄만 고치자’ 하고 시작하면 어느새 새벽 3시, 기능 두 개 추가하고 마이그레이션까지 하고 있는 미친 생산력. 이 집중력을 의도적으로 소환하고 싶은데 방법을 모르겠어요. 혹시 주문 같은 거 있나요? “코드여 등장하라!” 이런 거 말고 진짜 효과 있는 걸로요. 이제는 코딩하려고 의자에 앉는 순간 자동으로 집중 모드가 되는 인공지능 의자 같은 것도 필요할 지경입니다.
-                        </p>
-                    </div>
-                </div>
+                    <!-- 카드 1 -->
+                    <th:block th:unless="${#lists.size(freeboardList) == 0}"></th:block>  
+                        <div class="fbList-card" th:each="freeboard : ${freeboardList}">
+                            <!-- thumbnail -->
+                            <img th:if="${freeboard.thumbnail}" th:src="${freeboard.thumbnail}" class="fbList-card-img" th:alt="${freeboard.boardTitle}">
+                            <img th:unless="${freeboard.thumbnail}" th:src="${/images/logo.png}" class="fbList-card-img" th:alt="기본 이미지">
+                            <div class="fbList-content">
+                                <h3 class="fbList-title">
+                                    <!-- 게시글 상세 링크 -->
+                                    <a class="fbList-title-link"
+                                        th:href="@{/board/freeboard/{no}(no=${freeboard.boardNo}, cp=${pagination.currentPage})}"
+                                        th:text="${freeboard.boardTitle}">제목</a>
+                                </h3>
+                                <p class="fbList-text" th:text="${freeboard.boardContent}">내용</p>
+                            </div>
+                        </div>
+                    </th:block>
 
-                <div class="fbList-card">
-                    <img src="../../../static/images/board/freeboard/fbList_img5.png" class="fbList-card-img" alt="">
-                    <div class="fbList-content">
-                        <h3 class="fbList-title">
-                            <a href="#" class="fbList-title-link">
-                                사이드 프로젝트 팀원 모으기 쉽지 않네요
-                            </a>
-                        </h3>
-                        <p class="fbList-text">
-                            사이드 프로젝트 팀을 꾸리는 순간 저는 개발자가 아니라 스케줄 관리사가 됩니다. 서로 시간 조율하다가 하루가 사라지고, 회의를 하면 잡담이 기능 구현보다 길고, 회의 끝날 때마다 “우리… 뭐했지?” 싶습니다. 그래도 잘 맞는 팀원을 만나면 속도가 빛의 속도로 변하고 개발이 ‘힐링 취미’가 되는 기적을 봤어요. 문제는 그런 사람 찾는 게 리자몽 알부화보다 어렵다는 거죠. 여러분은 팀원을 고를 때 어떤 기준을 쓰시나요? 스택, 성격, 협업력… 혹은 ‘밈 이해력 95% 이상’ 같은 중요한 요소 있나요? 진지하게 듣고 싶습니다. 저는 이미 세 번 팀 구성 실패해서 마음이 닳았습니다.
-                        </p>
-                    </div>
-                </div>
+                    
 
-                <div class="fbList-card">
-                    <img src="../../../static/images/board/freeboard/fbList_img6.png" class="fbList-card-img" alt="">
-                    <div class="fbList-content">
-                        <h3 class="fbList-title">
-                            <a href="#" class="fbList-title-link">
-                                개발자 노트북 추천 좀 부탁드립니다!
-                            </a>
-                        </h3>
-                        <p class="fbList-text">
-                            노트북 알아보다가 머리가 스로틀링 걸리기 시작했습니다. 맥북은 우아함과 배터리의 신뢰성을 들이밀며 “너 여기 와라…” 속삭이고, 고성능 윈도우 랩탑은 “파워가 필요하지? 내가 해줄게”라고 외치는 느낌이에요. 이동할 땐 가벼워야 하고, 빌드 빠르려면 성능 좋아야 하고, 가격 보면 제 통장이 비명 지릅니다. 저는 지금 기술 문서가 아니라 노트북 스펙 비교표만 3일째 읽고 있어요. 그래서 결론은… 뭐가 좋은지 전혀 모르겠다는 겁니다. 여러분의 실제 사용 경험이 너무 궁금해요. 제 지갑은 여러분의 판단력을 전적으로 신뢰합니다. (지갑: “아니야 믿지 마…!”)
-                        </p>
-                    </div>
-                </div>
+                <!-- 페이지네이션 -->
+                <div class="pagination">
 
-                <div class="fbList-card">
-                    <img src="../../../static/images/board/freeboard/fbList_img7.png" class="fbList-card-img" alt="">
-                    <div class="fbList-content">
-                        <h3 class="fbList-title">
-                            <a href="#" class="fbList-title-link">
-                                새로운 언어 공부할 때 여러분은 어떻게 하세요?
-                            </a>
-                        </h3>
-                        <p class="fbList-text">
-                            새로운 언어 문법을 읽으면 “오케이, 나 이해했어!” 하는데 코드 작성하면 손가락이 갑자기 CPU 코어 하나로 줄어든 듯 굼떠집니다. 튜토리얼 영상 보면 다 아는 것 같은데 끝나고 나면 기억이 리셋되고, 공식 문서는 읽을 땐 천재 같고 닫으면 바보가 되는 마법이 걸려 있어요. 그래서 요즘은 작은 프로젝트 하나 만들어서 그냥 야생에 던져놓고 ‘알아서 살아남아라!’ 방식으로 학습하는 중입니다. 매일매일 생존 RPG 하는 기분이에요. 여러분은 새로운 언어 배울 때 어떻게 하시나요? 단계별 접근? 아니면 저처럼 야생형? 진짜 효과 있는 노하우 있으면 공유해주세요. 제 두뇌 캐시는 지금 거의 만료 직전입니다.
-                        </p>
-                    </div>
+                    <ul th:unless ="${param.query}" class="pagination">
+                        <li><a th:href="@{/board/freeboard(cp=1) }" class="arr left">&lt;&lt;</a></li>
+                        <li><a th:href="@{/board/freeboard(cp=${pagination.prevPage} ) }" class="page-btn previous">&lt;</a></li>
+                        <th:block th:each="i : ${#numbers.sequence(pagination.startPage, pagination.endPage, 1)}">
+                            <!-- 현재 보고있는 페이지 -->
+                            <li th:if="${pagination.currentPage == i}">
+                                <a class="page-btn active" th:text="${i}">현재 페이지</a>
+                            </li>
+                             
+                            <!-- 현재 페이지를 제외한 나머지 -->
+                            <li th:unless="${pagination.currentPage == i}">
+                                <a th:href="@{/board/freeboard( cp=${i}) }" class="page-btn" th:text="${i}"></a>
+                            </li>
+                        </th:block>
+                        <li><a th:href="@{/board/freeboard( cp=${pagination.nextPage} ) }" class="page-btn next">&gt;</a></li>
+                        <li><a th:href="@{/board/freeboard( cp=${pagination.maxPage} ) }" class="arr right">&gt;&gt;</a></li>
+
+                    </ul>
                 </div>
 
             </div>
-
-            <!-- 페이지네이션 -->
-            <div class="pagination">
-                <span class="arr left">&larr;</span>  <!-- ← -->
-                <a href="#" class="page-btn previous">Previous</a>
-                <a href="#" class="page-btn active">1</a>
-                <a href="#" class="page-btn">2</a>
-                <a href="#" class="page-btn">3</a>
-                <span class="dots"> … </span>
-                <a href="#" class="page-btn">67</a>                
-                <a href="#" class="page-btn">68</a>
-                <a href="#" class="page-btn next">Next</a>
-                <span class="arr right">&rarr;</span>  <!-- → -->
-            </div>
-
         </div>
-    </div>
 
+
+        <!--  ###################################################### -->
+        <footer class="main-footer">footer</footer>
+        <!-- footer.html 추가 -->
+        <!-- <th:block th:replace="~{common/footer}">footer.html</th:block> -->
+        <!-- 또는 -->
+        <!-- <div th:replace="common/footer :: footer"></div> -->
+
+    </main>
+
+    <!-- freeboardList.js 추가 -->
+    <script th:src="@{/js/board/freeboard/freeboardList.js}"></script>
 </body>
 </html>
