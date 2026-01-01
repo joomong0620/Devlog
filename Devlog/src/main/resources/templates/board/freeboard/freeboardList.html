@@ -7,8 +7,11 @@
 
     <link rel="stylesheet" th:href="@{/css/board/freeboard/freeboardList.css}">
     <link rel="stylesheet" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
 
 </head>
+
+
 
 <body>
 
@@ -16,11 +19,15 @@
     <p th:text="${map.freeboardList}"></p>     -->
     <main th:with="pagination=${map.pagination}, freeboardList=${map.freeboardList}">
         <!-- 헤더 -->
-        <header class="main-header">header</header>
+        <!--<header class="main-header">header</header> -->
         <!-- header.html (fragment) 추가 -->
         <!-- <th:block th:replace="~{/common/header}">header.html</th:block> -->
         <!-- 또는 -->
         <!-- <div th:replace="common/header :: header"></div> -->
+
+		<!--<div th:replace="common/header :: header"></div>-->
+		<!--<script th:src="@{/js/common/header.js}"></script>-->
+
 
         <!-- 네비게이션 -->
         <nav class="main-nav"></nav>
@@ -93,14 +100,16 @@
 
 
         <!--  ###################################################### -->
-        <footer class="main-footer">footer</footer>
+        <!--  <footer class="main-footer">footer</footer> -->
         <!-- footer.html 추가 -->
         <!-- <th:block th:replace="~{common/footer}">footer.html</th:block> -->
         <!-- 또는 -->
         <!-- <div th:replace="common/footer :: footer"></div> -->
-
+		<!--<div th:replace="common/footer :: footer"></div>-->
+		
     </main>
 
+	<script th:src="@{/js/notification/noti.js}"></script>
     <!-- freeboardList.js 추가 -->
     <script th:src="@{/js/board/freeboard/freeboardList.js}"></script>
 </body>
