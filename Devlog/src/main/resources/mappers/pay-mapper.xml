@@ -16,50 +16,85 @@
 	<select id="selectBeansHistory" resultType="PayDTO">
 	    SELECT 
 	        H.BEANS_HISTORY,
-	        P.BEANS_PAY_NO,
-	        T.TRADE_NO,
-	        COALESCE(T.PRICE, P.PRICE, ABS(H.PAY_AMOUNT)) AS displayPrice,
 	        H.PAY_AMOUNT AS payAmount,
-	        NVL(TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD HH24:MI'), 
-	            TO_CHAR(T.TRADE_AT, 'YYYY-MM-DD HH24:MI')) AS payDate,
+	        ABS(H.PAY_AMOUNT) AS displayPrice,
+	        TO_CHAR(H.REG_DATE, 'YYYY-MM-DD HH24:MI') AS payDate,
+	        P.PAYMENT_ID AS paymentId,
+	        P.BEANS_PAY_NO AS beansPayNo,
+	        P.USED_AMOUNT AS usedAmount,
 	        CASE 
-	            WHEN H.PAY_AMOUNT > 0 THEN '충전'
-	            WHEN T.CONTENT_TYPE IS NOT NULL THEN T.CONTENT_TYPE 
-	            ELSE '사용'
-	        END AS contentType, 
-	        T.CONTENT_ID AS contentId
+	            WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 THEN '취소'
+	            WHEN H.PAY_AMOUNT > 0 AND H.TRADE_NO IS NULL THEN '충전'
+	            ELSE (SELECT T.CONTENT_TYPE FROM COFFEE_BEANS_TRADE T WHERE T.TRADE_NO = H.TRADE_NO)
+	        END AS contentType
 	    FROM COFFEE_BEANS_HISTORY H
-	    LEFT JOIN COFFEE_BEANS_PAY P ON (H.MEMBER_NO = P.MEMBER_NO AND H.PAY_AMOUNT = P.PRICE AND H.TRADE_NO IS NULL)
-	    LEFT JOIN COFFEE_BEANS_TRADE T ON (H.TRADE_NO = T.TRADE_NO)
+	    LEFT JOIN COFFEE_BEANS_PAY P ON (
+	        H.MEMBER_NO = P.MEMBER_NO 
+	        AND ABS(H.PAY_AMOUNT) = P.PRICE 
+	        AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(P.PAY_DATE, 'YYYYMMDDHH24MI')
+	    )
 	    WHERE H.MEMBER_NO = #{memberNo}
 	    ORDER BY H.BEANS_HISTORY DESC
 	</select>
-	
-	<!-- 결제 정보 저장 -->
-	<insert id = "insertPayment" parameterType="PayDTO">
-		INSERT INTO COFFEE_BEANS_PAY (
-		    BEANS_PAY_NO,
-		    MEMBER_NO,
-		    PAYMENT_ID,
-		    PAY_METHOD,
-		    PRICE,
-		    PAY_DATE,
-		    USED_AMOUNT,
-		    PAY_STATUS
-			) VALUES (
-			    SEQ_BEANS_PAY_NO.NEXTVAL,,
-			    #{memberNo},
-			    #{paymentId},
-			    #{payMethod},
-			    #{price},
-			    SYSDATE,
-			    #{usedAmount},
-			    1
-			)	
 
+	
+	<!-- 결제 정보 저장 -->	
+	<insert id="insertPayment" parameterType="PayDTO">
+	    <selectKey keyProperty="beansPayNo" resultType="_int" order="BEFORE">
+	        SELECT SEQ_PAY_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+	    
+	    INSERT INTO COFFEE_BEANS_PAY (
+	        BEANS_PAY_NO, 
+	        MEMBER_NO, 
+	        PAYMENT_ID, 
+	        PAY_METHOD, 
+	        PRICE, 
+	        PAY_DATE, 
+	        USED_AMOUNT, 
+	        PAY_STATUS
+	    ) VALUES (
+	        #{beansPayNo}, 
+	        #{memberNo}, 
+	        #{paymentId}, 
+	        #{payMethod}, 
+	        #{price}, 
+	        SYSDATE, 
+	        0, 
+	        1
+	    )
+	</insert>
+		
+	<insert id="insertHistory">
+	    INSERT INTO COFFEE_BEANS_HISTORY (
+	        BEANS_HISTORY, 
+	        MEMBER_NO, 
+	        PAY_AMOUNT, 
+	        TRADE_NO
+	    ) VALUES (
+	        SEQ_HISTORY_NO.NEXTVAL, 
+	        #{memberNo}, 
+	        #{price}, 
+	        NULL  )
 	</insert>
 	
+	<update id="updateMemberBeans">
+	    UPDATE MEMBER 
+	    SET BEANS_AMOUNT = BEANS_AMOUNT + #{price}
+	    WHERE MEMBER_NO = #{memberNo}
+	</update>
 	
+	
+	<select id="selectPaymentByNo" resultType="PayDTO">
+	    SELECT * FROM COFFEE_BEANS_PAY WHERE BEANS_PAY_NO = #{beansPayNo}
+	</select>
+	
+	<update id="updatePayStatusCancel">
+	    UPDATE COFFEE_BEANS_PAY 
+	    SET PAY_STATUS = 2
+	    WHERE BEANS_PAY_NO = #{beansPayNo}
+	      AND PAY_STATUS != 2
+	</update>
 	
 
 

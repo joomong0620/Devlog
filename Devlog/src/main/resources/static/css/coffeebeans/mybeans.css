@@ -159,6 +159,8 @@
   border: 3px solid #F7E8F6;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  max-height: 600px;
 
 }
 
@@ -231,7 +233,10 @@
 
 .history-table tbody td:nth-child(2) {
   text-align: left;
-  padding-left: 20px;
+  padding-left: 17px;
+  display: flex;
+  text-align: center;
+  justify-content: center;
 }
 
 /* 금액 색상 */

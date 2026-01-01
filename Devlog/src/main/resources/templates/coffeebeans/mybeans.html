@@ -92,23 +92,30 @@
             </tr>
           </thead>
           <tbody id="history-tbody">
-            <tr th:each="history : ${historyList}" th:data-type="${history.payAmount > 0 ? 'charge' : 'use'}">
+            <tr th:each="history : ${historyList}"
+              th:data-type="${history.payAmount > 0 ? 'charge' : (history.contentType == '취소' ? 'cancel' : 'use')}"
+              th:data-id="${history.paymentId}" th:data-no="${history.beansPayNo}" th:data-used="${history.usedAmount}"
+              th:data-price="${history.displayPrice}">
 
               <td th:text="${history.contentType}">유형</td>
 
-              <td th:text="${history.contentId != 0 ? history.contentType : '커피콩 충전'}">내역</td>
+              <td
+                th:text="${history.contentType == '취소' ? '커피콩 결제 취소' : (history.contentId != 0 ? history.contentType : '커피콩 충전')}">
+                내역</td>
 
-              <td th:class="${history.payAmount > 0 ? 'plus' : 'minus'}"
+              <td th:class="${history.payAmount > 0 && history.contentType != '취소' ? 'plus' : 'minus'}"
                 th:text="${history.payAmount > 0 ? '+' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA') : '-' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA')}">
                 금액
               </td>
 
-              <td th:text="${history.payDate}">2025.12.31</td>
+              <td th:text="${history.payDate}">일시</td>
             </tr>
+          </tbody>
+          </tr>
 
-            <tr th:if="${#lists.isEmpty(historyList)}">
-              <td colspan="4" style="text-align: center;">내역이 존재하지 않습니다.</td>
-            </tr>
+          <tr th:if="${#lists.isEmpty(historyList)}">
+            <td colspan="4" style="text-align: center;">내역이 존재하지 않습니다.</td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -187,7 +194,7 @@
   </div>
   <div class="modal" id="exchange-complete-modal">
     <div class="complete-modal-content">
-      <img src="@{/images/common/coffebean.png}" alt="커피콩" class="complete-icon">
+      <img th:src="@{/images/common/coffebean.png}" alt="커피콩" class="complete-icon">
       <div class="complete-text">
         <p class="main-msg">회원님의 환전 요청이 관리자에게 정상적으로 전송되었습니다!</p>
         <p class="sub-msg">해당 요청 처리 건은 1~3일 정도 소요됩니다.</p>
@@ -243,10 +250,10 @@
 </div>
 
 <script th:inline="javascript">
-    const portoneConfig = {
-        storeId: [[${storeId}]],
-        channelKey: [[${channelKey}]]
-    };
+  const portoneConfig = {
+    storeId: [[${ storeId }]],
+    channelKey: [[${ channelKey }]]
+  };
 </script>
 
 
@@ -256,7 +263,6 @@
 <script th:src="@{/js/notification/noti.js}"></script>
 <script th:src="@{/js/coffeebeans/mybeans.js}"></script>
 <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
-<script th:src="@{/js/pay/mybeans.js}"></script>
 
 
 

@@ -1,5 +1,7 @@
 package com.devlog.project.pay.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,13 +12,19 @@ import lombok.ToString;
 public class PayDTO {
 	
 	// 커피콩 결제
+	@JsonProperty("beansPayNo")
 	private int beansPayNo;
+	
 	private Long memberNo;
+	
+	@JsonProperty("paymentId")
 	private String paymentId;
+	
+	@JsonProperty("payMethod")
 	private String payMethod;
 	private int price;
 	private String payDate;
-	private int usedAmount;
+	private Integer usedAmount;
 	private String payStatus;
 	
 	private int beansAmount;
