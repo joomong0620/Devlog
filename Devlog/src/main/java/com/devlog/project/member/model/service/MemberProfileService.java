@@ -1,0 +1,37 @@
+package com.devlog.project.member.model.service;
+
+import org.springframework.stereotype.Service;
+
+import com.devlog.project.member.model.dto.MemberProfileDTO;
+import com.devlog.project.member.model.entity.Level;
+import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.LevelRepository;
+import com.devlog.project.member.model.repository.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class MemberProfileService {
+	
+	private final MemberRepository repository;
+	private final LevelRepository levelRepository;
+	
+	public MemberProfileDTO selectProfile(Long memberNo) {
+		
+		Member member = repository.findById(memberNo)
+						.orElseThrow();
+		
+		
+		MemberProfileDTO resp = MemberProfileDTO.builder()
+								.memberNo(memberNo)
+								.memberNickname(member.getMemberNickname())
+								.profileImg(member.getProfileImg())
+								.level(member.getMemberLevel().getLevelNo())
+								.levelTitle(member.getMemberLevel().getTitle())
+								.build();
+		
+		return resp;
+	}
+
+}

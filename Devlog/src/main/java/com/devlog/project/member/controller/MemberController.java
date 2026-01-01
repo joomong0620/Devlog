@@ -23,8 +23,10 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
+import com.devlog.project.member.model.dto.MemberProfileDTO;
 import com.devlog.project.member.model.dto.MemberSignUpRequestDTO;
 import com.devlog.project.member.model.security.CustomUserDetails;
+import com.devlog.project.member.model.service.MemberProfileService;
 import com.devlog.project.member.model.service.MemberService;
 import com.devlog.project.member.model.service.MemberService2;
 
@@ -43,6 +45,7 @@ public class MemberController {
 
 	private final MemberService memberService; //
 	private final MemberService2 service; //
+	private final MemberProfileService profileService;
 	
 	private final AuthenticationManager authenticationManager; // spring-security
 	
@@ -304,6 +307,18 @@ public class MemberController {
 		
 		return path;
     }	
+	
+	
+	@GetMapping("/profile")
+	@ResponseBody
+	public MemberProfileDTO selectProfile(
+			Long memberNo
+			) {
+		
+		
+		
+		return profileService.selectProfile(memberNo);
+	}
 		
 	
 }

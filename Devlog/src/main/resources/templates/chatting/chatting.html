@@ -405,25 +405,8 @@
 
                             <!-- 유저 프로필 카드 -->
                             <div class="profile-card flex-col display-none">
-                                <div class="flex-center">
 
-                                    <img class="profile-card-img"
-                                        th:src="@{/images/chatting/박보검.png}"
-                                        alt="profile">
-                                </div>
-
-                                <div class="profile-info">
-                                    <span class="name">소연님</span>
-                                    <span class="level">LV4</span>
-                                </div>
-
-                                <p class="job-title">프론트엔드 개발자</p>
-
-                                <div class="button-group">
-                                    <button class="btn fw-600 fs-14">프로필 보기</button>
-                                    <button class="btn fw-600 fs-14">1:1 채팅 시작</button>
-                                    <button class="btn fw-600 fs-14">팔로우 하기</button>
-                                </div>
+                                
                             </div>
 
                             <div th:if="${msg.type == 'SYSTEM'}" class="system-message flex-center">

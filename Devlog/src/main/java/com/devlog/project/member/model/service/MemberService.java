@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devlog.project.member.model.dto.LevelDTO;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
+import com.devlog.project.member.model.dto.MemberProfileDTO;
 import com.devlog.project.member.model.entity.Level;
 import com.devlog.project.member.model.entity.Member;
 
@@ -52,5 +53,11 @@ public class MemberService {  // 로그인(login) 서비스 전용
             levelDTO
         );
     }
+
+
+    
+    
+    
+
 }
 

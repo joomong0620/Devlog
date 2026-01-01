@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', e => {
 
     selectChatList();
 
+    bindChatContainerEvents();
+
 })
 
 async function selectChatList(query = null){
@@ -29,13 +31,7 @@ document.addEventListener('click', (e) => {
     if (!item) return; // room-item이 아닌 곳 클릭이면 무시
 
     const roomNo = Number(item.dataset.roomNo);
-    // 현재 room-list 안의 room-item만 대상으로 선택 해제
-   /*  const container = document.getElementById('roomList');
-    container.querySelectorAll('.room-item').forEach(el => el.classList.remove('is-selected'));
 
-    item.classList.add('is-selected');
-    showChatRoomUI();
-    loadChatRoom(roomNo); */
 
     enterChatRoom(roomNo);
 });
@@ -651,16 +647,16 @@ function bindChatUIEvents() {
             chatOverlay.classList.remove('active');
 
             try{
-               const resp = await fetch('/devtalk/roomExit?roomNo=' + Number(currentRoomNo))
+                const resp = await fetch('/devtalk/roomExit?roomNo=' + Number(currentRoomNo))
 
-               if(!resp.ok) return ;
-                
-               if(stompClient){
-                   
-                   stompClient.send("/devtalk/chat.leave", {}, JSON.stringify({
-                       room_no : currentRoomNo ,
-                       member_no : myNo}));
-               }
+                if(!resp.ok) return ;
+                    
+                if(stompClient){
+                    
+                    stompClient.send("/devtalk/chat.leave", {}, JSON.stringify({
+                        room_no : currentRoomNo ,
+                        member_no : myNo}));
+                }
 
                 setTimeout(location.reload(), 200);
             } catch(e) {
@@ -1104,44 +1100,114 @@ function bindMessageDeleteEvents() {
     };
 }
 
+function bindProfileCardEvents() {
 
+    document.addEventListener('click', async e => {
 
+        const img = e.target.closest('.profile-img');
+        if(!img) return;
 
-
-
-const profileImgs = document.querySelectorAll('.profile-img');
-
-profileImgs.forEach(img => {
-    img.addEventListener('click', e => {
         e.stopPropagation();
 
         const messageItem = img.closest('.message-item');
         const profileCard = messageItem.querySelector('.profile-card');
+        const memberNo = messageItem.dataset.memberNo;
 
-        // 다른 카드 전부 닫기
+        // 다른 카드 닫기
         document.querySelectorAll('.profile-card').forEach(card => {
-            if (card !== profileCard) {
-                card.classList.add('display-none');
-            }
+            if(card !== profileCard) card.classList.add('display-none');
         });
+
+        if(profileCard.classList.contains('display-none')) {
+            const resp = await fetch(`/member/profile?memberNo=${memberNo}`);
+            const data = await resp.json();
+            openProfile(data, profileCard);
+        }
 
         profileCard.classList.toggle('display-none');
     });
-});
 
-document.addEventListener('click', () => {
-    document.querySelectorAll('.profile-card')
-        .forEach(card => card.classList.add('display-none'));
-});
+    // 카드 외부 클릭 시 닫기
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.profile-card')
+            .forEach(card => card.classList.add('display-none'));
+    });
 
-document.querySelectorAll('.profile-card').forEach(card => {
-    card.addEventListener('click', e => e.stopPropagation());
-});
+    // 카드 내부 클릭 막기
+    document.addEventListener('click', e => {
+        if(e.target.closest('.profile-card')) e.stopPropagation();
+    });
+}
 
 
+function openProfile(data, card) {
+    card.innerHTML = `
+        <div class="flex-center">
+            <img class="profile-card-img" src="${data.profile_img}">
+        </div>
+
+        <div class="profile-info">
+            <span class="name">${data.member_nickname}</span>
+            <span class="level">LV${data.level}</span>
+        </div>
+
+        <p class="job-title">${data.level_title}</p>
+
+        <div class="button-group">
+            <button class="btn fw-600 fs-14">프로필 보기</button>
+            <button class="btn fw-600 fs-14 start-private-chat" 
+                    data-profile-no="${data.member_no}">
+                1:1 채팅 시작
+            </button>
+            <button class="btn fw-600 fs-14">팔로우 하기</button>
+        </div>
+    `;
+}
 
 
+function bindChatContainerEvents(){
+    const container = document.getElementById('chatting-space');
 
+    container.addEventListener('click', async e => {
+
+        const btn = e.target.closest('.start-private-chat');
+        if(!btn) return;
+
+        e.stopPropagation();
+
+        const memberNo = Number(btn.dataset.profileNo);
+        const roomNo = await createPrivateWith(memberNo);
+
+        await selectChatList();
+
+        enterChatRoom(roomNo);
+
+        showChatRoomUI();
+
+        await loadChatRoom(roomNo)
+    });
+}
+
+
+// 1 ㄷ 1 채팅 연결
+async function createPrivateWith(targetMemberNo){
+    try {
+        const resp = await fetch("/devtalk/create/private", {
+            method : "POST",
+            headers: {'Content-Type' : 'application/json'},
+            body : JSON.stringify(targetMemberNo)
+        });
+
+        return await resp.text();
+
+    } catch(e){
+        console.error(e);
+        alert('채팅방 생성 실패');
+    }
+}
+
+
+// 채팅방내 이미지 클릭 시 가운데에 띄우기
 function imagebigViewer() {
 
     const viewer = document.getElementById('imageViewer');
@@ -1217,6 +1283,7 @@ function afterFuncLoad(){
     bindSendImage();
     imagebigViewer();
     bindMessageReportEvent();
+    bindProfileCardEvents()
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -1516,38 +1583,7 @@ function createLiBase(className, msg) {
     return li;
 }
 
-/* function applyModify(msg) {
-    const li = document.querySelector(`[data-message-no="${msg.message_no}"]`);
 
-    const bubble = li.querySelector('.bubble');
-
-    const msgContent = bubble.querySelector('.msg-content');
-
-            msgContent.innerText = msg.content
-
-        const edited = bubble.querySelector('.edited');
-        if(edited) return;
-
-
-        const span = document.createElement('span');
-        span.className = 'edited fs-12';
-        span.innerText = '(수정됨)';
-
-        bubble.append(span);
-
-
-}
-
-function applyDelete(msg) {
-    const li = document.querySelector(`[data-message-no="${msg.message_no}"]`);
-
-    const bubble = li.querySelector('.bubble');
-
-    const msgContent = bubble.querySelector('.msg-content');
-
-
-
-} */
 
 function applyMessageStatus(msg){
     console.log('여기까지 오기는 하는거니 ? ');
