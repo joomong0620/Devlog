@@ -107,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
   finalChargeSubmit?.addEventListener("click", async () => {
     const amount = parseInt(amountInput.value.replace(/[^0-9]/g, ""));
 
-
     if (isNaN(amount) || amount < 100) {
       alert("최소 충전 금액은 100원입니다.");
       return;
@@ -117,28 +116,29 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await PortOne.requestPayment({
         storeId: portoneConfig.storeId,
         channelKey: portoneConfig.channelKey,
-        paymentId: `payment-${crypto.randomUUID()}`,
+        paymentId: `pay-${crypto.randomUUID().split("-")[0]}`,
         orderName: "커피콩 충전",
         totalAmount: amount,
         currency: "CURRENCY_KRW",
         payMethod: "CARD",
       });
-
+      console.log(response);
       // 결제 실패 시
       if (response.code !== undefined) {
         alert(`결제 실패: ${response.message}`);
         return;
       }
 
-      // 저장 요청
+      // 저장
       const serverResponse = await fetch("/payment/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          paymentId: response.paymentId,
+          paymentId: response.paymentId, // 'payment-xxx' 문자열이 직접 할당됨
           price: amount,
-          payMethod: "CARD",
-          usedAmount: 0
+          payMethod: "CARD", // 일단 상수로 테스트
+          usedAmount: 0,
+          payStatus: "1", // 말씀하신 1:충전 로직
         }),
       });
 

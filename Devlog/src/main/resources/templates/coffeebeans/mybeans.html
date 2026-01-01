@@ -187,7 +187,7 @@
   </div>
   <div class="modal" id="exchange-complete-modal">
     <div class="complete-modal-content">
-      <img src="@{/images/common/coffebean.png}" alt="커피콩" class="complete-icon">
+      <img th:src="@{/images/common/coffebean.png}" alt="커피콩" class="complete-icon">
       <div class="complete-text">
         <p class="main-msg">회원님의 환전 요청이 관리자에게 정상적으로 전송되었습니다!</p>
         <p class="sub-msg">해당 요청 처리 건은 1~3일 정도 소요됩니다.</p>
@@ -243,10 +243,10 @@
 </div>
 
 <script th:inline="javascript">
-    const portoneConfig = {
-        storeId: [[${storeId}]],
-        channelKey: [[${channelKey}]]
-    };
+  const portoneConfig = {
+    storeId: [[${ storeId }]],
+    channelKey: [[${ channelKey }]]
+  };
 </script>
 
 

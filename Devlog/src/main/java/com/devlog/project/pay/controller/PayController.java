@@ -56,7 +56,12 @@ public class PayController {
 	// 결제 
 	@PostMapping("/payment/complete")
 	@ResponseBody
-	public ResponseEntity<?> completePayment(@RequestBody PayDTO payment){
+	public ResponseEntity<?> completePayment(@RequestBody PayDTO payment,
+			@SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember){
+		Long memberNo = loginMember.getMemberNo();
+		payment.setMemberNo(memberNo);
+		
+		
 		System.out.println("결제 데이터" + payment);
 		
 		int result = payService.insertPayment(payment);

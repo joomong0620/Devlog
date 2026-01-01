@@ -47,7 +47,7 @@
 		    USED_AMOUNT,
 		    PAY_STATUS
 			) VALUES (
-			    SEQ_BEANS_PAY_NO.NEXTVAL,,
+			    SEQ_PAY_NO.NEXTVAL,
 			    #{memberNo},
 			    #{paymentId},
 			    #{payMethod},
