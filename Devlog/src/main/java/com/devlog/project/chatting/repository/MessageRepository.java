@@ -1,5 +1,6 @@
 package com.devlog.project.chatting.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.devlog.project.chatting.dto.MessageDTO;
+import com.devlog.project.chatting.dto.QueryMessageResponseDTO;
 import com.devlog.project.chatting.entity.Message;
 
 @Repository
@@ -74,6 +76,33 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 			where m.chattingRoom.roomNo = :roomNo
 			""")
 	Integer selectLastMessage(@Param("roomNo") Long roomNo);
+
+
+//	private Long messageNo;
+//	private String messageContent;
+//	private LocalDateTime sendTime;
+//	private String memberNickname;
+//	private String profilePath;
+	
+	@Query("""
+			select new com.devlog.project.chatting.dto.QueryMessageResponseDTO(
+			m.messageNo,
+			m.messageContent,
+			m.sendTime,
+			mem.memberNickname,
+			mem.profileImg
+			
+			)
+			from Message m
+			JOIN m.member mem
+			where m.chattingRoom.roomNo = :roomNo
+				and m.messageContent LIKE concat('%', :query, '%')
+				and m.type = 'TEXT'
+				and (m.status is null or m.status != 'DEL')
+				
+			order by m.sendTime desc
+			""")
+	List<QueryMessageResponseDTO> searchMessage(Long roomNo, String query);
 	
 	
 }

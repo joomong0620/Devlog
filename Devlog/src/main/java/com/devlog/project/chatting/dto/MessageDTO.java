@@ -207,4 +207,7 @@ public class MessageDTO {
 		private MsgEnums.MsgStatus status;
 		
 	}
+	
+	
+
 }

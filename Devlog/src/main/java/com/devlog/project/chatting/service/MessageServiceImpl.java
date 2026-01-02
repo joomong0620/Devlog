@@ -26,6 +26,7 @@ import com.devlog.project.chatting.dto.MessageDTO.ChatMessageResponse;
 import com.devlog.project.chatting.dto.MessageDTO.ImageRequest;
 import com.devlog.project.chatting.dto.MessageDTO.MessageEdit;
 import com.devlog.project.chatting.dto.MessageDTO.MessageEditResp;
+import com.devlog.project.chatting.dto.QueryMessageResponseDTO;
 import com.devlog.project.chatting.entity.ChatRoom;
 import com.devlog.project.chatting.entity.Emoji;
 import com.devlog.project.chatting.entity.Message;
@@ -299,6 +300,20 @@ public class MessageServiceImpl implements MessageService {
 				updateEmoji
 				);
 		
+	}
+
+	
+	// 검색된 메세지 조회
+	@Override
+	public List<QueryMessageResponseDTO> searchMessageList(Map<String, Object> paramMap) {
+		
+		Long roomNo = ((Number)paramMap.get("roomNo")).longValue();
+		String query = (String) paramMap.get("query");
+		
+		System.out.println(roomNo);
+		System.out.println(query);
+		
+		return msgRepository.searchMessage(roomNo, query);
 	}
 
 }

@@ -297,32 +297,32 @@
                         <!-- 검색 입력 -->
                         <div class="search-msg-input flex">
                             <!-- 돋보기 아이콘 -->
-                            <img th:src="@{/images/chatting/돋보기.svg}">
+                            <img id="search-message" th:src="@{/images/chatting/돋보기.svg}">
 
                             <input type="search"
                                 name="msgSearch"
+                                id="msgSearch"
                                 placeholder="검색어를 입력해주세요">
                         </div>
 
                         <!-- 검색 결과 영역 -->
-                        <ul class="search-msg-area flex-col gap-16">
+                        <ul class="search-msg-area flex-col gap-16" id="searchMsgArea">
 
-                            <li class="search-msg-item flex">
+                            <li th:each="item : ${msgList}" class="search-msg-item flex" th:data-message-no="${item.messageNo}">
                                 <div>
                                     <!-- 메시지 작성자 프로필 -->
-                                    <img class="profile-img"
-                                        th:src="@{/images/chatting/박보검.png}">
+                                    <img  class="profile-img"
+                                        th:src="${item.profilePath != null ? item.profilePath : '/images/logo.png'}">
                                 </div>
 
                                 <div class="flex-col gap-8">
                                     <div class="user-info flex gap-12">
-                                        <span class="fw-600">박보검</span>
-                                        <span class="fs-12">2025-12-18</span>
+                                        <span class="fw-600" th:text="${item.memberNickname}">닉네임</span>
+                                        <span class="fs-12" th:text="${item.formatTime}">보낸날</span>
                                     </div>
 
                                     <!-- 검색된 메시지 미리보기 -->
-                                    <div class="msg-info ellipsis">
-                                        애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이애순이
+                                    <div class="msg-info ellipsis" th:text="${item.messageContent}">
                                     </div>
                                 </div>
                             </li>

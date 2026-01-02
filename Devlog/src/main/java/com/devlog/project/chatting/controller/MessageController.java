@@ -2,6 +2,7 @@ package com.devlog.project.chatting.controller;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.devlog.project.common.utility.Util;
 import com.devlog.project.chatting.dto.MessageDTO;
 import com.devlog.project.chatting.dto.MessageDTO.ChatMessageResponse;
 import com.devlog.project.chatting.dto.ParticipantDTO.ChatListUpdateDTO;
+import com.devlog.project.chatting.dto.QueryMessageResponseDTO;
 import com.devlog.project.chatting.service.ChattingService;
 import com.devlog.project.chatting.service.MessageService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
@@ -221,7 +224,30 @@ public class MessageController {
 		
 		return ResponseEntity.ok().build();
 	}
-
+	
+	
+	// 검색어 일치하는 메세지 목록 조회
+	
+	@PostMapping("/devtalk/searchMessageList")
+	public String searchMessageList(
+			@RequestBody Map<String, Object> paramMap,
+			Model model
+			) {
+		
+		List<QueryMessageResponseDTO> resp = service.searchMessageList(paramMap);
+		
+		
+		for (QueryMessageResponseDTO dto : resp) {
+			
+			dto.setFormatTime(Util.formatChatTime(dto.getSendTime()));
+			
+		}
+		System.out.println("메시지 목록 확인 : " + resp);
+		
+		model.addAttribute("msgList", resp);
+		
+		return "chatting/chatting :: #searchMsgArea";
+	}
 
 
 	

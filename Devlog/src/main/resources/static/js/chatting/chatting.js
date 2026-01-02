@@ -36,6 +36,15 @@ document.addEventListener('click', (e) => {
     enterChatRoom(roomNo);
 });
 
+// 검색된 메세지 클릭 시 해당 메세지로 이동
+document.addEventListener('click', e => {
+    const item = e.target.closest('.search-msg-item');
+    if (!item) return;
+
+    const messageNo = item.dataset.messageNo;
+    moveToMessage(messageNo);
+});
+
 
 window.addEventListener('load', () => {
     
@@ -669,7 +678,63 @@ function bindChatUIEvents() {
 
         });
     }
+
+
+
+    // -----------------------------------------------
+    // 메세지 검색
+    const chatMsgBtn = document.getElementById("search-message");
+    const msgInput = document.getElementById("msgSearch");
+
+    msgInput.addEventListener("keydown", async e=> {
+
+        if(e.key == "Enter"){
+
+            const query = msgInput.value.trim();
+    
+            if (!query) return;
+            
+            console.log(query);
+            const data = {
+                roomNo : currentRoomNo,
+                query : query
+    
+            }
+    
+            const resp = await fetch("/devtalk/searchMessageList", {
+                            method : "POST",
+                            headers : {"Content-Type" : "application/json"},
+                            body : JSON.stringify(data)
+            })
+            
+            const html = await resp.text();
+
+            document.getElementById("searchMsgArea").outerHTML = html;
+
+
+            msgInput.value=''
+        }
+
+    })
+
 }
+
+
+function moveToMessage(messageNo){
+
+    const target = document.querySelector(`.message-item[data-message-no="${messageNo}"]`)
+
+    target.scrollIntoView({
+        behavior : "smooth",
+        block : "center"
+    })
+
+
+    document.querySelector('.chat-search-panel').classList.remove('is-open');
+    document.querySelector('.search-msg-area').innerHTML = '';
+
+}
+
 
 
 /* ------------------------------------------- */

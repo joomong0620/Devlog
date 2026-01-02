@@ -100,6 +100,10 @@ input[type="search"]::-webkit-search-cancel-button {
     
 }
 
+#msgSearch:focus {
+    outline: none;
+}
+
 #chat-add-btn {
     width: 45px;
     height: 45px;
@@ -737,7 +741,11 @@ input[name="memberName"] {
 
 input[name='msgSearch'] {
     padding-left: 5px;
-    background-color: #F7E8F6
+    background-color: #F7E8F6;
+    height: 80%;
+    width: 80%;
+    border: none;
+
 }
 
 .search-msg-input > img {
@@ -749,13 +757,12 @@ input[name='msgSearch'] {
 .search-msg-area {
     list-style: none;
     width: 100%;
-    align-items: center;
     overflow-y: auto;
     
 }
 
 .search-msg-item {
-    width: 80%;
+    width: 90%;
     height: 60px;
     border: 1px solid #F7E8F6;
     border-radius: 10px;

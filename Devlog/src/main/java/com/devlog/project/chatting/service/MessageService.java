@@ -1,12 +1,15 @@
 package com.devlog.project.chatting.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
+import com.devlog.project.chatting.dto.MessageDTO;
 import com.devlog.project.chatting.dto.MessageDTO.ChatMessage;
 import com.devlog.project.chatting.dto.MessageDTO.ChatMessageResponse;
 import com.devlog.project.chatting.dto.MessageDTO.ImageRequest;
 import com.devlog.project.chatting.dto.MessageDTO.MessageEdit;
+import com.devlog.project.chatting.dto.QueryMessageResponseDTO;
 
 public interface MessageService {
 	
@@ -31,5 +34,9 @@ public interface MessageService {
 	
 	// 메세지 공감 삽입
 	void sendEmoji(Map<String, Object> paramMap);
+	
+	
+	// 메세지 리스트 조회
+	List<QueryMessageResponseDTO> searchMessageList(Map<String, Object> paramMap);
 
 }
