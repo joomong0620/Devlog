@@ -56,11 +56,49 @@ public class FreeboardServiceImpl implements FreeboardService {
 	    return map;
 	}
 
+
+	// 게시글 상세 조회	
 	@Override
 	public Freeboard selectFreeboardDetail(Map<String, Object> map) {
 		
-	      return mapper.selectFreeboardDetail(map);
+	    return mapper.selectFreeboardDetail(map);
 	}
 
+	// 조회수 증가
+	@Override
+	public int updateBoardCount(int boardNo) {
+		return mapper.updateBoardCount(boardNo);
+	}	
+	
+	// 상세 게시글 좋아요 여부 확인
+	@Override
+	public int boardLikeCheck(Map<String, Object> map) {
+		return mapper.boardLikeCheck(map);
+	}
+
+	// 상세 게시글 좋아요 처리 서비스
+	@Override
+	//public int like(Map<String, Integer> paramMap) {	
+	public int like(Map<String, Integer> paramMap) {
+		int result = 0;
+
+		if(paramMap.get("check") == 0) { // 좋아요 X 상태
+		//if(paramMap.get("check") == true) { // 좋아요 X 상태
+			// BOARD_LIKE 테이블 INSERT
+			result = mapper.insertBoardLike(paramMap);
+
+		} else { // 좋아요 O 상태
+			// BOARD_LIKE 테이블 DELETE
+			result = mapper.deleteBoardLike(paramMap);
+		}
+
+		// SQL 수행 결과가 0 == DB 또는 파라미터에 문제가 있음
+		// -> 에러를 나타내는 임의의 값을 반환(-1)
+		if(result == 0) return -1;
+
+		// 현재 게시글의 좋아요 개수 조회
+		return mapper.countBoardLike(paramMap.get("boardNo"));
+	}
+	
 }
 

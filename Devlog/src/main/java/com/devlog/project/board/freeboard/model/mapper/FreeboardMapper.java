@@ -25,4 +25,19 @@ public interface FreeboardMapper {
 	// Freeboard 게시판(boardCode=3)에서 boardNo 에 해당하는 게시글 상세 조회
 	public Freeboard selectFreeboardDetail(Map<String, Object> map);	
 
+	// 상세 게시글 조회수 증가(BOARD_COUNT = READ_COUNT)
+	public int updateBoardCount(int boardNo);
+	
+	// 상세 게시글 좋아요 여부 확인
+	public int boardLikeCheck(Map<String, Object> map);
+
+	// 상세 게시글 좋아요 처리: 좋아요 추가
+	public int insertBoardLike(Map<String, Integer> paramMap);
+
+	// 상세 게시글 좋아요 처리: 좋아요 취소	
+	public int deleteBoardLike(Map<String, Integer> paramMap);
+
+	// 상세 게시글 좋아요 처리: 좋아요 수 조회
+	public int countBoardLike(Integer integer);	
+	
 }

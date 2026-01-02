@@ -11,7 +11,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Freeboard {
-	private int boardNo;
+	private Long boardNo;
 	private String boardTitle;
 	private String boardContent;
 	private String bCreateDate; // LocalDateTime?
@@ -27,7 +27,7 @@ public class Freeboard {
 	
 	
 	// 회원 join
-	private int memberNo;
+	private Long memberNo;
 	private String memberNickname; 
 	private String profileImg;
 	private String thumbnail;
