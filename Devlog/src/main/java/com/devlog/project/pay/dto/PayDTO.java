@@ -44,6 +44,25 @@ public class PayDTO {
 	private int contentId; // 대상 ID(게시글번호, 회원번호, 챗봇번호)
 	
 	
+	// 환전     
+	private int exchangeNo;  
+	
+	@JsonProperty("returnBank")
+    private String returnBank;      // 은행 코드
+    
+    @JsonProperty("requestAmount")
+    private int requestAmount;      // 환전 신청한 금액 (10% 차감)
+    
+    @JsonProperty("exchangeHolder")
+    private String exchangeHolder;  // 예금주
+    
+    @JsonProperty("exchangeAccount")
+    private String exchangeAccount; // 계좌번호
+    private String exchangeReqDate; // 신청일시
+    private String exchangeOkDate;  // 처리일시
+
+	
+	
 	
 	
 	

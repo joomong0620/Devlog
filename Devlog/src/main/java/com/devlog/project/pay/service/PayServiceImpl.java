@@ -112,8 +112,48 @@ public class PayServiceImpl implements PayService {
 	    return false;
 	}
 
-	
-	
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public int insertExchange(PayDTO pay) {
+
+	    // 현재 보유 콩 확인 
+	    PayDTO myBeans = paymapper.selectMyBeans(pay.getMemberNo());
+	    int currentBeans = myBeans.getBeansAmount(); 
+	    System.out.println(currentBeans);
+	    
+	    // 사용자가 입력한 원본 금액
+	    int originAmount = pay.getRequestAmount();
+
+	    // 검증 (최소 금액 및 잔액 확인)
+	    if (originAmount < 5000) return -3;
+	    if (currentBeans < originAmount) return -2;
+	    if (pay.getReturnBank() == null || pay.getReturnBank().isEmpty()) return -4;
+
+	    // 수수료 10% 제외한 금액 세팅 및 내역 삽입
+	    pay.setRequestAmount((int)(originAmount * 0.9));
+	    int result = paymapper.insertExchange(pay);
+
+	    // 성공 시 원본 금액만큼 회원 잔액 차감
+	    if (result > 0) {
+	        // 기존 필드인 price에 차감할 액수를 음수로 세팅
+	        pay.setPrice(-originAmount); 
+	        result = paymapper.updateMemberBeans(pay);
+	        if(result > 0) {
+	            paymapper.insertHistory(pay); 
+	        }
+	        
+	    }
+
+	    return result;
+	}
+
+
+
+	@Override
+	public List<Map<String, Object>> selectBankList() {
+		return paymapper.selectBankList();
+	}
 	
 	
 	

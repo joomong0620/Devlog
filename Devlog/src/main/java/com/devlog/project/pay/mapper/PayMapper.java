@@ -1,6 +1,7 @@
 package com.devlog.project.pay.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -25,8 +26,20 @@ public interface PayMapper {
 	// 내 커피콩 내역 업데이트
 	public int updateMemberBeans(PayDTO payment);
 
+	// 결제 내역 조회
 	public PayDTO selectPaymentByNo(int beansPayNo);
 
+	// 취소
 	public int updatePayStatusCancel(int beansPayNo);
+
+	// 현재 커피콩
+	public int checkCurrentBeans(Long memberNo);
+
+	// 환전
+	public int insertExchange(PayDTO pay);
+
+	// 은행 코드
+	public List<Map<String, Object>> selectBankList();
+
 
 }

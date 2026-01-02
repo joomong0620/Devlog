@@ -22,16 +22,27 @@
 	        P.PAYMENT_ID AS paymentId,
 	        P.BEANS_PAY_NO AS beansPayNo,
 	        P.USED_AMOUNT AS usedAmount,
+	        H.TRADE_NO AS tradeNo,
 	        CASE 
-	            WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 THEN '취소'
+	            -- 환전인지 먼저 확인 (JOIN이 성공하면 EXCHANGE_NO가 있음)
+	            WHEN E.EXCHANGE_NO IS NOT NULL THEN '환전'
+	            -- 환전이 아닐 때, 거래 번호가 없고 음수면 '취소'
+	            WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 AND H.TRADE_NO IS NULL THEN '취소'
+	            -- 양수고 거래 번호 없으면 '충전'
 	            WHEN H.PAY_AMOUNT > 0 AND H.TRADE_NO IS NULL THEN '충전'
+	            -- 나머지는 거래 내역
 	            ELSE (SELECT T.CONTENT_TYPE FROM COFFEE_BEANS_TRADE T WHERE T.TRADE_NO = H.TRADE_NO)
 	        END AS contentType
 	    FROM COFFEE_BEANS_HISTORY H
+	    -- 충전 JOIN
 	    LEFT JOIN COFFEE_BEANS_PAY P ON (
 	        H.MEMBER_NO = P.MEMBER_NO 
 	        AND ABS(H.PAY_AMOUNT) = P.PRICE 
 	        AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(P.PAY_DATE, 'YYYYMMDDHH24MI')
+	    )
+	    LEFT JOIN COFFEE_BEANS_EXCHANGE E ON (
+	        H.MEMBER_NO = E.MEMBER_NO
+	        AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(E.EXCHANGE_REQ_DATE, 'YYYYMMDDHH24MI')
 	    )
 	    WHERE H.MEMBER_NO = #{memberNo}
 	    ORDER BY H.BEANS_HISTORY DESC
@@ -96,6 +107,36 @@
 	      AND PAY_STATUS != 2
 	</update>
 	
+	
+	<!-- 환전 -->
+	<insert id="insertExchange" parameterType="PayDTO">
+			INSERT INTO COFFEE_BEANS_EXCHANGE (
+				EXCHANGE_NO,
+				MEMBER_NO,
+				RETURN_BANK,      REQUEST_AMOUNT,   EXCHANGE_HOLDER,
+				EXCHANGE_ACCOUNT,
+				EXCHANGE_REQ_DATE
+			) VALUES (
+				SEQ_EXCHANGE_NO.NEXTVAL,
+				#{memberNo},
+				#{returnBank},
+				#{requestAmount},
+				#{exchangeHolder},
+				#{exchangeAccount},
+				CURRENT_TIMESTAMP
+			)
+		</insert>
+		
+		
+		
+	<!-- 은행코드 -->
+	<select id="selectBankList" resultType="map">
+	    SELECT 
+	        RETURN_BANK AS "bankCode", 
+	        BANK_NAME AS "bankName"
+	    FROM BANK_INFO
+	    ORDER BY BANK_NAME ASC
+	</select>
 
 
 

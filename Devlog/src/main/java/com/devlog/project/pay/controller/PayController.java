@@ -1,6 +1,7 @@
 package com.devlog.project.pay.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
-import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.pay.dto.PayDTO;
 import com.devlog.project.pay.service.PayService;
 
@@ -99,11 +99,40 @@ public class PayController {
 	    } catch (Exception e) {
 	        return ResponseEntity.status(500).body("서버 오류");
 	    }
+
 	}
+	
+	// 환전
+	@PostMapping("/payment/exchange")
+	@ResponseBody
+	public int insertExchange(
+			@RequestBody PayDTO exchange,
+			@SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember) {
+	
+		if (loginMember == null) {
+			return -1;
+		}
+		
+		exchange.setMemberNo(loginMember.getMemberNo());
+		
+		try {
+            return payService.insertExchange(exchange);
+        } catch (Exception e) {
+        	e.printStackTrace();
+            return 0; 
+        }
+	
+	}
+	
+	// 은행 코드
+	@GetMapping("/payment/bankList")
+	@ResponseBody
+	public List<Map<String, Object>> getBankList() {
+	    return payService.selectBankList();
 	}
 	
 	
-	
+}
 	
 	
 	
