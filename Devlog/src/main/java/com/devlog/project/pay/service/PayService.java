@@ -2,6 +2,7 @@ package com.devlog.project.pay.service;
 
 
 import java.util.List;
+import java.util.Map;
 
 import com.devlog.project.pay.dto.PayDTO;
 
@@ -20,6 +21,12 @@ public interface PayService {
 	
 	// 결제 취소
 	boolean cancelPayment(PayDTO payDTO, String secretKey);
+
+	// 환전
+	int insertExchange(PayDTO exchange);
+
+	// 은행 코드
+	List<Map<String, Object>> selectBankList();
 
 
 

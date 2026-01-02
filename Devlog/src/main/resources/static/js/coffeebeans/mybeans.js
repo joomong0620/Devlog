@@ -23,39 +23,62 @@ document.addEventListener("DOMContentLoaded", () => {
   const historyRows = document.querySelectorAll("#history-tbody tr");
   // const amountInput = document.getElementById("charge-amount-input");
   const finalChargeSubmit = document.getElementById("final-charge-submit");
-
+  fetchBankList();
   // 모달 열기 제어
   chargeBtn?.addEventListener(
     "click",
     () => (chargeModal.style.display = "flex")
   );
-  exchangeBtn?.addEventListener(
-    "click",
-    () => (exchangeModal.style.display = "flex")
-  );
+
+  exchangeBtn?.addEventListener("click", () => {
+    exchangeModal.style.display = "flex";
+
+    // 보유 콩 텍스트에서 숫자만 추출
+    const currentBeansText = document.querySelector(".mybeans-val").innerText;
+    const amount = parseInt(currentBeansText.replace(/[^0-9]/g, ""));
+
+    if (isNaN(amount) || amount === 0) {
+      document.getElementById("calcOrigin").innerText = "0 콩";
+      document.getElementById("calcFee").innerText = "-0 콩";
+      document.getElementById("calcFinal").innerText = "0 원";
+      return;
+    }
+
+    // 10% 수수료 계산
+    const fee = Math.floor(amount * 0.1);
+    const finalAmount = amount - fee;
+
+    // 모달 내 계산 영역 업데이트
+    document.getElementById("calcOrigin").innerText =
+      amount.toLocaleString() + " 콩";
+    document.getElementById("calcFee").innerText =
+      "-" + fee.toLocaleString() + " 콩";
+    document.getElementById("calcFinal").innerText =
+      finalAmount.toLocaleString() + " 원";
+  });
 
   // historyRows를 돌면서 클릭 이벤트 설정
   historyRows.forEach((row) => {
     const amountCell = row.querySelector(".plus"); // 충전(+) 내역만 클릭 가능하게
 
     amountCell?.addEventListener("click", () => {
-      // 1. 행에 심어진 데이터 가져오기
+      // 행에 심어진 데이터 가져오기
       const pId = row.getAttribute("data-id");
       const pNo = row.getAttribute("data-no");
       const pPrice = row.getAttribute("data-price");
       const used = parseInt(row.getAttribute("data-used") || 0);
 
-      // 2. 이미 사용했다면 실패 모달
+      // 이미 사용했다면 실패 모달
       if (used > 0) {
         document.getElementById("cancel-fail-modal").style.display = "flex";
         return;
       }
 
-      // 3. 전역 바구니에 저장 (취소 버튼 클릭 시 사용)
+      // 전역 바구니에 저장 (취소 버튼 클릭 시 사용)
       selectedPaymentData.id = pId;
       selectedPaymentData.no = pNo;
 
-      // 4. 취소 모달 내부 텍스트 변경
+      // 취소 모달 내부 텍스트 변경
       const beansVal = document.querySelector("#cancel-modal .val");
       const priceVal = document.querySelector("#cancel-modal .val.minus");
       if (beansVal) beansVal.innerText = Number(pPrice).toLocaleString() + "콩";
@@ -68,8 +91,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 환전 및 취소 완료 처리
   submitExchangeBtn?.addEventListener("click", () => {
-    exchangeModal.style.display = "none";
-    completeModal.style.display = "flex";
+    // 데이터 수집
+    const beansText = document.querySelector(".mybeans-val").innerText;
+    const amount = parseInt(beansText.replace(/[^0-9]/g, "")); // "12,450 콩" -> 12450
+    const returnBank = document.querySelector("#returnBank").value;
+    const exchangeAccount = document.querySelector("#exchangeAccount").value;
+    const exchangeHolder = document.querySelector("#exchangeHolder").value;
+    console.log("보내는 금액:", amount);
+
+    if (!returnBank || !exchangeAccount || !exchangeHolder) {
+      alert("은행, 계좌번호, 예금주를 모두 입력해주세요.");
+      return;
+    }
+
+    const data = {
+      requestAmount: amount,
+      returnBank: returnBank,
+      exchangeAccount: exchangeAccount,
+      exchangeHolder: exchangeHolder,
+    };
+
+    fetch("/payment/exchange", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+      .then((resp) => resp.json())
+      .then((result) => {
+        if (result > 0) {
+          // 성공 시 모달 전환
+          exchangeModal.style.display = "none";
+          completeModal.style.display = "flex";
+
+          // 확인 버튼 누르면 새로고침
+          // completeConfirmBtn.onclick = () => location.reload();
+        } else if (result === -2) {
+          alert("보유하신 커피콩 잔액이 부족합니다.");
+        } else if (result === -3) {
+          alert("최소 5,000콩 이상부터 환전 가능합니다.");
+        } else {
+          alert("환전 신청에 실패했습니다.");
+        }
+      })
+      .catch((err) => {
+        console.error("환전 에러:", err);
+        alert("서버 통신 중 오류가 발생했습니다.");
+      });
   });
 
   // 모달 닫기 제어
@@ -221,4 +288,21 @@ document.addEventListener("DOMContentLoaded", () => {
       submitCancelBtn.innerText = "결제 취소하기";
     }
   });
+
+  // 은행 목록 가져오기 함수
+  function fetchBankList() {
+    fetch("/payment/bankList")
+      .then((resp) => resp.json())
+      .then((bankList) => {
+        const select = document.querySelector("#returnBank");
+
+        bankList.forEach((bank) => {
+          const opt = document.createElement("option");
+          opt.value = bank.bankCode; // 서버로 보낼 값 (예: 088)
+          opt.innerText = bank.bankName; // 화면에 보일 이름 (예: 신한은행)
+          select.appendChild(opt);
+        });
+      })
+      .catch((err) => console.error("은행 목록 로드 실패:", err));
+  }
 });

@@ -92,23 +92,32 @@
             </tr>
           </thead>
           <tbody id="history-tbody">
-            <tr th:each="history : ${historyList}"
-              th:data-type="${history.payAmount > 0 ? 'charge' : (history.contentType == '취소' ? 'cancel' : 'use')}"
-              th:data-id="${history.paymentId}" th:data-no="${history.beansPayNo}" th:data-used="${history.usedAmount}"
+            <tr th:each="history : ${historyList}" th:data-type="${history.contentType == '충전' ? 'charge' : 
+                    (history.contentType == '사용' ? 'use' : 
+                    (history.contentType == '환전' ? 'exchange' : 
+                    (history.contentType == '취소' ? 'cancel' : 'all')))}" th:data-id="${history.paymentId}"
+              th:data-no="${history.beansPayNo}" th:data-used="${history.usedAmount}"
               th:data-price="${history.displayPrice}">
 
               <td th:text="${history.contentType}">유형</td>
 
-              <td
-                th:text="${history.contentType == '취소' ? '커피콩 결제 취소' : (history.contentId != 0 ? history.contentType : '커피콩 충전')}">
-                내역</td>
+              <td th:text="${history.contentType == '취소' ? '커피콩 결제 취소' : 
+                  (history.contentType == '환전' ? '커피콩 환전 신청' : 
+                  (history.contentType == '사용' ? history.contentId + '번 글 후원' : 
+                  '커피콩 충전'))}">
+                내역
+              </td>
 
-              <td th:class="${history.payAmount > 0 && history.contentType != '취소' ? 'plus' : 'minus'}"
-                th:text="${history.payAmount > 0 ? '+' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA') : '-' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA')}">
+              <td th:class="${history.contentType == '충전' ? 'plus' : 'minus'}"
+                th:text="${history.contentType == '충전' ? '+' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA') : '-' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA')}">
                 금액
               </td>
 
               <td th:text="${history.payDate}">일시</td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(historyList)}">
+              <td colspan="4" style="text-align: center;">내역이 존재하지 않습니다.</td>
             </tr>
           </tbody>
           </tr>
@@ -149,25 +158,27 @@
 
       <div class="exchange-content">
         <h3 class="beans-label">내 보유 커피콩</h3>
-        <span class="mybeans-val">12,450 콩</span>
+        <span class="mybeans-val" id="currentBeansVal"
+          th:text="|${#numbers.formatInteger(myBeans.beansAmount, 0, 'COMMA')} 콩|">12,450 콩</span>
+
         <ul class="exchange-info-list">
           <li>환전 시 계좌에 환급은 1~3일이 소요됩니다.</li>
-          <li>수수료 10%가 부과됩니다.</li>
+          <li>환전 시 <strong>10% 수수료</strong>가 자동 차감됩니다.</li>
         </ul>
       </div>
 
       <div class="calculation-section">
         <div class="calc-row">
-          <span>환전 커피콩</span>
-          <span class="val">12,450콩</span>
+          <span>신청 커피콩</span>
+          <span class="val" id="calcOrigin">0 콩</span>
         </div>
         <div class="calc-row">
-          <span>수수료</span>
-          <span class="val minus">-1,245콩</span>
+          <span>수수료 (10%)</span>
+          <span class="val minus" id="calcFee">-0 콩</span>
         </div>
         <div class="calc-total-row">
-          <span>총 환전 금액</span>
-          <span class="total-val">11,205원</span>
+          <span>최종 입금 예정액</span>
+          <span class="total-val" id="calcFinal">0 원</span>
         </div>
       </div>
 
@@ -175,22 +186,33 @@
         <p class="section-label">계좌 입력 <span class="required">*</span></p>
         <div class="account-form-table">
           <div class="form-row">
-            <div class="form-label">농협</div>
+            <div class="form-label">은행</div>
             <div class="form-input">
-              <input type="text" value="4509010-1445860">
+              <select id="returnBank">
+                <option value="">은행을 선택하세요</option>
+              </select>
             </div>
           </div>
+
+          <div class="form-row">
+            <div class="form-label">계좌번호</div>
+            <div class="form-input">
+              <input type="text" id="exchangeAccount" placeholder="'-' 제외 숫자만 입력">
+            </div>
+          </div>
+
           <div class="form-row">
             <div class="form-label">예금주명</div>
             <div class="form-input">
-              <input type="text" value="김주몽">
+              <input type="text" id="exchangeHolder" placeholder="예금주 성함">
             </div>
           </div>
         </div>
       </div>
 
-      <button class="exchange-submit-btn">환전하기</button>
+      <button class="exchange-submit-btn" id="final-exchange-submit">환전하기</button>
     </div>
+  </div>
   </div>
   <div class="modal" id="exchange-complete-modal">
     <div class="complete-modal-content">
