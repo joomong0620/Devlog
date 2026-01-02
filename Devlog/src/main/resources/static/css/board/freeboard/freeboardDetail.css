@@ -99,7 +99,8 @@ body {
     width: 300px;
     text-align: right;
     /* margin-right: 25px; */
-    font-size: 24px;
+    /* font-size: 24px; */
+    font-size: 22px;
     line-height: 1.6;
 
 
@@ -232,4 +233,27 @@ body {
 }
 .bottom-btn:hover {
     background: #E5B0EA;
+}
+
+/* 좋아요 하트 클릭 */
+.like-icon {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.like-icon img {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* hover 효과 */
+.like-icon:hover img {
+    transform: scale(1.15);
+    opacity: 0.8;
+}
+
+/* 클릭 애니메이션 */
+.like-icon.active img {
+    transform: scale(1.2);
 }
