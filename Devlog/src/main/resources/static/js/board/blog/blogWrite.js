@@ -1,4 +1,3 @@
-
 console.log('blogWrite.js loaded');
 
 // 1. Toast UI Editor 초기화
@@ -18,14 +17,218 @@ const editor = new toastui.Editor({
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.text())
-            .then(url => {
-                callback(url, '이미지 설명');
-            })
-            .catch(error => console.error('이미지 업로드 실패:', error));
+                .then(response => response.text())
+                .then(url => {
+                    callback(url, '이미지 설명');
+                })
+                .catch(error => console.error('이미지 업로드 실패:', error));
         }
     }
 });
+
+
+
+document.querySelector('.btn-publish').addEventListener('click', () => {
+    savePost(false);
+});
+
+// ---------------------- 오탈자 검출 - 소연!!!!!! ------------------------
+
+let spellOn = false;
+let debounceTimer = null;
+let lastRequestId = 0;
+let currentFixes = [];
+
+const CHECK_DELAY = 1000;
+const MIN_TEXT_LENGTH = 10;
+
+// 토글
+const spellToggle = document.getElementById("spellToggle");
+
+spellToggle.addEventListener("change", (e) => {
+    spellOn = e.target.checked;
+    console.log("맞춤법 검사:", spellOn ? "ON" : "OFF");
+
+    clearSpellOverlay();
+
+    if (!spellOn && debounceTimer) {
+        clearTimeout(debounceTimer);
+        debounceTimer = null;
+    }
+});
+
+// 에디터 입력
+editor.on("change", () => {
+    if (!spellOn) return;
+
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(checkSpelling, CHECK_DELAY);
+});
+
+// 에디터 텍스트 추출해내기
+function getEditorText() {
+    return editor
+        .getMarkdown()
+        .replace(/```[\s\S]*?```/g, "")
+        .replace(/[#>*_\-`]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+
+// 맞춤법 검사 요청보내기
+async function checkSpelling() {
+    const text = getEditorText();
+    if (text.length < MIN_TEXT_LENGTH) return;
+
+    const requestId = ++lastRequestId;
+    console.log("[SpellCheck] send:", text);
+
+    try {
+        const res = await fetch("/api/ai/writing/spell-check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ content: text }),
+        });
+
+        if (!res.ok || requestId !== lastRequestId) return;
+
+        const { fixes } = await res.json();
+        console.log("[SpellCheck] fixes:", fixes);
+
+        currentFixes = fixes;
+        renderSpellErrors(fixes);
+    } catch (err) {
+        console.error("SpellCheck Error:", err);
+    }
+}
+
+
+function getEditorRoot() {
+    // WYSIWYG 기준
+    return document.querySelector(".toastui-editor-contents");
+}
+
+function createSpellOverlay() {
+    let overlay = document.querySelector(".spell-overlay");
+    if (overlay) return overlay;
+
+    const editorRoot = getEditorRoot();
+    if (!editorRoot) return null;
+
+    overlay = document.createElement("div");
+    overlay.className = "spell-overlay";
+
+    Object.assign(overlay.style, {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 20,
+    });
+
+    editorRoot.style.position = "relative";
+    editorRoot.appendChild(overlay);
+
+    return overlay;
+}
+
+function clearSpellOverlay() {
+    const overlay = document.querySelector(".spell-overlay");
+    if (overlay) overlay.remove();
+}
+
+function renderSpellErrors(fixes) {
+    clearSpellOverlay();
+    if (!fixes || fixes.length === 0) return;
+
+    const editorRoot = getEditorRoot();
+    const overlay = createSpellOverlay();
+    if (!editorRoot || !overlay) return;
+
+    const editorRect = editorRoot.getBoundingClientRect();
+
+    fixes.forEach((fix) => {
+        const ranges = findTextRanges(fix.before);
+
+        ranges.forEach(({ rect, range }) => {
+            const underline = document.createElement("div");
+
+            const left = rect.left - editorRect.left;
+            const top =
+                rect.bottom - editorRect.top - 2;
+
+            Object.assign(underline.style, {
+                position: "absolute",
+                left: `${left}px`,
+                top: `${top}px`,
+                width: `${rect.width}px`,
+                height: "2px",
+                backgroundColor: "red",
+                pointerEvents: "auto",
+                cursor: "pointer",
+            });
+
+            underline.title = `교정: ${fix.after}`;
+
+            underline.addEventListener("click", () => {
+                applySingleFix(range, fix.after);
+            });
+
+            overlay.appendChild(underline);
+        });
+    });
+}
+
+function findTextRanges(targetText) {
+    const results = [];
+    if (!targetText) return results;
+
+    const editorRoot = getEditorRoot();
+    if (!editorRoot) return results;
+
+    const walker = document.createTreeWalker(
+        editorRoot,
+        NodeFilter.SHOW_TEXT,
+        null
+    );
+
+    let node;
+    while ((node = walker.nextNode())) {
+        let index = node.textContent.indexOf(targetText);
+
+        while (index !== -1) {
+            const range = document.createRange();
+            range.setStart(node, index);
+            range.setEnd(node, index + targetText.length);
+
+            const rects = range.getClientRects();
+            Array.from(rects).forEach((rect) => {
+                results.push({ rect, range });
+            });
+
+            index = node.textContent.indexOf(
+                targetText,
+                index + targetText.length
+            );
+        }
+    }
+
+    return results;
+}
+
+
+function applySingleFix(range, afterText) {
+    range.deleteContents();
+    range.insertNode(document.createTextNode(afterText));
+
+    setTimeout(() => {
+        renderSpellErrors(currentFixes);
+    }, 0);
+}
 
 // 2. 태그 입력 시스템
 const tagInput = document.getElementById('tagInput');
@@ -138,7 +341,7 @@ function savePost(isTemp) {
         boardTitle: title,            // title -> boardTitle
         boardContent: content,        // content -> boardContent
         tagList: Array.from(tags),    // tags -> tagList
-        
+
         // boolean -> String("Y"/"N") 변환
         isPaid: isPaidChecked ? "Y" : "N",
         price: isPaidChecked ? parseInt(priceInput.value) : 0,
@@ -152,18 +355,18 @@ function savePost(isTemp) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postData),
     })
-    .then(response => {
-        if (response.ok) {
-            alert(isTemp ? '임시저장 되었습니다.' : '발행되었습니다!');
-            location.href = "/blog/list";
-        } else {
-            alert('저장 실패');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("통신 오류 발생");
-    });
+        .then(response => {
+            if (response.ok) {
+                alert(isTemp ? '임시저장 되었습니다.' : '발행되었습니다!');
+                location.href = "/blog/list";
+            } else {
+                alert('저장 실패');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("통신 오류 발생");
+        });
 }
 
 document.querySelector('.btn-draft').addEventListener('click', () => savePost(true));

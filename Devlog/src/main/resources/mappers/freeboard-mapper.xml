@@ -199,5 +199,11 @@
 		BOARD_LIKE WHERE BOARD_NO = ${boardNo}
 	</select>   	
 	
-	
+	<!-- 게시글 수정에서 이미지삭제/추가에서 기존이미지 한개 삭제: 먼저 삭제할 이미지가 데이터베이스에 존재하는지 확인(DB삭제 + 파일삭제용), AJAX -->
+    <select id="selectImageByImgNo" resultMap="boardImgDB_rm">
+        SELECT * FROM BOARD_IMG
+        WHERE IMG_NO = ${imgNo}
+    </select>	
+   
+   	
 </mapper>

@@ -1,70 +1,132 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>게시글 수정</title>
-    <link rel="stylesheet" href="../../../static/css/board/freeboard/freeboardUpdate.css">
-    <link rel="stylesheet" href="../../static/css/common/font.css">
+    <link rel="stylesheet" th:href="@{/css/board/freeboard/freeboardUpdate.css}">
+    <link rel="stylesheet" th:href="@{/css/common/font.css}">
 </head>
 
 <body>
+    <!-- <p th:text="${freeboard}" th:if="${freeboard != null}"></p>  -->  
+    <main>
 
-    <!-- 상단 타이틀 바 -->
-    <h2 class="title-main fw-800">자유게시판</h2>
-    <div class="container">
+        <!-- 헤더 -->
+        <header class="main-header">header</header>
+        <!-- header.html (fragment) 추가 -->
+        <!-- <th:block th:replace="~{/common/header}">header.html</th:block> -->
+        <!-- 또는 -->
+        <!-- <div th:replace="common/header :: header"></div> -->
 
-        <!-- 글작성 도우미 -->
-        <div class="helper-box">
-            <button class="helper-btn">글작성 도우미</button>
+        <!-- 네비게이션 -->
+        <nav class="main-nav"></nav>
+        <!--  ###################################################### -->  
+        
+        <!-- 상단 타이틀 바 -->
+        <h2 class="title-main fw-800">자유게시판</h2>
+        <div class="container">
 
-            <div class="select-box">
-                <select class="ai-select">
-                    <option class="sel-ai">AI</option>
-                    <option class="sel-chatbot">챗봇</option>
-                </select>
+            <!-- 글작성 도우미 -->
+            <div class="helper-box">
+                <button class="helper-btn">글수정 도우미</button>
+
+                <div class="select-box">
+                    <select class="ai-select" id="helperType">
+                        <option class="sel-ai" value="ai">AI</option>
+                        <option class="sel-chatbot" value="chatbot">챗봇</option>
+                    </select>
+                </div>
             </div>
+
+
+            <!-- 작성 폼 -->  
+            <form th:action="@{update}" method="post" enctype="multipart/form-data"
+                    class="board-write" id="boardWriteFrm">     
+
+                <!-- 제목 입력 -->
+                <p id="updateText">게시글 제목 수정</p>
+                <input type="text" id="titleInput" name="boardTitle" class="title-input" th:value="${freeboard.boardTitle}">
+
+                <!-- 사진 등록 -->
+                <div class="photo-header">
+                    <!-- <span class="photo-title-spaceholder"></span> -->
+                    <span class="photo-title">등록 사진 수정 <p>썸네일(대표) 이미지는 첫 사진입니다.</p></span>
+                    <span class="photo-max">최대 5장</span>
+                </div>
+
+                <!-- 미리보기 이미지 + 업로드 박스 -->
+                <!-- <div class="photo-row"> -->
+                <div class="photo-section">      
+                    <div class="photo-upload-area">
+                        <!-- 미리보기 영역 -->
+                        <div id="photoPreview" class="photo-preview">
+                            <th:block th:if="${#lists.size(freeboard.imageList) > 0 }"> 
+                                <!--                                     start,        end,                     step -->
+                                <th:block th:each="i : ${#numbers.sequence(0, #lists.size(freeboard.imageList)-1, 1)}">
+                                        <div class="preview-img-container"  th:with="path=|${freeboard.imageList[i].imgPath}${freeboard.imageList[i].imgRename}|"
+                                                                            th:data-img-no="${freeboard.imageList[i].imgNo}" > 
+                                                                            <!-- 변수에 담아두고 div태그 안에서 쓴다; data-img-no는 기존이미지 인지 판별의 핵심  -->
+                                            <img th:src="${path}" class="preview-img" alt="사진 미리보기">
+                                            <button type="button" class="preview-remove">&times;</button>
+                                        </div>
+                                </th:block>
+                            </th:block>
+                        </div>
+                        <!-- + 버튼 -->
+                        <label for="photoInput" class="photo-upload">
+                            <span class="plus">+</span>
+                        </label>
+                        <!-- 실제 파일 input (숨김) -->
+                        <input type="file" id="photoInput" name="images" multiple accept="image/*" hidden />
+                    </div>
+                </div>
+
+                <p class="image-warning">
+                    본 사이트 약관/정책을 위반하는 이미지는 안내 없이 삭제 될 수 있습니다.
+                </p>
+
+                <!-- 내용 입력 -->
+                <p id="updateText">게시글 내용 수정</p>
+                <textarea id="contentInput" name="boardContent" minlength="10" maxlength="4000" 
+                        class="content-box" th:text="${freeboard.boardContent}">수정할 게시글 내용
+                </textarea>
+
+                <div class="text-limit">최소 10자, 최대 4000자 (<span id="charCount">0</span> / 4000자)</div>
+
+                <!-- 버튼 -->
+                <div class="button-box">
+                    <button type="submit" id="submitBtn" class="submit-btn">수정 완료</button>
+                    <button type="button" class="cancel-btn"
+                    th:onclick="|location.href='@{/board/freeboard/}${boardNo}'|">취소</button>
+                </div>
+
+
+                 <input type="hidden" name="deleteList" value=""> 
+                <!-- <input type="hidden" name="deleteList" value="1,2,3" if used> -->                
+
+                <input type="hidden" name="cp" th:value="${param.cp}">                
+            </form>
+
         </div>
 
-        <!-- 제목 입력 -->
-        <input type="text" class="title-input" value="사이드 프로젝트 팀원을 모으는게 생각보다 어렵네요">
+        <!--  ###################################################### -->
+        <footer class="main-footer">footer</footer>
+        <!-- footer.html 추가 -->
+        <!-- <th:block th:replace="~{common/footer}">footer.html</th:block> -->
+        <!-- 또는 -->
+        <!-- <div th:replace="common/footer :: footer"></div> -->
 
-        <!-- 사진 등록 -->
-        <div class="photo-header">
-            <span class="photo-title-spaceholder"></span>
-            <span class="photo-title">사진 등록</span>
-            <span class="photo-max">최대 5장</span>
-        </div>
+    </main>
 
-        <!-- 미리보기 이미지 + 업로드 박스 -->
-        <div class="photo-row">
-            <img src="../../../static/images/board/freeboard/fbUpdate_img1.png" class="preview-img">
-            <img src="../../../static/images/board/freeboard/fbDetail_img2.png" class="preview-img">
-            <img src="../../../static/images/board/freeboard/fbDetail_img3.png" class="preview-img">
 
-            <div class="photo-upload">
-                <span class="plus">+</span>
-            </div>
-        </div>
-
-        <p class="image-warning">
-            본 사이트 약관/정책을 위반하는 이미지는 안내 없이 삭제 될 수 있습니다.
-        </p>
-
-        <!-- 내용 입력 -->
-        <textarea class="content-box">
-사이드 프로젝트 팀을 꾸리는 순간 저는 개발자가 아니라 스케줄 관리자가 됩니다. 서로 시간 조율하다가 하루가 사라지고, 회의를 하면 잡담이 기능 구현보다 길고, 회의 끝날 때마다 “우리… 뭐했지?” 싶습니다. 그래도 잘 맞는 팀원을 만나면 속도가 빛의 속도로 변하고 개발이 ‘힐링 취미’가 되는 기적을 봤어요. 문제는 그런 사람 찾는 게 진짜로… 힘들다는 거죠. 여러분은 팀원을 고를 때 어떤 기준을 쓰시나요? 스택, 성격, 협업력… 혹은 ‘팀 이해도 95% 이상’ 같은 중요한 요소 있나요? 진지하게 듣고 싶습니다.
-저는 이미 세 번 팀 구성 실패해서 마음이 닳았습니다.
-        </textarea>
-
-        <div class="text-limit">최소 10자, 최대 4000자</div>
-
-        <!-- 버튼 -->
-        <div class="button-box">
-            <button class="submit-btn">수정 완료</button>
-            <button class="cancel-btn">취소</button>
-        </div>
-
-    </div>
+    <!-- 알림창 띄우기 -->
+    <script th:inline="javascript"> 
+        const message = /*[[${message}]]*/ "전달 받은 message";
+        if(message != null) alert(message); // message12가 없으면 null값
+    </script>
+        
+    <!-- freeboardUpdate.js 추가 -->
+    <script th:src="@{/js/board/freeboard/freeboardUpdate.js}"></script>    
 
 </body>
 

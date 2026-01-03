@@ -119,7 +119,7 @@ body {
     border: 1px solid #CFCFCF;
     border-radius: 20px;
     font-size: 36px;
-    color: #B4B4B4;
+    /* color: #B4B4B4; */
     margin-bottom: 60px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
@@ -145,18 +145,31 @@ body {
 }
 
 /* 사진 업로드 박스 */
+/* 사진 */
+
 .photo-upload {
-    width: 200px;
-    height: 200px;
-    margin-left: 130px;
-    margin-top: 20px;   
-    border: 1px solid #868686;
+    /* width: 200px;
+    height: 200px; */
+    width: 175px;
+    height: 175px;    
+    /* margin-left: 130px; */
+    /* margin-top: 20px;    */
+    border: 1px solid #ccc;
     background: #fbfbfb;
-    border-radius: 0px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    /* flex: 1 0 auto;  //flex: <flex-grow> <flex-shrink> <flex-basis>; */
+    /* flex-grow: 1;   남으면 늘어남 */
+    flex-shrink: 0; /* 부모 컨테이너 공간이 부족해도 이 요소는 크기를 줄이지 않는다 (스크롤 생김)*/
+    /* flex-basis: auto 기본 크기는 원래 크기대로 설정된 width가 있으면 그걸 사용 */
+    /* *****
+    flex: 1 1 0; // 가장유연
+    flex: 0 0 auto // 완전고정
+    flex: 1 0 auto //콘텐츠 보호 + 가변 레이아웃 
+    ***** */
 }
 .photo-upload:hover {
     background-color: #F7E8F6;
@@ -175,7 +188,112 @@ body {
     color: #B4B4B4;
 }
 
-/* 내용 입력 */
+/* ===== 사진 업로드 박스: 추가 ===== */
+/* 썸네일 지정 알림 텍스트 */
+.photo-title p{ 
+    color: #B4B4B4;
+    font-size: 24px;
+    padding-left: 40px;
+}
+
+.photo-section {
+    width: 100%;
+    margin-top: 30px;
+}
+
+.photo-upload-area {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-left: 130px;
+    margin-bottom: 10px;
+}
+
+
+.photo-preview {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.preview-img-container {
+    position: relative;
+    /* width: 200px;
+    height: 200px; */
+    width: 175px;
+    height: 175px;      
+    /*  */
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+}
+
+.preview-img {
+    /* width: 200px;
+    height: 200px; */
+    width: 175px;
+    height: 175px;       
+    object-fit: cover;
+    border-radius: 6px;
+    
+    /*  */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* .preview-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+} */
+
+.preview-remove {
+    position: absolute;
+
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background-color: #f74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.preview-remove:hover {
+    background-color: #80392b;
+}
+
+/* 썸네일(대표) 이미지 강조 */
+.preview-img-container.thumbnail {
+    outline: 4px solid #F7A1C4;
+}
+
+.thumbnail-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background-color: #F7A1C4;
+    color: white;
+    font-size: 12px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* 게시글 내용 입력 */
 .content-box {
     /* width: 100%; */
     height: 463px;
@@ -195,12 +313,22 @@ body {
 .text-limit {
     width: 80%;
     margin-left: 70px;  
-    margin-right: 40px;        
+    margin-right: 40px;
+
     text-align: right;
     margin-top: 5px;
     font-size: 36px;
     color: #B4B4B4;
 }
+/* 입력 글자수 카운트 */
+/* .char-count {
+    width: 80%;
+    margin-right: 40px;    
+    text-align: right;  
+    margin-top: 5px;
+    font-size: 24px;
+    color: #B4B4B4;
+} */
 
 /* 버튼 영역 */
 .button-box {
