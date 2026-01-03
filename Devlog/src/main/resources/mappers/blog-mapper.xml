@@ -171,5 +171,12 @@
         GROUP BY t.TAG_NAME
         ORDER BY count DESC
     </select>
+    
+    <select id="selectBoardTags" resultType="string">
+    SELECT T.TAG_NAME
+    FROM TAG T
+    JOIN BLOG_TAG BT ON T.TAG_NO = BT.TAG_NO
+    WHERE BT.BOARD_NO = #{boardNo}
+	</select>
 
 </mapper>

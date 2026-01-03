@@ -27,6 +27,9 @@ public interface BlogService {
 	// 내 블로그 화면용 전체 데이터 조회
 	MyBlogResponseDto getMyBlogPageData(String blogId, String currentLoginId);
 	
+	// 상세 게시글 조회
+	BlogDTO getBoardDetail(Long boardNo);
+	
 	
 	
 }
