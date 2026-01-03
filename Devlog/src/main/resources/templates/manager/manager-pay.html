@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>회원 관리</title>
+
+  <link rel="stylesheet" th:href="@{/css/manager/manager-layout.css}">
+  <link rel="stylesheet" th:href="@{/css/manager/manager-pay.css}">
+</head>
+
+
+<!-- 헤더 -->
+<header class="header">
+  <div class="left-area">
+    <img th:src="@{/images/manager/devlog.svg}" alt="Devlog logo" class="logo" />
+    <span class="welcome"
+      th:text="|${session.loginMember != null ? session.loginMember.memberNickname : '관리자'}님, 돌아오신 것을 환영합니다.|">
+      소연님, 돌아오신 것을 환영합니다.
+    </span>
+  </div>
+
+  <div class="dashboard-info">
+    Devlog<br />
+    <span>Manager Dashboard</span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- 사이드 바-->
+  <aside class="sidebar">
+    <nav class="menu">
+      <h4>Management</h4>
+      <ul>
+        <li class="active">
+          <img th:src="@{/images/manager/home.svg}" alt="home" />
+          <span>Home</span>
+        </li>
+
+        <li>
+          <img th:src="@{/images/manager/customer.svg}" alt="customers" />
+          <span>Customers</span>
+        </li>
+
+        <li>
+          <img th:src="@{/images/manager/report.svg}" alt="report" />
+          <span>Report</span>
+        </li>
+
+        <li th:onclick="|location.href='@{/admin/dashboard/pay}'|">
+          <img th:src="@{/images/manager/pay.svg}" alt="pay" />
+          <span>Pay</span>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- 로그아웃 -->
+    <div class="logout" th:onclick="|location.href='@{/member/logout}'|">
+      <img th:src="@{/images/common/logout.svg}" alt="logout" />
+      <span>Logout</span>
+    </div>
+  </aside>
+
+
+
+  <main class="main">
+    <h2>결제 관리</h2>
+
+    <div class="pay-all">
+      <table class="pay-table">
+        <thead>
+          <tr class="category">
+            <th>유형</th>
+            <th>내역</th>
+            <th>금액</th>
+            <th>상태</th>
+            <th>결제일시</th>
+            <th>환전처리일시</th>
+            <th>회원</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="history : ${payList}" th:object="${history}">
+            <td th:text="*{contentType}">환전</td>
+            <td th:text="*{contentType == '환전' ? '커피콩 환전 신청' : '커피콩 충전'}">내용</td>
+            <td th:text="|${#numbers.formatInteger(history.displayPrice ?: 0, 0, 'COMMA')}원|">금액</td>
+
+            <td>
+              <span th:class="*{status == '요청' ? 'status-req' : 'status-done'}" th:text="*{status}">요청</span>
+
+              <div class="account-info-wrapper" th:if="*{contentType == '환전' && status == '요청'}">
+                <img th:src="@{/images/common/pay-toggle.png}" class="info-icon" onclick="toggleTooltip(this)">
+                <div class="account-tooltip">
+                  <p><strong th:text="*{returnBankName}">농협</strong> <span th:text="*{exchangeAccount}">계좌번호</span></p>
+                  <p>예금주: <span th:text="*{exchangeHolder}">이름</span></p>
+                  <button class="complete-btn" th:onclick="|approveExchange(*{exchangeNo})|">입금완료</button>
+                </div>
+              </div>
+            </td>
+
+            <td th:text="*{payDate}">2026-01-03</td>
+
+            <td th:text="*{exchangeOkDate != null ? exchangeOkDate : '-'}">
+              2026-01-04 14:00 (처리 전이면 - 표시)
+            </td>
+
+            <td th:text="*{memberNickname}">닉네임</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+
+  <script>
+    // 1. 환전 정보 툴팁 토글 (아이콘 클릭 시)
+    function toggleTooltip(element) {
+      // 클릭한 아이콘 옆에 있는 .account-tooltip을 찾아서 토글
+      const tooltip = element.nextElementSibling;
+      if (tooltip) {
+        tooltip.classList.toggle('active');
+      }
+    }
+
+    // 2. 툴팁 외부 클릭 시 닫기 (선택 사항 - 사용자 편의성)
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.account-info-wrapper')) {
+        document.querySelectorAll('.account-tooltip').forEach(el => {
+          el.classList.remove('active');
+        });
+      }
+    });
+
+    // 3. 환전 승인(완료) 처리
+    // HTML 버튼에 적힌 이름 approveExchange와 일치시켰습니다.
+    function approveExchange(exchangeNo) {
+      if (!confirm("해당 환전 요청을 완료 처리하시겠습니까?")) return;
+
+      fetch("/admin/pay/approve", { // 컨트롤러에 생성할 매핑 경로
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ exchangeNo: exchangeNo })
+      })
+        .then(resp => resp.text())
+        .then(result => {
+          if (result > 0) {
+            alert("환전 처리가 완료되었습니다.");
+            location.reload();
+          } else {
+            alert("처리 중 오류가 발생했습니다.");
+          }
+        })
+        .catch(err => console.error("Error:", err));
+    }
+  </script>
+
+</html>

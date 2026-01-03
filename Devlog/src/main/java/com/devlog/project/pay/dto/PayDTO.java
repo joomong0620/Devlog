@@ -32,6 +32,8 @@ public class PayDTO {
 	// 커피콩 내역
 	private int beansHistory;
 	private int payAmount;
+	
+	@JsonProperty("displayPrice")
 	private int displayPrice;
 	
 	
@@ -45,6 +47,7 @@ public class PayDTO {
 	
 	
 	// 환전     
+	@JsonProperty("exchangeNo")
 	private int exchangeNo;  
 	
 	@JsonProperty("returnBank")
@@ -60,7 +63,9 @@ public class PayDTO {
     private String exchangeAccount; // 계좌번호
     private String exchangeReqDate; // 신청일시
     private String exchangeOkDate;  // 처리일시
-
+    private String status; // "요청", "완료"
+    private String memberNickname;
+    private String returnBankName;
 	
 	
 	

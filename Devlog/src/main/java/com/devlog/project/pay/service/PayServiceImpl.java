@@ -154,6 +154,21 @@ public class PayServiceImpl implements PayService {
 	public List<Map<String, Object>> selectBankList() {
 		return paymapper.selectBankList();
 	}
+
+	
+	
+	// 환전 ok
+	@Override
+	public int okExchange(int exchangeNo) {
+		return paymapper.okExchange(exchangeNo);
+	}
+
+
+	// 관리자용 
+	@Override
+	public List<PayDTO> selectAllBeansHistory() {
+		return paymapper.selectAllBeansHistory();
+	}
 	
 	
 	
