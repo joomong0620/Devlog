@@ -472,10 +472,10 @@ input:checked+.slider:before {
     inset: 0;
     pointer-events: none;
     z-index: 999999;
-  }
-  .spell-debug-mark {
+}
+.spell-debug-mark {
     position: fixed;
     background: rgba(255, 255, 0, 0.55);
     outline: 2px solid rgba(255, 0, 0, 0.9);
     border-radius: 3px;
-  }
+}
