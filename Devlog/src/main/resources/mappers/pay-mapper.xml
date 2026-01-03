@@ -151,50 +151,54 @@
 	
 	<!-- 관리자용 -->
 	<select id="selectAllBeansHistory" resultType="PayDTO">
-	    SELECT 
-	        H.BEANS_HISTORY,
-	        H.PAY_AMOUNT AS payAmount,
-	        ABS(H.PAY_AMOUNT) AS displayPrice,
-	        TO_CHAR(H.REG_DATE, 'YYYY-MM-DD HH24:MI') AS payDate,
-	        P.PAYMENT_ID AS paymentId,
-	        P.BEANS_PAY_NO AS beansPayNo,
-	        P.USED_AMOUNT AS usedAmount,
-	        H.TRADE_NO AS tradeNo,
-	        M.MEMBER_NICKNAME,
-	        
-	        E.EXCHANGE_NO,
-	        E.RETURN_BANK,
-	        BI.BANK_NAME AS returnBankName, /* BANK_INFO 테이블에서 이름 가져오기 */
-	        E.EXCHANGE_ACCOUNT,
-	        E.EXCHANGE_HOLDER,
-	        TO_CHAR(E.EXCHANGE_OK_DATE, 'YYYY-MM-DD HH24:MI') AS exchangeOkDate,
-	        
-	        CASE 
-	            WHEN E.EXCHANGE_NO IS NOT NULL THEN '환전'
-	            WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 AND H.TRADE_NO IS NULL THEN '취소'
-	            WHEN H.PAY_AMOUNT > 0 AND H.TRADE_NO IS NULL THEN '충전'
-	            ELSE (SELECT T.CONTENT_TYPE FROM COFFEE_BEANS_TRADE T WHERE T.TRADE_NO = H.TRADE_NO)
-	        END AS contentType,
-	        
-	        CASE
-	            WHEN E.EXCHANGE_NO IS NOT NULL AND E.EXCHANGE_OK_DATE IS NULL THEN '요청'
-	            ELSE '완료' 
-	        END AS status
-	        
-	    FROM COFFEE_BEANS_HISTORY H
-	    JOIN "MEMBER" M ON (H.MEMBER_NO = M.MEMBER_NO)
-	    LEFT JOIN COFFEE_BEANS_PAY P ON (
-	        H.MEMBER_NO = P.MEMBER_NO 
-	        AND ABS(H.PAY_AMOUNT) = P.PRICE 
-	        AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(P.PAY_DATE, 'YYYYMMDDHH24MI')
+	    SELECT * FROM (
+	        SELECT 
+	            H.BEANS_HISTORY,
+	            H.PAY_AMOUNT AS payAmount,
+	            CASE 
+	                WHEN E.EXCHANGE_NO IS NOT NULL THEN E.REQUEST_AMOUNT 
+	                ELSE ABS(H.PAY_AMOUNT) 
+	            END AS displayPrice,
+	            TO_CHAR(H.REG_DATE, 'YYYY-MM-DD HH24:MI') AS payDate,
+	            M.MEMBER_NICKNAME,
+	            E.EXCHANGE_NO,
+	            BI.BANK_NAME AS returnBankName,
+	            E.EXCHANGE_ACCOUNT,
+	            E.EXCHANGE_HOLDER,
+	            TO_CHAR(E.EXCHANGE_OK_DATE, 'YYYY-MM-DD HH24:MI') AS exchangeOkDate,
+	            CASE 
+	                WHEN E.EXCHANGE_NO IS NOT NULL THEN '환전'
+	                WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 AND H.TRADE_NO IS NULL THEN '취소'
+	                WHEN H.PAY_AMOUNT > 0 AND H.TRADE_NO IS NULL THEN '충전'
+	                ELSE '사용' 
+	            END AS contentType,
+	            CASE
+	                WHEN E.EXCHANGE_NO IS NOT NULL AND E.EXCHANGE_OK_DATE IS NULL THEN '요청'
+	                ELSE '완료' 
+	            END AS status
+	        FROM COFFEE_BEANS_HISTORY H
+	        JOIN "MEMBER" M ON (H.MEMBER_NO = M.MEMBER_NO)
+	        LEFT JOIN COFFEE_BEANS_EXCHANGE E ON (
+	            H.MEMBER_NO = E.MEMBER_NO
+	            AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(E.EXCHANGE_REQ_DATE, 'YYYYMMDDHH24MI')
+	        )
+	        LEFT JOIN BANK_INFO BI ON (E.RETURN_BANK = BI.RETURN_BANK)
 	    )
-	    LEFT JOIN COFFEE_BEANS_EXCHANGE E ON (
-	        H.MEMBER_NO = E.MEMBER_NO
-	        AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(E.EXCHANGE_REQ_DATE, 'YYYYMMDDHH24MI')
-	    )
-	    /* 은행 정보 조인 */
-	    LEFT JOIN BANK_INFO BI ON (E.RETURN_BANK = BI.RETURN_BANK)
-	    ORDER BY H.BEANS_HISTORY DESC
+	    <where>
+	        <if test="query != null and query != ''">
+	            AND (
+	                MEMBER_NICKNAME LIKE '%' || #{query} || '%' OR
+	                EXCHANGE_ACCOUNT LIKE '%' || #{query} || '%' OR
+	                EXCHANGE_HOLDER LIKE '%' || #{query} || '%' OR
+	                contentType LIKE '%' || #{query} || '%'
+	            )
+	        </if>
+	        
+	        <if test="type != null and type != ''">
+	            AND contentType = #{type}
+	        </if>
+	    </where>
+	    ORDER BY BEANS_HISTORY DESC
 	</select>
 		
 </mapper>

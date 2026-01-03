@@ -45,7 +45,7 @@ public interface PayMapper {
 	int okExchange(int exchangeNo);
 
 	// 관리자용 조회
-	public List<PayDTO> selectAllBeansHistory();
+	public List<PayDTO> selectAllBeansHistory(Map<String, Object> paramMap);
 
 
 }

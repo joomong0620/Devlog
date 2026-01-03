@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.devlog.project.pay.dto.PayDTO;
 import com.devlog.project.pay.mapper.PayMapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 
 @Service
 public class PayServiceImpl implements PayService {
@@ -165,9 +167,15 @@ public class PayServiceImpl implements PayService {
 
 
 	// 관리자용 
-	@Override
-	public List<PayDTO> selectAllBeansHistory() {
-		return paymapper.selectAllBeansHistory();
+	public PageInfo<PayDTO> selectAllBeansHistory(Map<String, Object> paramMap, int cp) {
+	    
+	    // PageHelper.startPage(현재페이지, 한페이지당개수);
+	    PageHelper.startPage(cp, 10); 
+	    
+	    // 전체 조회 쿼리 호출 
+	    List<PayDTO> payList = paymapper.selectAllBeansHistory(paramMap);
+	    
+	    return new PageInfo<>(payList, 5); // 5는 하단에 보여줄 페이지 번호 개수
 	}
 	
 	

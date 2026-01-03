@@ -88,7 +88,11 @@ dependencies {
     
     // additional: DTO validation(선택)&test, 2025/12/20
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    testImplementation 'org.springframework.security:spring-security-test'    
+    testImplementation 'org.springframework.security:spring-security-test'  
+    
+    
+    // 페이지 헬퍼
+    implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:2.1.1'  
     
 }
 
