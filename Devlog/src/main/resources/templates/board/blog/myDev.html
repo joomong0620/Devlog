@@ -31,10 +31,10 @@
                         <h1 th:text="${userProfile.nickname}">Nickname</h1>
 
                         <div class="dropdown-owner" th:if="${isOwner}">
-                            <i class="fa-solid fa-ellipsis-vertical" id="menuBtn"></i>
+                            <i class="fa-solid fa-ellipsis-vertical" id="blogOptionBtn"></i>
                             <div class="dropdown-box" id="dropdownMenu">
                                 <a href="/myPage/activity"><i class="fa-solid fa-clock-rotate-left"></i> 내 활동</a>
-                                <a href="/myPage/settings"><i class="fa-solid fa-user-gear"></i> 프로필 설정</a>
+                                <a href="/myPage/check-password"><i class="fa-solid fa-user-gear"></i> 프로필 설정</a>
                                 <hr>
                                 <a href="/logout">로그아웃</a>
                             </div>
@@ -84,19 +84,25 @@
             <div class="header-right">
                 <p class="pick-title">유저 PICK 인기 글🔥</p>
                 <div class="pick-card-item" th:if="${pickPost != null}"
-                    th:onclick="|location.href='@{/blog/detail/{id}(id=${pickPost.id})}'|" style="cursor:pointer;">
-                    <img th:src="${pickPost.thumbnailUrl}" alt="Pick Thumb">
+                    th:onclick="|location.href='@{/blog/detail/{no}(no=${pickPost.boardNo})}'|" style="cursor:pointer;">
+                    
+                    <img th:src="${pickPost.thumbnailUrl != null ? pickPost.thumbnailUrl : 'https://placehold.co/100x100/333/fff?text=No+Img'}" alt="Pick Thumb">
+                    
                     <div class="pick-info">
-                        <h4 class="pick-card-title" th:text="${pickPost.title}">제목</h4>
-                        <span class="tag-pill" th:text="${pickPost.category}">Category</span>
+                        <h4 class="pick-card-title" th:text="${pickPost.boardTitle}">제목</h4>
+                        
+                        <span class="tag-pill">Popular</span>
+                        
                         <div class="pick-meta-row">
                             <div class="p-meta">
                                 <i class="fa-solid fa-heart"></i> <span th:text="${pickPost.likeCount}">0</span>
                             </div>
-                            <span class="p-date"
-                                th:text="${#temporals.format(pickPost.createdAt, 'yyyy.MM.dd')}">날짜</span>
+                            <span class="p-date" th:text="${pickPost.bCreateDate}">날짜</span>
                         </div>
                     </div>
+                </div>
+                <div class="pick-card-item empty" th:unless="${pickPost != null}">
+                    <p style="color:#aaa; font-size:0.9rem;">아직 인기글이 없어요!</p>
                 </div>
             </div>
         </header>

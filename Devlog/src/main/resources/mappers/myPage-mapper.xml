@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devlog.project.myPage.mapper.MyPageMapper">
+
+    <update id="updateMemberInfo">
+        UPDATE "MEMBER"
+        SET 
+            MEMBER_NICKNAME = #{dto.memberNickname},
+            MEMBER_CAREER = #{dto.memberCareer},
+            MY_INFO_INTRO = #{dto.myInfoIntro},
+            MEMBER_TEL = #{dto.memberTel},
+            MY_INFO_GIT = #{dto.myInfoGit},
+            MY_INFO_HOMEPAGE = #{dto.myInfoHomepage}
+        WHERE MEMBER_EMAIL = #{email}
+    </update>
+
+    <update id="updateProfileImage">
+        UPDATE "MEMBER"
+        SET PROFILE_IMG = #{imageUrl}
+        WHERE MEMBER_EMAIL = #{email}
+    </update>
+
+</mapper>

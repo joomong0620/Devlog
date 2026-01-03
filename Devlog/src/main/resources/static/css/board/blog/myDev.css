@@ -67,6 +67,8 @@ body[data-user-type="owner"] .visitor-only {
 
 /* 드롭다운 메뉴 */
 .dropdown-owner {
+    position: relative; 
+    display: inline-block;
     cursor: pointer;
     padding: 5px;
     color: var(--text-sub);
@@ -75,9 +77,14 @@ body[data-user-type="owner"] .visitor-only {
 .dropdown-box {
     display: none;
     position: absolute;
-    top: 40px;
-    left: 0;
+    
+    /* 버튼 바로 아래에 붙도록 설정 */
+    top: 100%; 
+    left: 0; 
+    margin-top: 5px; /* 버튼이랑 살짝 띄우기 */
+    
     background: #fff;
+    /* ... 아래는 기존 코드 유지 ... */
     border: 1px solid var(--border);
     border-radius: 8px;
     min-width: 150px;

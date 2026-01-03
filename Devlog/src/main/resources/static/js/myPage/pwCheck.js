@@ -1,35 +1,57 @@
+console.log("pwCheck.js loaded");
+
 document.addEventListener('DOMContentLoaded', () => {
     const confirmBtn = document.getElementById('confirmBtn');
     const passwordInput = document.getElementById('passwordInput');
     const errorModal = document.getElementById('errorModal');
 
-    // 가상의 정답 비밀번호 (서버와 연동 필요)
-    const CORRECT_PASSWORD = "password123";
-
-    const verifyPassword = () => {
+    // 실제 서버 검증 로직
+    const verifyPassword = async () => {
         const inputVal = passwordInput.value;
 
-        if (inputVal === CORRECT_PASSWORD) {
-            alert('비밀번호가 확인되었습니다. 설정 페이지로 이동합니다.');
-            // window.location.href = "/settings"; // 이동할 경로
-        } else {
-            errorModal.classList.remove('hidden');
+        if (!inputVal) {
+            alert("비밀번호를 입력해주세요.");
+            return;
+        }
+
+        try {
+            // 1. 서버로 비밀번호 전송
+            const response = await fetch('/api/myPage/verify-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ password: inputVal })
+            });
+
+            if (!response.ok) throw new Error("서버 오류");
+
+            const isMatch = await response.json(); // true or false
+
+            if (isMatch) {
+                // 2. 일치하면 설정 페이지로 이동
+                // alert('확인되었습니다.'); // (선택사항)
+                window.location.href = "/myPage/settings"; 
+            } else {
+                // 3. 불일치하면 모달 띄우기
+                errorModal.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            console.error("비밀번호 검증 실패:", error);
+            alert("오류가 발생했습니다.");
         }
     };
 
-    // 버튼 클릭 이벤트
     confirmBtn.addEventListener('click', verifyPassword);
 
-    // 엔터 키 이벤트
     passwordInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            verifyPassword();
-        }
+        if (e.key === 'Enter') verifyPassword();
     });
 });
 
-// 모달 닫기 함수
 function closeModal() {
     document.getElementById('errorModal').classList.add('hidden');
     document.getElementById('passwordInput').focus();
+    document.getElementById('passwordInput').value = ''; // 틀렸으니 비워주기
 }

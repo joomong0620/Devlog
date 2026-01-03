@@ -1,18 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>비밀번호 확인</title>
-    <link rel="stylesheet" href="../../../static/css/board/blog/pwCheck.css">
+
+    <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+    <link rel="stylesheet" th:href="@{/css/myPage/pwCheck.css}">
 </head>
 
 <body>
+
+    <div th:replace="~{common/header :: header}"></div>
+    
     <main class="password-verification-container">
         <div class="content-wrapper">
             <div class="logo-area">
-                <img src="../../../static/images/common/devlog.svg" alt="DevLog Logo" class="main-logo">
+                <img th:src="@{/images/common/devlog.svg}" alt="DevLog Logo" class="main-logo">
             </div>
 
             <h2 class="title">비밀번호 확인</h2>
@@ -31,7 +37,12 @@
             </div>
         </div>
     </main>
-    <script src="../../../static/js/board/blog/pwCheck.js"></script>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+    <script th:src="@{/js/notification/noti.js}"></script>
+    <script th:src="@{/js/common/header.js}"></script>
+    
+    <script th:src="@{/js/myPage/pwCheck.js}"></script>
 </body>
 
 </html>
