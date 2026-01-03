@@ -37,7 +37,7 @@
                     <!-- 대표 이미지 -->
                     <div class="main-image-box">
                         <img th:if="${freeboard.thumbnail}" th:src="${freeboard.thumbnail}" class="main-img" th:alt="${freeboard.boardTitle}">
-                        <img th:unless="${freeboard.thumbnail}" th:src="${/images/logo.png}" class="main-img" th:alt="기본 이미지">
+                        <img th:unless="${freeboard.thumbnail}" th:src="@{/images/logo.png}" class="main-img" alt="기본 이미지">
                     </div>
 
                     <div class="post-info-box">
@@ -127,7 +127,14 @@
         window.boardTitle = /*[[${freeboard?.boardTitle}]]*/ null;
         
     </script>
-
+    
+    <!-- 알림창 띄우기 -->
+    <script th:inline="javascript"> 
+        //const message = /*[ [ ${message} ] ]*/ "전달 받은 message";
+        let message = /*[[${message}]]*/ null;
+        if(message != null) alert(message); // message12가 없으면 null값
+    </script>
+    
     <!-- freeboardDetail.js 추가 -->
     <script th:src="@{/js/board/freeboard/freeboardDetail.js}"></script>    
 </body>

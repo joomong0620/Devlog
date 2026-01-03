@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
 
+import com.devlog.project.board.freeboard.model.dto.BoardImgDB;
 import com.devlog.project.board.freeboard.model.dto.Freeboard;
 
 
@@ -39,5 +40,11 @@ public interface FreeboardMapper {
 
 	// 상세 게시글 좋아요 처리: 좋아요 수 조회
 	public int countBoardLike(Integer integer);	
+	
+	/** 게시글 수정에서 이미지삭제/추가에서 기존이미지 한개 삭제시, 먼저 해당 이미지 있는지 조회, AJAX
+	 * @param imgNo
+	 * @return
+	 */
+	public BoardImgDB selectImageByImgNo(Long imgNo);	
 	
 }
