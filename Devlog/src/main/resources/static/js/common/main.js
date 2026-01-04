@@ -278,3 +278,57 @@ cafes.forEach((cafe) => {
   `;
   cafeList.insertAdjacentHTML("beforeend", item);
 });
+
+//########################## 현재 활동 ###########################
+
+let stompClient = null;
+
+function connectOnlineStatus() {
+  const socket = new SockJS("/ws-chat");
+  stompClient = Stomp.over(socket);
+
+  stompClient.connect(
+    {},
+    function (frame) {
+      console.log("활동 상태 모니터링 시작");
+
+      // 서버가 유저 목록을 뿌려주는 채널(/topic/friends) 구독
+      stompClient.subscribe("/topic/friends", function (response) {
+        const onlineUserList = JSON.parse(response.body); // 이름 리스트 ["소연", "철수"]
+        updateFriendsUI(onlineUserList);
+      });
+    },
+    function (error) {
+      console.log("연결 실패, 5초 후 재시도");
+      setTimeout(connectOnlineStatus, 5000);
+    }
+  );
+}
+
+// 화면에 친구 목록
+function updateFriendsUI(users) {
+  const friendsList = document.getElementById("friendsList");
+  if (!friendsList) return;
+
+  friendsList.innerHTML = "";
+
+  if (users.length === 0) {
+    friendsList.innerHTML =
+      "<p style='font-size:12px; color:#999;'>현재 활동중인 친구가 없어요.</p>";
+    return;
+  }
+
+  users.forEach((name) => {
+    const friendHtml = `
+            <div class="friend active" title="${name}">
+                <img src="/images/common/user.png" alt="${name}">
+                <span class="friend-name" style="font-size:11px; display:block; text-align:center;">${name}</span>
+            </div>
+        `;
+    friendsList.insertAdjacentHTML("beforeend", friendHtml);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  connectOnlineStatus();
+});
