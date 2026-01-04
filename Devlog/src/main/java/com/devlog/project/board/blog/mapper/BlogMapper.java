@@ -36,6 +36,9 @@ public interface BlogMapper {
     // 유저 PICK 인기 글 조회
     BlogDTO selectPopularPost(String blogId);
     
- // 태그 목록 조회
+    // 블로그 전체 태그 목록 조회
     List<TagDto> selectBlogTagList(String blogId);
+    
+    // 상세 게시글 전용 태그 조회
+    List<String> selectBoardTags(Long boardNo);
 }

@@ -192,12 +192,14 @@ body {
     grid-template-columns: 3fr 1fr;
     gap: 60px;
     margin-bottom: 80px;
+    min-height: 500px;
 }
 
 /* === [중요 수정] 본문 및 잠금 스타일 === */
 .post-body {
     position: relative;
-    min-height: 300px;
+    min-height: 500px;
+    min-width: 0;
     /* 맛보기 텍스트가 너무 짧아도 레이아웃 유지 */
 }
 
@@ -254,7 +256,7 @@ body {
     right: 0;
 
     /* 오버레이 높이: 텍스트를 얼마나 가릴지 결정 */
-    height: 350px;
+    height: 200px;
 
     /* 투명 -> 흰색 그라데이션 */
     background: linear-gradient(to bottom,
