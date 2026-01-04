@@ -57,12 +57,14 @@
 
         <!-- 스크랩 -->
         <p>
-          <!-- <span class="scrap-area">
-            <i class="fa-bookmark" th:classappend="${scrapCheck} ? fa-solid : fa-regular" id="boardScrap"></i>
+          <span class="scrap-area" style="cursor: pointer; display: flex; align-items: center; gap: 5px;"
+            th:onclick="|toggleScrap(this, ${news.boardNo})|">
 
-            <span th:text="${news.scrapCount}">0</span>
-          </span> -->
-          <span class="scrap-area">스크랩</span>
+            <img th:src="${scrapCheck > 0} ? @{/images/common/scrap-filled.png} : @{/images/common/scrap-empty.png}"
+              id="scrapIcon" alt="스크랩" style="width: 20px; height: 20px;">
+
+            <span id="scrapText">스크랩</span>
+          </span>
         </p>
         <!-- 신고하기 -->
         <p>
