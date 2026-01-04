@@ -16,19 +16,19 @@
 
 	<!-- 뉴스 상세 조회 -->
 	<select id="selectNewsDetail" resultType="ITnewsDTO">
-		SELECT
-		B.BOARD_NO,
-		B.BOARD_TITLE,
-		B.BOARD_CONTENT,
-		B.BOARD_COUNT,
-		B.NEWS_REPORTER,
-		TO_CHAR(B.B_CREATE_DATE, 'YYYY-MM-DD') AS B_CREATE_DATE,
-		I.IMG_PATH
-		FROM BOARD B
-		LEFT JOIN BOARD_IMG I ON (B.BOARD_NO = I.BOARD_NO)
-		WHERE B.BOARD_NO = #{boardNo} AND B.BOARD_DEL_FL = 'N'
+	    SELECT
+	        B.BOARD_NO,
+	        B.BOARD_TITLE,
+	        B.BOARD_CONTENT,
+	        B.BOARD_COUNT,
+	        B.NEWS_REPORTER,
+	        B.MEMBER_NO,  TO_CHAR(B.B_CREATE_DATE, 'YYYY-MM-DD') AS B_CREATE_DATE,
+	        I.IMG_PATH
+	    FROM BOARD B
+	    LEFT JOIN BOARD_IMG I ON (B.BOARD_NO = I.BOARD_NO)
+	    WHERE B.BOARD_NO = #{boardNo} AND B.BOARD_DEL_FL = 'N'
 	</select>
-
+	
 	<!-- 좋아요 여부 확인 -->
 	<select id="newsLikeCheck" resultType="_int">
 		SELECT COUNT(*) FROM BOARD_LIKE

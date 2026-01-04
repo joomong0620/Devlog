@@ -12,10 +12,12 @@
   <link rel="stylesheet" th:href="@{/css/common/common.css}" />
   <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
   <link rel="stylesheet" th:href="@{/css/board/ITnews/ITnewsComment.css}">
+  <link rel="stylesheet" th:href="@{/css/common/report.css}">
 
 </head>
 <div th:replace="common/header :: header"></div>
 <script th:src="@{/js/common/header.js}"></script>
+
 
 <body>
   <main>
@@ -64,10 +66,11 @@
         </p>
         <!-- 신고하기 -->
         <p>
-          <!-- <span class="report-area">
-            <i class="fa-flag" id="boardReport"></i>
-          </span> -->
-          <span class="report-area">신고하기</span>
+          <span class="report-area" style="cursor: pointer; display: flex; align-items: center; gap: 5px;"
+            th:onclick="|openReportModal(${news.memberNo}, ${news.boardNo})|">
+            <img th:src="@{/images/report_icon.png}" alt="신고" style="width: 20px; height: 20px;">
+            <span>신고하기</span>
+          </span>
         </p>
 
 
@@ -109,6 +112,8 @@
     const isAdmin = /*[[${session.loginMember?.memberAdmin?.name() == 'Y'}]]*/ false;
   </script>
 
+  <div id="modal-root"></div>
+  <script th:src="@{/js/common/report.js}"></script>
 
 
 
