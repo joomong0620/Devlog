@@ -42,6 +42,12 @@ public interface ITnewsService {
 	// 게시글 수정
 	int boardUpdate(ITnewsDTO itnews, MultipartFile imageFile) throws IllegalStateException, IOException;
 
+	// 스크랩
+	int toggleScrap(Map<String, Object> paramMap);
+	
+	// 스크랩 확인
+	int checkScrap(Map<String, Object> scrapMap);
+
 	
 
 

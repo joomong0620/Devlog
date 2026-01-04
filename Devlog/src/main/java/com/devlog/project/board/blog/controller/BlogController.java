@@ -15,6 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devlog.project.board.blog.dto.BlogDTO;
 import com.devlog.project.board.blog.dto.MyBlogResponseDto;
 import com.devlog.project.board.blog.service.BlogService;
+import com.devlog.project.board.blog.service.ReplyService;
+import com.devlog.project.member.enums.CommonEnums;
+import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.MemberRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -22,6 +27,9 @@ import lombok.RequiredArgsConstructor;
 public class BlogController {
 
 	private final BlogService blogService;
+	private final ReplyService replyService;
+	private final MemberRepository memberRepository;
+	
 
 	// 1. 블로그 목록 화면
 	@GetMapping("/blog/list")
@@ -126,4 +134,50 @@ public class BlogController {
         // Service로 type 전달
         return blogService.getMyBlogList(blogId, type, pageable.getPageNumber(), pageable.getPageSize(), sortProp);
     }
+    
+    // 8. 블로그 상세 게시글 조회
+    @GetMapping("/blog/detail/{boardNo}")
+    public String blogDetail(@PathVariable Long boardNo, Model model) {
+    	
+    	// 1. 로그인 체크
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String loginEmail = (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) 
+                            ? auth.getName() : null;
+
+        // 2. 게시글 조회
+        BlogDTO post = blogService.getBoardDetail(boardNo);
+        if (post == null) return "redirect:/blog/list";
+
+        // 3. 유료글 잠금 체크
+        boolean isLocked = false;
+        
+        // 게시글에 가격이 있고, 로그인 안 했거나 내 글이 아닐 때
+        if (post.getPrice() > 0 && (loginEmail == null || !post.getMemberEmail().equals(loginEmail))) {
+            boolean isPurchased = false;
+            if (loginEmail != null) {
+                Member me = memberRepository.findByMemberEmailAndMemberDelFl(loginEmail, CommonEnums.Status.N).orElse(null);
+                if (me != null) {
+                    isPurchased = replyService.isPurchased(boardNo, me.getMemberNo());
+                }
+            }
+            if (!isPurchased) isLocked = true;
+        }
+
+        // 4. 내 정보 (잔액 등)
+        if (loginEmail != null) {
+            // JPA 써서 내 정보 가져오기
+        	Member loginUser = memberRepository.findByMemberEmailAndMemberDelFl(loginEmail, CommonEnums.Status.N).orElse(null);
+            // null 이면 모델 안 담고 끝냄 (에러 발생 x)
+        	if(loginUser != null) {
+            	model.addAttribute("loginUser", loginUser);
+            }
+        }
+
+        model.addAttribute("post", post);
+        model.addAttribute("isLocked", isLocked);
+
+        return "board/blog/blogDetail";
+    }
+    
+    
 }

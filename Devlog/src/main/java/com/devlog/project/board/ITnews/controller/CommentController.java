@@ -1,6 +1,7 @@
 package com.devlog.project.board.ITnews.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,7 +46,12 @@ public class CommentController {
 		return service.delete(comment);
 	}
 	
-	
-	
+	// 댓글 좋아요 & 싫어요 통합 처리
+	@PostMapping("/ITnews/comment/like")
+	public Map<String, Object> updateLikeDislike(@RequestBody Map<String, Integer> param) {
+	    // commentNo, memberNo, status(1:좋아요, 2:싫어요)
+	    return service.updateLikeDislike(param);
+	}
+
 	
 }

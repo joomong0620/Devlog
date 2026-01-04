@@ -1,6 +1,7 @@
 package com.devlog.project.board.ITnews.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -34,5 +35,15 @@ public interface CommentMapper {
 	
 	// 해당 댓글 게시글 조회
 	public Long selectBoardNo(Long targetId);
+
+	
+	// 댓글 상태 변경
+	public void updateLikeDislike(Map<String, Integer> param);
+
+	public int countCommentLikes(Integer integer);
+
+	public int countCommentDislikes(Integer integer);
+
+	public int checkLikeDislikeStatus(Map<String, Integer> param);
 
 }

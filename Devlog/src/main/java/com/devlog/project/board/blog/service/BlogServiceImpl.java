@@ -38,7 +38,8 @@ public class BlogServiceImpl implements BlogService {
 
     @Value("${my.blogWrite.webpath}")
     private String uploadWebPath;
-
+    
+    // 블로그 페이지네이션
     @Override
     public Map<String, Object> getBlogList(int page, int size, String sort) {
         Map<String, Object> params = new HashMap<>();
@@ -57,7 +58,8 @@ public class BlogServiceImpl implements BlogService {
         
         return result;
     }
-
+    
+    // 블로그 게시글 글 작성
     @Override
     @Transactional
     public Long writeBlog(BlogDTO blogDTO) {
@@ -89,7 +91,7 @@ public class BlogServiceImpl implements BlogService {
         return blogDTO.getBoardNo();
     }
 
- // 목록 조회 구현
+    // 목록 조회 구현
     @Override
     public Map<String, Object> getMyBlogList(String blogId, String type, int page, int size, String sort) {
         Map<String, Object> params = new HashMap<>();
@@ -110,7 +112,8 @@ public class BlogServiceImpl implements BlogService {
 
         return result;
     }
-
+    
+    // 이미지 업로드
     @Override
     public String uploadImage(MultipartFile image) {
         if(image == null || image.isEmpty()) return null;
@@ -148,7 +151,7 @@ public class BlogServiceImpl implements BlogService {
         return userProfileDto;
     }
 
-    // [핵심] 화면용 전체 데이터 조립 (Service에서 로직 처리!)
+    // 화면용 전체 데이터
     @Override
     public MyBlogResponseDto getMyBlogPageData(String blogId, String currentLoginId) {
         MyBlogResponseDto response = new MyBlogResponseDto();
@@ -181,5 +184,23 @@ public class BlogServiceImpl implements BlogService {
         response.setTodayVisit(0);
 
         return response;
+    }
+    
+    // 블로그 상세 게시글 조회
+    @Override
+    public BlogDTO getBoardDetail(Long boardNo) {
+        // 1. 조회수 증가
+        blogMapper.updateViewCount(boardNo);
+        
+        // 2. 게시글 상세 내용 가져오기
+        BlogDTO dto = blogMapper.selectBlogDetail(boardNo);
+        
+        // 3. 태그 목록 가져와서 넣기 (게시글이 존재할 때만)
+        if (dto != null) {
+            List<String> tags = blogMapper.selectBoardTags(boardNo);
+            dto.setTagList(tags);
+        }
+        
+        return dto;
     }
 }

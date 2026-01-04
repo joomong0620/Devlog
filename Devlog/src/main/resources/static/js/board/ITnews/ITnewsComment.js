@@ -88,53 +88,42 @@ function selectCommentList() {
         `;
 
         commentRow.append(commentWriter, commentContent, commentActions);
+        // 버튼 영역(div)은 무조건 생성
+        const btnArea = document.createElement("div");
+        btnArea.classList.add("comment-btn-area");
 
-        // 수정/삭제 버튼 (내 댓글일 때)
-        if (loginMemberNo && loginMemberNo == comment.memberNo) {
-          const btnArea = document.createElement("div");
-          btnArea.classList.add("comment-btn-area");
-
-          // 답글
+        // 답글 버튼 생성 (로그인한 사람이라면 '남의 댓글'에도 보여야 함)
+        // parentCommentNo가 0인 경우(원댓글)에만 답글을 달 수 있게 설정
+        if (loginMemberNo && loginMemberNo != 0) {
           if (comment.parentCommentNo == 0) {
             const replyBtn = document.createElement("button");
             replyBtn.innerText = "답글";
             replyBtn.classList.add("reply-btn");
+            // 로그인한 유저라면 누구나 답글 버튼을 클릭할 수 있음
             replyBtn.onclick = () =>
               showInsertComment(comment.commentNo, replyBtn);
-
             btnArea.append(replyBtn);
           }
+        }
 
-          // 수정 버튼
+        // 수정/삭제 버튼 생성 (작성자 본인일 때만 추가)
+        if (loginMemberNo && loginMemberNo == comment.memberNo) {
           const updateBtn = document.createElement("button");
           updateBtn.innerText = "수정";
           updateBtn.onclick = () =>
             showUpdateComment(comment.commentNo, updateBtn);
 
-          // 삭제 버튼
           const deleteBtn = document.createElement("button");
           deleteBtn.innerText = "삭제";
           deleteBtn.onclick = () => deleteComment(comment.commentNo);
 
-          // if (comment.commentDeleteFlag === "Y") {
-          //   const deleteSpan = document.createElement("span");
-          //   updateBtn.innerText = "";
-          //   deleteBtn.innerText = "";
-          //   deleteSpan.innerText = " (삭제되었습니다.)";
-          //   deleteSpan.style.fontSize = "0.85em";
-          //   deleteSpan.style.color = "#999";
-          //   deleteSpan.style.marginLeft = "5px";
-          //   commentDate.append(deleteSpan);
-          // }
-
           btnArea.append(updateBtn, deleteBtn);
-          commentRow.append(btnArea);
         }
 
         // 답글 버튼 (부모 댓글일 때만)
         if (comment.parentCommentNo == 0) {
         }
-
+        commentRow.append(btnArea);
         commentList.append(commentRow);
       }
       scrollToHashIfExists();
@@ -441,13 +430,8 @@ function insertChildComment(parentCommentNo, btn) {
     .catch((err) => console.log(err));
 }
 
-// 서비스 호출
-selectCommentList();
-
-
-
 function scrollToHashIfExists() {
-  const hash = location.hash;      // 예: "#comment-6"
+  const hash = location.hash; // 예: "#comment-6"
   if (!hash) return;
 
   const target = document.querySelector(hash);
@@ -455,3 +439,69 @@ function scrollToHashIfExists() {
     target.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 }
+
+// --- 좋아요 / 싫어요 클릭 이벤트 (수정된 안전한 버전) ---
+// 페이지가 완전히 로드된 후 이벤트를 등록합니다.
+document.addEventListener("DOMContentLoaded", () => {
+  // 요소가 있는지 확인 후 등록 (혹은 document에 위임)
+  const commentList = document.getElementById("commentList");
+
+  if (commentList) {
+    commentList.addEventListener("click", (e) => {
+      // 클릭된 요소가 버튼인지, 혹은 버튼 안의 이미지/스팬인지 확인
+      const btn = e.target.closest(".comment-good-btn, .comment-bad-btn");
+      if (!btn) return;
+
+      // 로그인 체크 (loginMemberNo 변수가 전역에 선언되어 있어야 함)
+      if (
+        typeof loginMemberNo === "undefined" ||
+        !loginMemberNo ||
+        loginMemberNo == 0
+      ) {
+        alert("로그인 후 이용해주세요.");
+        return;
+      }
+
+      const commentRow = btn.closest(".comment-row");
+      const commentNo = commentRow.dataset.commentId;
+      const type = btn.dataset.type; // 'good' 또는 'bad'
+      const status = type === "good" ? 1 : 2; // 1:좋아요, 2:싫어요
+
+      const data = {
+        commentNo: commentNo,
+        memberNo: loginMemberNo,
+        status: status,
+      };
+
+      fetch("/ITnews/comment/like", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((resp) => resp.json())
+        .then((result) => {
+          // 숫자 업데이트
+          commentRow.querySelector(".good-count").innerText = result.likeCount;
+          commentRow.querySelector(".comment-bad-btn .count").innerText =
+            result.dislikeCount;
+
+          // 시각적 피드백 (이미지 필터 변경)
+          const goodImg = commentRow.querySelector(".comment-good-btn img");
+          const badImg = commentRow.querySelector(".comment-bad-btn img");
+
+          goodImg.style.filter = "grayscale(100%)";
+          badImg.style.filter = "grayscale(100%)";
+
+          if (result.currentStatus == 1) {
+            goodImg.style.filter = "grayscale(0%)";
+          } else if (result.currentStatus == 2) {
+            badImg.style.filter = "grayscale(0%)";
+          }
+        })
+        .catch((err) => console.log("좋아요 처리 중 오류:", err));
+    });
+  }
+});
+
+// 서비스 호출
+selectCommentList();
