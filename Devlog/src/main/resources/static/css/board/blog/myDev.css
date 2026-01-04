@@ -199,6 +199,17 @@ body[data-user-type="owner"] .visitor-only {
     border: none;
 }
 
+.btn-purple.active {
+    background-color: #fff;       /* 배경을 흰색으로 */
+    color: var(--primary);        /* 글자색을 보라색으로 */
+    border: 1px solid var(--primary); /* 테두리 추가 */
+}
+
+/* (선택사항) 마우스 올렸을 때 조금 더 진하게 */
+.btn-purple.active:hover {
+    background-color: var(--primary-light);
+}
+
 .btn-white {
     background: #fff;
     border: 1px solid var(--border);

@@ -1,5 +1,6 @@
 package com.devlog.project.board.blog.service;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,13 @@ public interface BlogService {
 	
 	// 상세 게시글 조회
 	BlogDTO getBoardDetail(Long boardNo);
+	
+	boolean toggleFollow(Long followerId, Long targetId);
+    boolean isFollowing(Long followerId, Long targetId);
+    void increaseVisitCount(Long blogOwnerNo);
+    
+    // 팔로워, 팔로잉 목록 조회
+    List<UserProfileDto> getFollowList(String blogId, String type);
 	
 	
 	

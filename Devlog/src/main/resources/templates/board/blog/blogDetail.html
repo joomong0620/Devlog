@@ -54,10 +54,9 @@
                             </span>
                             <span><i class="fa-regular fa-comment-dots"></i> <span id="commentCount"
                                     th:text="${post.commentCount}">0</span></span>
-                            <span><i class="fa-regular fa-eye"></i> <span th:text="${post.readCount}">0</span></span>
+                            <span><i class="fa-regular fa-eye"></i> <span th:text="${post.boardCount}">0</span></span>
                         </div>
-                        <span class="date"
-                            th:text="${#temporals.format(post.bCreateDate, 'yyyy.MM.dd')}">2025.01.01</span>
+                        <span class="date" th:text="${post.bCreateDate}">2025.01.01</span>
                     </div>
                 </div>
 

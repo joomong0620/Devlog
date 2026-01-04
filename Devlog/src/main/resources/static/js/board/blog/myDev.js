@@ -8,6 +8,180 @@ const PAGE_SIZE = 6;
 let isLoading = false;
 let isLastPage = false;
 
+// HTML 태그 제거 및 길이 제한 함수
+function stripHtml(html) {
+    if (!html) return '';
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    let text = tmp.textContent || tmp.innerText || "";
+    if (text.length > 30) {
+        text = text.substring(0, 30) + "...";
+    }
+    return text;
+}
+
+// 본문에서 첫 번째 이미지 URL 추출 (없으면 로고 반환)
+function extractFirstImage(html) {
+    // 내용이 없으면 로고 반환
+    if (!html) return '/images/logo.png';
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const img = doc.querySelector('img');
+
+    // 이미지가 있으면 그 주소, 없으면 로고 반환
+    if (img) {
+        return img.src;
+    } else {
+        return '/images/logo.png';
+    }
+}
+
+// 팔로우 기능
+function toggleFollow() {
+    // blogOwnerId는 HTML 하단에서 정의됨 (주인장 이메일)
+    if (!blogOwnerId) return;
+
+    fetch(`/api/blog/follow/${blogOwnerId}`, {
+        method: 'POST'
+    })
+        .then(res => {
+            if (res.status === 401) {
+                if (confirm("로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?")) {
+                    location.href = "/member/login";
+                }
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+
+            if (data.success) {
+                const btn = document.getElementById('btnFollow');
+                const followerCntEl = document.getElementById('followerCnt');
+                let currentCount = parseInt(followerCntEl.innerText);
+
+                if (data.isFollowed) {
+                    // 팔로우 성공 상태로 변경
+                    btn.innerText = "팔로잉";
+                    btn.classList.add('active'); // CSS로 스타일링 (흰색 배경 등)
+                    // 숫자 증가
+                    followerCntEl.innerText = currentCount + 1;
+                } else {
+                    // 언팔로우 상태로 변경
+                    btn.innerText = "팔로우";
+                    btn.classList.remove('active');
+                    // 숫자 감소
+                    followerCntEl.innerText = Math.max(0, currentCount - 1);
+                }
+            }
+        })
+        .catch(err => console.error("Follow Error:", err));
+}
+
+/* =========================================
+[추가] 유저 목록 모달 관련 로직
+========================================= */
+
+const modalOverlay = document.getElementById('userModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalUserList = document.getElementById('modalUserList');
+
+// 1. 모달 열기 함수
+function openUserModal(type) {
+    if (!blogOwnerId) {
+        alert("블로그 정보가 없습니다.");
+        return;
+    }
+
+    // 제목 설정
+    let titleText = "";
+    let apiUrl = "";
+
+    if (type === 'follower') {
+        titleText = "팔로워 목록";
+        // 예: /api/blog/{id}/followers
+        apiUrl = `/api/blog/${blogOwnerId}/followers`;
+    } else if (type === 'following') {
+        titleText = "팔로잉 목록";
+        // 예: /api/blog/{id}/followings
+        apiUrl = `/api/blog/${blogOwnerId}/followings`;
+    } else if (type === 'subscriber') {
+        titleText = "구독자 목록";
+        apiUrl = `/api/blog/${blogOwnerId}/subscribers`;
+    }
+
+    modalTitle.innerText = titleText;
+    modalUserList.innerHTML = '<li style="text-align:center; padding:20px;">로딩 중...</li>';
+
+    // 모달 표시
+    modalOverlay.classList.add('active');
+
+    // 데이터 가져오기
+    fetchUserList(apiUrl);
+}
+
+// 2. 유저 목록 API 호출 및 렌더링
+async function fetchUserList(url) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("목록을 불러오지 못했습니다.");
+
+        const users = await res.json(); // List<UserDto> 형태 가정
+
+        renderUserList(users);
+
+    } catch (err) {
+        console.error(err);
+        modalUserList.innerHTML = '<li style="text-align:center; color:red;">목록을 불러오는데 실패했습니다.</li>';
+    }
+}
+
+// 3. 리스트 HTML 그리기
+function renderUserList(users) {
+    modalUserList.innerHTML = ''; // 초기화
+
+    if (!users || users.length === 0) {
+        modalUserList.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">목록이 비어있습니다.</li>';
+        return;
+    }
+
+    users.forEach(user => {
+        // 프로필 이미지 없으면 기본 이미지
+        const profileImg = user.profileImgUrl ? user.profileImgUrl : 'https://placehold.co/40x40/eee/999?text=U';
+        // 소개글 없으면 빈칸
+        const bio = user.bio ? user.bio : '';
+
+        // 유저 아이템 HTML (클릭 시 해당 유저 블로그로 이동 기능 추가 가능)
+        const li = document.createElement('li');
+        li.className = 'user-item';
+        li.innerHTML = `
+            <img src="${profileImg}" alt="profile" style="cursor:pointer;" onclick="location.href='/blog/${user.id}'">
+            <div class="user-item-info">
+                <span class="u-nick" onclick="location.href='/blog/${user.id}'" style="cursor:pointer;">
+                    ${user.nickname}
+                </span>
+                <span class="u-bio">${bio}</span>
+            </div>
+            `;
+        modalUserList.appendChild(li);
+    });
+}
+
+// 4. 모달 닫기 함수
+function closeUserModal() {
+    modalOverlay.classList.remove('active');
+}
+
+// 5. 모달 바깥 영역 클릭 시 닫기
+modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+        closeUserModal();
+    }
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const listWrap = document.getElementById('post-list-wrap');
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -60,10 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1. 스타일 변경
             tabBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
             // 2. [추가됨 2] 탭 타입 변경 (HTML의 data-type 속성 읽기)
             const newType = btn.getAttribute('data-type'); // 'all' 또는 'paid'
-            
+
             if (currentType !== newType) {
                 currentType = newType;
                 console.log("탭 변경됨:", currentType); // 확인용 로그
@@ -97,10 +271,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     // ============================================================
     // [핵심] 게시글 로딩 함수
     // ============================================================
     async function renderPosts(isReset = false) {
+
         if (isLoading) return;
 
         if (isReset) {
@@ -140,11 +316,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (posts) {
                 posts.forEach(post => {
-                    // 썸네일 처리
-                    const thumb = post.thumbnailUrl ? post.thumbnailUrl : 'https://placehold.co/170x120/eeeeee/333?text=DevLog';
-                    
-                    // 본문 요약 처리
-                    const desc = post.boardContent ? post.boardContent : ''; 
+
+                    // 썸네일 추출 (본문에서 이미지 꺼내기 + 없으면 로고)
+                    const thumb = extractFirstImage(post.boardContent);
+
+                    // 본문 내용 태그 제거 (글자만 남기기)
+                    const desc = stripHtml(post.boardContent);
 
                     // 태그 리스트 처리
                     let tagsHtml = '';
@@ -155,8 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     // 유료 글 표시 아이콘
-                    const paidIcon = (post.isPaid === 'Y') 
-                        ? '<span style="background:#ffca28; color:#fff; padding:2px 6px; border-radius:4px; font-size:12px; margin-right:5px; vertical-align: middle;">Premium</span>' 
+                    const paidIcon = (post.isPaid === 'Y')
+                        ? '<span style="background:#ffca28; color:#fff; padding:2px 6px; border-radius:4px; font-size:12px; margin-right:5px; vertical-align: middle;">Premium</span>'
                         : '';
 
                     // HTML 생성
@@ -164,18 +341,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         <article class="post-item" onclick="location.href='/blog/detail/${post.boardNo}'" style="cursor:pointer;">
                             <div class="post-main">
                                 <h2>${paidIcon}${post.boardTitle}</h2>
-                                <p class="post-content">${desc}</p>
-                                <div class="post-stats">
+                                <p class="post-content">${desc}</p> <div class="post-stats">
                                     <span><i class="fa-solid fa-heart"></i> ${post.likeCount}</span>
                                     <span><i class="fa-solid fa-comment"></i> ${post.commentCount}</span>
                                     <span><i class="fa-solid fa-eye"></i> ${post.boardCount}</span> 
-                                    <span>${post.bCreateDate}</span> 
+                                    <span>${post.bcreateDate}</span> 
                                 </div>
                                 <div class="post-tags">${tagsHtml}</div>
                             </div>
-                            <img src="${thumb}" class="post-thumb-img" alt="thumbnail">
+                            <img src="${thumb}" class="post-thumb-img" alt="thumbnail" onerror="this.src='/images/logo.png'">
                         </article>`;
-                    
+
                     listWrap.insertAdjacentHTML('beforeend', html);
                 });
             }

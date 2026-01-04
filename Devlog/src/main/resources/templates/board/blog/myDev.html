@@ -59,13 +59,26 @@
 
             <div class="header-center">
                 <div class="top-stat-row">
-                    <div class="stat-btn">팔로워 <strong th:text="${followerCount}">0</strong></div>
-                    <div class="stat-btn">팔로잉 <strong th:text="${followingCount}">0</strong></div>
-                    <div class="stat-btn" th:if="${isOwner}">구독 <strong th:text="${subscriberCount}">0</strong></div>
+                    <div class="stat-btn" onclick="openUserModal('follower')">
+                        팔로워 <strong id="followerCnt" th:text="${followerCount}">0</strong>
+                    </div>
+
+                    <div class="stat-btn" onclick="openUserModal('following')">
+                        팔로잉 <strong th:text="${followingCount}">0</strong>
+                    </div>
+
+                    <div class="stat-btn" th:if="${isOwner}" onclick="openUserModal('subscriber')">
+                        구독 <strong th:text="${subscriberCount}">0</strong>
+                    </div>
                 </div>
+
                 <div class="action-row">
                     <th:block th:unless="${isOwner}">
-                        <button class="btn-purple">팔로우</button>
+                        <button class="btn-purple" id="btnFollow" onclick="toggleFollow()"
+                            th:classappend="${isFollowed} ? 'active'" th:text="${isFollowed} ? '팔로잉 v' : '팔로우'">
+                            팔로우
+                        </button>
+
                         <button class="btn-white">메시지</button>
                         <button class="btn-purple">구독</button>
                     </th:block>
@@ -73,6 +86,7 @@
                     <button class="btn-white" th:if="${isOwner}" onclick="location.href='/blog/write'">
                         <i class="fa-solid fa-plus"></i> 새 글 작성
                     </button>
+
                 </div>
                 <div class="visit-summary">
                     <p>전체 방문자 <strong th:text="${totalVisit}">0</strong></p>
@@ -85,14 +99,15 @@
                 <p class="pick-title">유저 PICK 인기 글🔥</p>
                 <div class="pick-card-item" th:if="${pickPost != null}"
                     th:onclick="|location.href='@{/blog/detail/{no}(no=${pickPost.boardNo})}'|" style="cursor:pointer;">
-                    
-                    <img th:src="${pickPost.thumbnailUrl != null ? pickPost.thumbnailUrl : 'https://placehold.co/100x100/333/fff?text=No+Img'}" alt="Pick Thumb">
-                    
+
+                    <img th:src="${pickPost.thumbnailUrl != null ? pickPost.thumbnailUrl : 'https://placehold.co/100x100/333/fff?text=No+Img'}"
+                        alt="Pick Thumb">
+
                     <div class="pick-info">
                         <h4 class="pick-card-title" th:text="${pickPost.boardTitle}">제목</h4>
-                        
+
                         <span class="tag-pill">Popular</span>
-                        
+
                         <div class="pick-meta-row">
                             <div class="p-meta">
                                 <i class="fa-solid fa-heart"></i> <span th:text="${pickPost.likeCount}">0</span>
@@ -147,6 +162,17 @@
                     </li>
                 </ul>
             </aside>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">목록 타이틀</h3>
+                <i class="fa-solid fa-xmark close-modal" onclick="closeUserModal()"></i>
+            </div>
+            <ul class="user-list" id="modalUserList">
+            </ul>
         </div>
     </div>
 

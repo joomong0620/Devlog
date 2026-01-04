@@ -10,35 +10,72 @@ let currentSort = 'id';
 let isLoading = false;
 let isLastPage = false;
 
-// 1. 카드 생성 함수 (필드명 수정됨)
+
+// 블로그 목록 카드에 HTML 태그 제거 및 길이 제한 함수
+function stripHtml(html) {
+    if (!html) return '';
+    // 1. 임시 엘리먼트를 만들어 HTML을 주입
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    // 2. 텍스트만 추출 (태그는 사라짐)
+    let text = tmp.textContent || tmp.innerText || "";
+    
+    // 3. 너무 길면 100자까지만 자르고 ... 붙이기 (카드 모양 유지용)
+    if (text.length > 30) {
+        text = text.substring(0, 30) + "...";
+    }
+    return text;
+}
+
+// 본문에서 첫 번째 이미지 URL 추출 (없으면 로고 반환)
+function extractFirstImage(html) {
+    if (!html) return '/images/logo.png';
+    
+    // 1. HTML 문자열을 DOM으로 변환
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // 2. img 태그 찾기
+    const img = doc.querySelector('img');
+    
+    // 3. 이미지가 있으면 src 반환, 없으면 로고 반환
+    if (img) {
+        return img.src;
+    } else {
+        return '/images/logo.png';
+    }
+}
+
+// 1. 카드 생성 함수
 function createCard(post) {
     const card = document.createElement('div');
     card.className = 'blog-card';
 
-    const imgSrc = post.thumbnailUrl ? post.thumbnailUrl : 'https://placehold.co/300x200/eeeeee/333?text=DevLog';
-    // [수정] id -> boardNo
-    const detailUrl = `/blog/detail/${post.boardNo}`; 
-    const paidIcon = (post.isPaid === 'Y') ? '<i class="fa-solid fa-crown" style="color:#ffd700; margin-right:5px;"></i>' : '';
+    const imgSrc = extractFirstImage(post.board_content);
+    const detailUrl = `/blog/detail/${post.board_no}`;
+    const paidIcon = (post.is_paid === 'Y') ? '<i class="fa-solid fa-crown" style="color:#ffd700; margin-right:5px;"></i>' : '';
+
+    const cleanContent = stripHtml(post.board_content);
 
     card.innerHTML = `
         <a href="${detailUrl}" class="card-link">
             <div class="card-image">
-                <img src="${imgSrc}" alt="썸네일" onerror="this.src='https://via.placeholder.com/300'">
+                <img src="${imgSrc}" alt="썸네일" onerror="this.src='/images/logo.png'">
             </div>
             <div class="card-content">
-                <h3 class="card-title">${paidIcon}${post.boardTitle}</h3>
+                <h3 class="card-title">${paidIcon}${post.board_title}</h3> 
                 
-                <p class="card-desc">${post.boardContent ? post.boardContent : ''}</p>
+                <p class="card-desc">${cleanContent}</p>
                 
                 <div class="card-meta">
-                    <span class="author">${post.memberNickname}</span>
+                    <span class="author">${post.member_nickname}</span>
                     <div class="stats">
-                        <span><i class="fa-solid fa-eye"></i> ${post.boardCount}</span>
-                        <span><i class="fa-solid fa-comment"></i> ${post.commentCount}</span>
+                        <span><i class="fa-solid fa-eye"></i> ${post.board_count}</span>
+                        <span><i class="fa-solid fa-comment"></i> ${post.comment_count}</span>
                     </div>
                 </div>
                 <div class="card-footer-time" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>${post.bCreateDate}</span>
+                    <span>${post.bcreate_date}</span>
                 </div>
             </div>
         </a>
@@ -126,4 +163,39 @@ window.addEventListener('scroll', () => {
 });
 scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// 초기 로딩 카드 내 게시글 내용 태그 제거 처리
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. 모든 카드들을 찾기
+    const cards = document.querySelectorAll('.blog-card');
+    
+    cards.forEach(card => {
+        // [내용 처리]
+        const descEl = card.querySelector('.card-desc');
+        let rawContent = "";
+        
+        if (descEl) {
+            // th:text로 뿌려졌다면 태그가 그대로 text로 들어있으므로 innerText로 가져옴
+            rawContent = descEl.innerText || descEl.textContent;
+            
+            // stripHtml 돌려서 다시 넣기
+            descEl.innerText = stripHtml(rawContent);
+        }
+        
+        // 썸네일 처리
+        const imgEl = card.querySelector('.card-image img');
+        if (imgEl && rawContent) {
+            // extractFirstImage로 썸네일 주소 뽑기
+            const newSrc = extractFirstImage(rawContent);
+            
+            // 이미지 주소 교체 (원래 있던 프로필 사진 -> 본문 이미지 or 로고)
+            imgEl.src = newSrc;
+            
+            // 혹시라도 이미지가 깨지면 로고로 방어
+            imgEl.onerror = function() {
+                this.src = '/images/logo.png';
+            };
+        }
+    });
 });

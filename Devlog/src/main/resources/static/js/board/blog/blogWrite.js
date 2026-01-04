@@ -9,7 +9,7 @@ const editor = new toastui.Editor({
     placeholder: '내용을 입력하세요.',
     hooks: {
         addImageBlobHook: (blob, callback) => {
-            // 이미지 업로드 로직 (기존과 동일)
+            // 이미지 업로드 로직 
             const formData = new FormData();
             formData.append('image', blob);
 
@@ -19,7 +19,11 @@ const editor = new toastui.Editor({
             })
                 .then(response => response.text())
                 .then(url => {
-                    callback(url, '이미지 설명');
+                    // URL 대신 HTML 태그를 만들어서 콜백에 넘김
+                    const imgTag = `<img src="${url}" alt="이미지" style="max-width:100%;">`;
+                    // 에디터에 HTML을 삽입합니다. (마크다운 모드에서도 태그 그대로 들어감)
+                    editor.insertText(imgTag);
+                    
                 })
                 .catch(error => console.error('이미지 업로드 실패:', error));
         }
@@ -321,7 +325,7 @@ document.querySelector('.btn-exit').addEventListener('click', () => {
 // ============================================================
 function savePost(isTemp) {
     const title = document.querySelector('.input-title').value.trim();
-    const content = editor.getMarkdown().trim();
+    const content = editor.getHTML().trim();
     const isPaidChecked = document.querySelector('input[name="content-type"]:checked').value === 'paid';
 
     if (!title) {
@@ -336,16 +340,17 @@ function savePost(isTemp) {
         return priceInput.focus();
     }
 
-    // [DTO 매핑] 백엔드 BlogDTO 필드명과 일치시킴
+    // 백엔드 BlogDTO 필드명과 일치
     const postData = {
-        boardTitle: title,            // title -> boardTitle
-        boardContent: content,        // content -> boardContent
-        tagList: Array.from(tags),    // tags -> tagList
+        "board_title": title,          // boardTitle  -> board_title
+        "board_content": content,      // boardContent -> board_content
+        "tag_list": Array.from(tags),  // tagList     -> tag_list
 
-        // boolean -> String("Y"/"N") 변환
-        isPaid: isPaidChecked ? "Y" : "N",
-        price: isPaidChecked ? parseInt(priceInput.value) : 0,
-        tempFl: isTemp ? "Y" : "N"    // isTemp -> tempFl
+        "is_paid": isPaidChecked ? "Y" : "N",
+
+        "price": isPaidChecked ? parseInt(priceInput.value) : 0,
+
+        "temp_fl": isTemp ? "Y" : "N"
     };
 
     console.log('전송 데이터:', postData);
@@ -370,4 +375,3 @@ function savePost(isTemp) {
 }
 
 document.querySelector('.btn-draft').addEventListener('click', () => savePost(true));
-document.querySelector('.btn-publish').addEventListener('click', () => savePost(false));

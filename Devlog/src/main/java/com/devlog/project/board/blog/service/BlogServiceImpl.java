@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.board.blog.dto.BlogDTO;
-import com.devlog.project.board.blog.dto.MyBlogResponseDto; // [추가]
+import com.devlog.project.board.blog.dto.MyBlogResponseDto;
 import com.devlog.project.board.blog.dto.TagDto;
 import com.devlog.project.board.blog.dto.UserProfileDto;
 import com.devlog.project.board.blog.mapper.BlogMapper;
@@ -31,15 +31,15 @@ import lombok.RequiredArgsConstructor;
 public class BlogServiceImpl implements BlogService {
 
     private final BlogMapper blogMapper;
-    private final MemberRepository memberRepository; 
+    private final MemberRepository memberRepository;
 
     @Value("${my.blogWrite.location}")
     private String uploadLocation;
 
     @Value("${my.blogWrite.webpath}")
     private String uploadWebPath;
-    
-    // 블로그 페이지네이션
+
+    // 1. 블로그 목록 조회
     @Override
     public Map<String, Object> getBlogList(int page, int size, String sort) {
         Map<String, Object> params = new HashMap<>();
@@ -55,11 +55,11 @@ public class BlogServiceImpl implements BlogService {
         result.put("totalElements", totalCount);
         result.put("totalPages", (int) Math.ceil((double) totalCount / size));
         result.put("last", (page + 1) * size >= totalCount);
-        
+
         return result;
     }
-    
-    // 블로그 게시글 글 작성
+
+    // 2. 글 작성
     @Override
     @Transactional
     public Long writeBlog(BlogDTO blogDTO) {
@@ -81,7 +81,7 @@ public class BlogServiceImpl implements BlogService {
             for (String tagName : blogDTO.getTagList()) {
                 blogMapper.insertTag(tagName);
                 Long tagNo = blogMapper.selectTagNoByName(tagName);
-                
+
                 Map<String, Object> tagParams = new HashMap<>();
                 tagParams.put("boardNo", blogDTO.getBoardNo());
                 tagParams.put("tagNo", tagNo);
@@ -91,12 +91,12 @@ public class BlogServiceImpl implements BlogService {
         return blogDTO.getBoardNo();
     }
 
-    // 목록 조회 구현
+    // 3. 내 블로그 목록 조회
     @Override
     public Map<String, Object> getMyBlogList(String blogId, String type, int page, int size, String sort) {
         Map<String, Object> params = new HashMap<>();
         params.put("blogId", blogId);
-        params.put("type", type); // [중요] XML로 type 전달
+        params.put("type", type);
         params.put("offset", page * size);
         params.put("limit", size);
         params.put("sort", sort);
@@ -112,26 +112,26 @@ public class BlogServiceImpl implements BlogService {
 
         return result;
     }
-    
-    // 이미지 업로드
+
+    // 4. 이미지 업로드
     @Override
     public String uploadImage(MultipartFile image) {
-        if(image == null || image.isEmpty()) return null;
-        
+        if (image == null || image.isEmpty()) return null;
+
         String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
         File folder = new File(uploadLocation);
         if (!folder.exists()) folder.mkdirs();
-        
+
         try {
             File saveFile = new File(uploadLocation, fileName);
             image.transferTo(saveFile);
             return uploadWebPath + fileName;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("이미지 업로드 실패", e);
         }
     }
-    
-    // 단순 프로필 조회
+
+    // 5. 프로필 조회
     @Override
     public UserProfileDto getUserProfile(String blogId) {
         Member member = memberRepository.findByMemberEmailAndMemberDelFl(blogId, CommonEnums.Status.N)
@@ -151,56 +151,114 @@ public class BlogServiceImpl implements BlogService {
         return userProfileDto;
     }
 
-    // 화면용 전체 데이터
+    // 6. 상세 조회
+    @Override
+    public BlogDTO getBoardDetail(Long boardNo) {
+        blogMapper.updateViewCount(boardNo);
+        BlogDTO dto = blogMapper.selectBlogDetail(boardNo);
+        if (dto != null) {
+            List<String> tags = blogMapper.selectBoardTags(boardNo);
+            dto.setTagList(tags);
+        }
+        return dto;
+    }
+
+    // 7. 팔로우 여부 확인
+    @Override
+    public boolean isFollowing(Long followerId, Long targetId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("followerId", followerId);
+        params.put("targetId", targetId);
+        return blogMapper.checkFollowStatus(params) > 0;
+    }
+
+    // 8. 팔로우 토글
+    @Override
+    @Transactional
+    public boolean toggleFollow(Long followerId, Long targetId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("followerId", followerId);
+        params.put("targetId", targetId);
+
+        int count = blogMapper.checkFollowStatus(params);
+        if (count > 0) {
+            blogMapper.deleteFollow(params);
+            return false; // 언팔로우됨
+        } else {
+            blogMapper.insertFollow(params);
+            return true; // 팔로우됨
+        }
+    }
+
+    // 9. 방문자 수 증가
+    @Override
+    @Transactional
+    public void increaseVisitCount(Long blogOwnerNo) {
+        Map<String, Object> visitData = blogMapper.selectVisitCount(blogOwnerNo);
+        if (visitData == null) {
+            blogMapper.insertVisitCount(blogOwnerNo);
+        } else {
+            blogMapper.updateVisitCount(blogOwnerNo);
+        }
+    }
+
+    // 10. [핵심] 화면용 전체 데이터 (통계 포함) - 중복 제거됨
     @Override
     public MyBlogResponseDto getMyBlogPageData(String blogId, String currentLoginId) {
         MyBlogResponseDto response = new MyBlogResponseDto();
 
-        // 프로필 정보
+        // 1) 프로필
         UserProfileDto profile = this.getUserProfile(blogId);
         response.setUserProfile(profile);
-        
-        // 유저 PICK 인기글 가져오기
-        BlogDTO pickPost = blogMapper.selectPopularPost(blogId);
-        response.setPickPost(pickPost);
-        
-        // 태그 목록 가져오기
-        List<TagDto> tags = blogMapper.selectBlogTagList(blogId);
-        response.setTags(tags);
-        
-        // 주인 여부 확인
+
+        // 2) 주인 찾기
+        Member blogOwner = memberRepository.findByMemberEmailAndMemberDelFl(blogId, CommonEnums.Status.N).orElse(null);
+        Long ownerNo = (blogOwner != null) ? blogOwner.getMemberNo() : 0L;
+
+        // 3) 주인 여부 체크
         boolean isOwner = false;
         if (currentLoginId != null && currentLoginId.equals(blogId)) {
             isOwner = true;
         }
         response.setOwner(isOwner);
 
-        // 통계 데이터 0으로 초기화
-        response.setFollowerCount(0);
-        response.setFollowingCount(0);
+        // 4) 인기글, 태그
+        response.setPickPost(blogMapper.selectPopularPost(blogId));
+        response.setTags(blogMapper.selectBlogTagList(blogId));
+
+        // 5) 통계 데이터 (DB 조회)
+        if (ownerNo != 0L) {
+            response.setFollowerCount(blogMapper.countFollower(ownerNo));
+            response.setFollowingCount(blogMapper.countFollowing(ownerNo));
+
+            // 방문자 수
+            Map<String, Object> visitMap = blogMapper.selectVisitCount(ownerNo);
+            if (visitMap != null) {
+                // 오라클 숫자는 BigDecimal로 올 수 있어서 String 변환 후 파싱이 안전
+                response.setTotalVisit(Integer.parseInt(String.valueOf(visitMap.get("TOTAL_VISIT"))));
+                response.setTodayVisit(Integer.parseInt(String.valueOf(visitMap.get("DAILY_VISIT"))));
+            } else {
+                response.setTotalVisit(0);
+                response.setTodayVisit(0);
+            }
+        }
+
+        response.setPostCount(blogMapper.countTotalPosts(blogId));
         response.setSubscriberCount(0);
-        response.setTotalVisit(0);
-        response.setPostCount(0);
-        response.setTodayVisit(0);
 
         return response;
     }
     
-    // 블로그 상세 게시글 조회
+    // 팔로워/팔로잉 목록 가져오기
     @Override
-    public BlogDTO getBoardDetail(Long boardNo) {
-        // 1. 조회수 증가
-        blogMapper.updateViewCount(boardNo);
+    public List<UserProfileDto> getFollowList(String blogId, String type) {
+        Member owner = memberRepository.findByMemberEmailAndMemberDelFl(blogId, CommonEnums.Status.N)
+                .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
         
-        // 2. 게시글 상세 내용 가져오기
-        BlogDTO dto = blogMapper.selectBlogDetail(boardNo);
-        
-        // 3. 태그 목록 가져와서 넣기 (게시글이 존재할 때만)
-        if (dto != null) {
-            List<String> tags = blogMapper.selectBoardTags(boardNo);
-            dto.setTagList(tags);
+        if ("follower".equals(type)) {
+            return blogMapper.selectFollowerList(owner.getMemberNo());
+        } else {
+            return blogMapper.selectFollowingList(owner.getMemberNo());
         }
-        
-        return dto;
     }
 }

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.devlog.project.board.blog.dto.BlogDTO;
 import com.devlog.project.board.blog.dto.TagDto;
+import com.devlog.project.board.blog.dto.UserProfileDto;
 
 @Mapper
 public interface BlogMapper {
@@ -41,4 +42,24 @@ public interface BlogMapper {
     
     // 상세 게시글 전용 태그 조회
     List<String> selectBoardTags(Long boardNo);
+    
+    // 팔로우
+    int checkFollowStatus(Map<String, Object> params);
+    int insertFollow(Map<String, Object> params);
+    int deleteFollow(Map<String, Object> params);
+    
+    // 통계
+    int countFollower(Long memberNo);
+    int countFollowing(Long memberNo);
+    int countTotalPosts(String blogId);
+
+    // 방문자
+    Map<String, Object> selectVisitCount(Long memberNo);
+    int insertVisitCount(Long memberNo);
+    int updateVisitCount(Long memberNo);
+    
+    // 팔로워, 팔로잉 목록 조회
+    List<UserProfileDto> selectFollowerList(Long memberNo);
+    List<UserProfileDto> selectFollowingList(Long memberNo);
+    
 }

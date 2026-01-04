@@ -78,20 +78,24 @@
                 SELECT 
                     b.BOARD_NO AS boardNo,
                     b.BOARD_TITLE AS boardTitle,
-                    DBMS_LOB.SUBSTR(b.BOARD_CONTENT, 100, 1) AS boardContent,
+                    b.BOARD_CONTENT AS boardContent, 
                     b.BOARD_COUNT AS boardCount,
                     TO_CHAR(b.B_CREATE_DATE, 'YYYY.MM.DD') AS bCreateDate,
                     m.MEMBER_NICKNAME AS memberNickname,
                     m.MEMBER_EMAIL AS memberEmail,
                     m.PROFILE_IMG AS thumbnailUrl,
-                    bl.IS_PAID AS isPaid,
+                    
+                    bl.IS_PAID AS isPaid, 
+                    
                     (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO) AS commentCount,
                     (SELECT COUNT(*) FROM "BOARD_LIKE" l WHERE l.BOARD_NO = b.BOARD_NO) AS likeCount
                 FROM "BOARD" b
                 JOIN "MEMBER" m ON b.MEMBER_NO = m.MEMBER_NO
                 JOIN "BLOG" bl ON b.BOARD_NO = bl.BOARD_NO
                 WHERE b.BOARD_CODE = 1 AND b.BOARD_DEL_FL = 'N' 
-                  AND m.MEMBER_EMAIL = #{blogId} AND bl.TEMP_FL = 'N'
+                  AND m.MEMBER_EMAIL = #{blogId} 
+                  
+                  AND bl.TEMP_FL = 'N'
                 
                 <if test="type == 'paid'">
                     AND bl.IS_PAID = 'Y'
@@ -178,5 +182,93 @@
     JOIN BLOG_TAG BT ON T.TAG_NO = BT.TAG_NO
     WHERE BT.BOARD_NO = #{boardNo}
 	</select>
+	
+	<select id="checkFollowStatus" parameterType="map" resultType="int">
+        SELECT COUNT(*) 
+        FROM "FOLLOW" 
+        WHERE FOLLOW_ID = #{followerId} AND FOLLOWED_ID = #{targetId}
+    </select>
+
+    <insert id="insertFollow" parameterType="map">
+        INSERT INTO "FOLLOW" (FOLLOW_ID, FOLLOWED_ID)
+        VALUES (#{followerId}, #{targetId})
+    </insert>
+
+    <delete id="deleteFollow" parameterType="map">
+        DELETE FROM "FOLLOW" 
+        WHERE FOLLOW_ID = #{followerId} AND FOLLOWED_ID = #{targetId}
+    </delete>
+
+
+    <select id="countFollower" parameterType="long" resultType="int">
+        SELECT COUNT(*) FROM "FOLLOW" WHERE FOLLOWED_ID = #{memberNo}
+    </select>
+
+    <select id="countFollowing" parameterType="long" resultType="int">
+        SELECT COUNT(*) FROM "FOLLOW" WHERE FOLLOW_ID = #{memberNo}
+    </select>
+
+    <select id="countTotalPosts" parameterType="string" resultType="int">
+        SELECT COUNT(*) 
+        FROM "BOARD" b
+        JOIN "MEMBER" m ON b.MEMBER_NO = m.MEMBER_NO
+        WHERE m.MEMBER_EMAIL = #{blogId} 
+          AND b.BOARD_DEL_FL = 'N'
+          AND b.BOARD_CODE = 1
+    </select>
+
+
+    <select id="selectVisitCount" parameterType="long" resultType="map">
+        SELECT TOTAL_VISIT, DAILY_VISIT, TO_CHAR(LAST_DATE, 'YYYYMMDD') AS LAST_DATE
+        FROM "VISIT_COUNT"
+        WHERE MEMBER_NO = #{memberNo}
+    </select>
+
+    <insert id="insertVisitCount" parameterType="long">
+        INSERT INTO "VISIT_COUNT" (MEMBER_NO, TOTAL_VISIT, DAILY_VISIT, LAST_DATE)
+        VALUES (#{memberNo}, 1, 1, SYSDATE)
+    </insert>
+
+    <update id="updateVisitCount" parameterType="long">
+        UPDATE "VISIT_COUNT"
+        SET 
+            TOTAL_VISIT = TOTAL_VISIT + 1,
+            DAILY_VISIT = CASE 
+                            WHEN TO_CHAR(LAST_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD') THEN DAILY_VISIT + 1
+                            ELSE 1 
+                          END,
+            LAST_DATE = SYSDATE
+        WHERE MEMBER_NO = #{memberNo}
+    </update>
+    
+    <select id="selectFollowerList" parameterType="long" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
+        SELECT 
+            m.MEMBER_EMAIL AS id,
+            m.MEMBER_NICKNAME AS nickname,
+            m.PROFILE_IMG AS profileImgUrl,
+            m.MY_INFO_INTRO AS bio
+        FROM "FOLLOW" f
+        JOIN "MEMBER" m ON f.FOLLOW_ID = m.MEMBER_NO
+        WHERE f.FOLLOWED_ID = #{memberNo}
+    </select>
+
+    <select id="selectFollowingList" parameterType="long" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
+        SELECT 
+            m.MEMBER_EMAIL AS id,
+            m.MEMBER_NICKNAME AS nickname,
+            m.PROFILE_IMG AS profileImgUrl,
+            m.MY_INFO_INTRO AS bio
+        FROM "FOLLOW" f
+        JOIN "MEMBER" m ON f.FOLLOWED_ID = m.MEMBER_NO
+        WHERE f.FOLLOW_ID = #{memberNo}
+    </select>
+	
+	
+	
+	
+	
+	
+	
+	
 
 </mapper>

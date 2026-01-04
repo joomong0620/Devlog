@@ -29,7 +29,7 @@ body {
 
 /* === 헤더 스타일 === */
 .post-header {
-    margin-top: 60px;
+    margin-top: 140px;
     margin-bottom: 40px;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
@@ -203,6 +203,15 @@ body {
     /* 맛보기 텍스트가 너무 짧아도 레이아웃 유지 */
 }
 
+/* 본문 안의 이미지 크기 자동 조절 */
+.text-content img {
+    max-width: 100%;  /* 부모 너비를 넘지 않도록 설정 */
+    height: auto;     /* 비율 유지 */
+    display: block;   /* 글자 취급되지 않도록 블록 처리 */
+    margin: 20px auto; /* 가운데 정렬 */
+    
+}
+
 .dummy-img {
     width: 100%;
     height: 300px;
@@ -234,8 +243,9 @@ body {
 
 /* 1. 잠금 상태 컨테이너 */
 .post-body.locked {
-    overflow: hidden;
-    /* max-height는 이제 불필요 (서버에서 잘라서 주니까) */
+    max-height: 400px; /* 맛보기 높이 고정 (원하는 만큼 조절 가능) */
+    overflow: hidden;  /* 400px 넘는 내용은 잘라냄 */
+    position: relative; /* 오버레이 위치 기준점 */
 }
 
 /* 2. 잠긴 텍스트 스타일 (보안/UX 효과) */
@@ -251,25 +261,22 @@ body {
 /* 3. 페이드아웃 오버레이 (핵심) */
 .lock-overlay {
     position: absolute;
-    bottom: 0;
+    top: 0;      /* 위에서부터 */
     left: 0;
-    right: 0;
-
-    /* 오버레이 높이: 텍스트를 얼마나 가릴지 결정 */
-    height: 200px;
-
-    /* 투명 -> 흰색 그라데이션 */
-    background: linear-gradient(to bottom,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.6) 40%,
-            rgba(255, 255, 255, 1) 80%,
-            #fff 100%);
-
+    width: 100%;
+    height: 100%; /* 전체를 덮음 */
+    
+    /* 투명 -> 흰색 자연스러운 그라데이션 */
+    background: linear-gradient(
+        to bottom, 
+        rgba(255, 255, 255, 0) 0%,      /* 위쪽은 투명 (글씨 보임) */
+        rgba(255, 255, 255, 0.8) 50%,   /* 중간부터 흐려짐 */
+        rgba(255, 255, 255, 1) 100%     /* 아래는 완전 흰색 */
+    );
+    
     display: flex;
-    align-items: flex-end;
-    /* 버튼을 아래쪽에 배치 */
-    justify-content: center;
-    padding-bottom: 60px;
+    align-items: center;    /* 수직 중앙 정렬 */
+    justify-content: center; /* 수평 중앙 정렬 */
     z-index: 10;
 }
 
@@ -279,18 +286,17 @@ body {
 }
 
 .lock-card {
+    margin-top: 100px; /* 그라데이션 아래쪽 흰색 부분에 배치되도록 밀어줌 */
     background: #fff;
     border: 1px solid var(--border-color);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    /* 그림자 조금 더 부드럽게 */
     border-radius: 12px;
     padding: 40px 60px;
     text-align: center;
     width: 400px;
-    /* 카드가 그라데이션 위에 둥둥 떠있는 느낌 */
-    position: relative;
-    z-index: 20;
 }
+
+
 
 .lock-card i {
     color: var(--primary-color);

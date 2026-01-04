@@ -1,5 +1,6 @@
 package com.devlog.project.board.blog.controller;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.board.blog.dto.BlogDTO;
 import com.devlog.project.board.blog.dto.MyBlogResponseDto;
+import com.devlog.project.board.blog.dto.UserProfileDto;
 import com.devlog.project.board.blog.service.BlogService;
+import com.devlog.project.board.blog.service.BlogServiceImpl;
 import com.devlog.project.board.blog.service.ReplyService;
 import com.devlog.project.member.enums.CommonEnums;
 import com.devlog.project.member.model.entity.Member;
@@ -91,16 +94,26 @@ public class BlogController {
         }
 
         try {
+        	
+        	// 1. [NEW] 방문자 수 증가 (본인 블로그가 아닐 때만 증가시키는 로직을 넣어도 됨)
+            // 블로그 주인 찾기
+            Member owner = memberRepository.findByMemberEmailAndMemberDelFl(blogId, CommonEnums.Status.N).orElse(null);
+            
+            if (owner != null) {
+                // 로그인 안 했거나, 로그인 했어도 내 블로그가 아니면 방문수 증가
+                if (currentLoginId == null || !currentLoginId.equals(blogId)) {
+                    blogService.increaseVisitCount(owner.getMemberNo());
+                }
+            }
+            
             // 2. 서비스에 내 블로그 화면 데이터 요청
             MyBlogResponseDto myBlogData = blogService.getMyBlogPageData(blogId, currentLoginId);
             
             // 3. 모델에 담기
             model.addAttribute("userProfile", myBlogData.getUserProfile());
             model.addAttribute("isOwner", myBlogData.isOwner());
-            
             // 인기글 정보
             model.addAttribute("pickPost", myBlogData.getPickPost());
-            
             // 태그 리스트
             model.addAttribute("tags", myBlogData.getTags());
             
@@ -111,15 +124,48 @@ public class BlogController {
             model.addAttribute("totalVisit", myBlogData.getTotalVisit());
             model.addAttribute("postCount", myBlogData.getPostCount());
             model.addAttribute("todayVisit", myBlogData.getTodayVisit());
+            
+         // 4. 내가 팔로우 중인지 여부 확인
+            boolean isFollowing = false;
+            if (currentLoginId != null && owner != null) {
+                Member me = memberRepository.findByMemberEmailAndMemberDelFl(currentLoginId, CommonEnums.Status.N).orElse(null);
+                if (me != null) {
+                    isFollowing = blogService.isFollowing(me.getMemberNo(), owner.getMemberNo());
+                }
+            }
+            model.addAttribute("isFollowing", isFollowing);
 
         } catch (Exception e) {
-            // 회원이 없거나 에러 발생 시 목록으로 리턴
-            System.out.println("블로그 진입 에러: " + e.getMessage());
+            e.printStackTrace();
             return "redirect:/blog/list";
         }
 
         model.addAttribute("blogId", blogId); // JS용 ID
         return "board/blog/myDev";
+    }
+	
+	// 팔로우 토글 API
+    @PostMapping("/api/blog/follow/{targetId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> toggleFollow(@PathVariable String targetId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
+        }
+        
+        String myEmail = auth.getName();
+        Member me = memberRepository.findByMemberEmailAndMemberDelFl(myEmail, CommonEnums.Status.N).orElse(null);
+        Member target = memberRepository.findByMemberEmailAndMemberDelFl(targetId, CommonEnums.Status.N).orElse(null);
+
+        if(me == null || target == null) return ResponseEntity.badRequest().build();
+
+        // ServiceImpl 캐스팅 또는 인터페이스 수정 필요
+        boolean isFollowed = blogService.toggleFollow(me.getMemberNo(), target.getMemberNo());
+        
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "isFollowed", isFollowed
+        ));
     }
 
 	// 7. 내 블로그 목록 (API) - [수정] type 파라미터 받기
@@ -179,5 +225,38 @@ public class BlogController {
         return "board/blog/blogDetail";
     }
     
+ // ====================================================
+    // [추가] 팔로워 / 팔로잉 목록 API (모달 연동용)
+    // ====================================================
+
+    // 9. 팔로워 목록 조회
+    @GetMapping("/api/blog/{blogId}/followers")
+    @ResponseBody
+    public ResponseEntity<List<UserProfileDto>> getFollowers(@PathVariable String blogId) {
+        // Service의 getFollowList 호출 (type="follower")
+        List<UserProfileDto> list = blogService.getFollowList(blogId, "follower");
+        return ResponseEntity.ok(list);
+    }
+
+    // 10. 팔로잉 목록 조회
+    @GetMapping("/api/blog/{blogId}/followings")
+    @ResponseBody
+    public ResponseEntity<List<UserProfileDto>> getFollowings(@PathVariable String blogId) {
+        // Service의 getFollowList 호출 (type="following")
+        List<UserProfileDto> list = blogService.getFollowList(blogId, "following");
+        return ResponseEntity.ok(list);
+    }
+    
+    // 11. 구독자 목록 조회 (현재 로직상 준비 안됨, 추후 구현 필요)
+    // 현재 JS에서는 /subscribers 를 호출하므로 빈 리스트라도 리턴해야 에러가 안 남
+    @GetMapping("/api/blog/{blogId}/subscribers")
+    @ResponseBody
+    public ResponseEntity<List<UserProfileDto>> getSubscribers(@PathVariable String blogId) {
+        // TODO: 추후 구독(Payment) 로직 구현 시 Mapper/Service 추가 필요
+        // 현재는 빈 리스트 반환
+        return ResponseEntity.ok(List.of()); 
+    }
+    
+
     
 }
