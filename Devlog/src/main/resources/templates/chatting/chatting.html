@@ -494,6 +494,7 @@
                         </li>
                     </ul>
 
+                    <div class="typing-box fs-12 fw-600 display-none"></div>
 
                     <!-- 입력창 -->                    
                     <div class="send-area flex">
@@ -504,6 +505,8 @@
 
                         <div id="mention-box" class="mention-box display-none"></div>
 
+                        
+                            
                         <textarea id="send-message"
                                 name="messageContent"
                                 rows="1"
@@ -568,7 +571,7 @@
 
         // 로그인한 회원 번호
         const myNo = /*[[${session.loginMember.memberNo}]]*/ "로그인한 회원 번호";
-
+        const myNick = /*[[${session.loginMember.memberNickname}]]*/ "본인 닉네임"
     </script>
 
     <script th:src="@{/js/chatting/chatting.js}"></script>

@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.chatting.chatenums.ChatEnums;
 import com.devlog.project.chatting.chatenums.ChatEnums.RoomType;
+import com.devlog.project.chatting.chatenums.MsgEnums.MsgStatus;
 import com.devlog.project.chatting.chatenums.MsgEnums.MsgType;
 import com.devlog.project.chatting.dto.ChattingDTO.FollowListDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.GroupCreateDTO;
@@ -206,7 +207,20 @@ public class ChattingServiceImpl implements ChattingService {
 
 			chattingUserRepository.saveAll(users);
 
-
+			
+			Member admin = memberRepository.findById(0l)
+							.orElseThrow();
+			
+			Message message = Message.builder()
+							.member(admin)
+							.chattingRoom(room)
+							.messageContent("채팅방이 생성되었습니다.")
+							.type(MsgType.SYSTEM)
+							.build();
+			
+			
+			messageRepository.save(message);
+								
 
 			return roomNo;
 			
@@ -444,6 +458,9 @@ public class ChattingServiceImpl implements ChattingService {
 						.orElseThrow();
 		
 		Integer LastMessageNo = messageRepository.selectLastMessage(roomNo);
+		if(LastMessageNo == null) {
+			LastMessageNo = 0;
+		}
 		
 		List<String> nicknames = new ArrayList<>();
 		
@@ -466,6 +483,8 @@ public class ChattingServiceImpl implements ChattingService {
 			
 			
 			chattingUserRepository.save(user);
+			
+			
 			
 		}
 		

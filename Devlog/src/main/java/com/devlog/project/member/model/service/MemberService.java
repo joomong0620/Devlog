@@ -12,12 +12,15 @@ import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.member.model.dto.MemberProfileDTO;
 import com.devlog.project.member.model.entity.Level;
 import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {  // 로그인(login) 서비스 전용
+	
+	private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
     public MemberLoginResponseDTO toLoginResponse(Member member,
@@ -53,6 +56,20 @@ public class MemberService {  // 로그인(login) 서비스 전용
             levelDTO
         );
     }
+    
+    // 로그인 시 회원 경험치 증가
+    @Transactional
+	public void increaseExp(Long memberNo, int exp) {
+		
+		Member member = memberRepository.findById(memberNo).orElseThrow();
+		
+			
+		member.setCurrentExp(member.getCurrentExp() + exp);
+		
+		// 현재 회원 레벨 조회
+		Integer currentLevel = member.getMemberLevel().getLevelNo();
+		
+	}
 
 
     

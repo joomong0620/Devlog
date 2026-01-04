@@ -2,13 +2,80 @@
 
 let followList = false;
 
-document.addEventListener('DOMContentLoaded', e => {
-
+document.addEventListener('DOMContentLoaded', () => {
+    
+    connectSocket();
+    // 화면 입장 시 채팅방 목록 리스트 조회
     selectChatList();
 
+    
+    // 이벤트 바인딩
     bindChatContainerEvents();
 
-})
+
+    // 알리 클릭 해서 올 경우 
+    // /devtalk>roomNo=123&targetMst=123 이런 식
+    const params = new URLSearchParams(location.search); //요청 주소 쿼리스트링 부분 
+    const roomNo = params.get("roomNo");
+    const targetMsg = params.get("targetMsg");
+
+    console.log(roomNo, targetMsg);
+
+    // 방번호가 없다면 종료
+    if (!roomNo) return;
+
+    // 방 목록이 그려질 때까지 대기
+    const interval = setInterval(() => {
+
+        // roomNo를 가진 요소가 생겼는지 확인
+        const roomEl = document.querySelector(`[data-room-no="${roomNo}"]`);
+
+        // 생성되지 않았으ㅕㄴ 대기
+        if (!roomEl) return;
+
+        // 요소가 생성되었음 중단
+        clearInterval(interval);
+
+
+        // 채팅방 선택 함수
+        enterChatRoom(roomNo);
+        // 선택 효과 
+        // ui
+        // 채팅방 정보 로딩
+        // stomp 구독
+        // 읽음 처리
+
+        // 해당 메세지로 스크롤
+        if (targetMsg) {
+            waitAndScrollToMessage(targetMsg);
+        }
+
+    }, 50);
+});
+
+
+function waitAndScrollToMessage(targetMsg) {
+
+    const listInterval = setInterval(() => {
+        const chatArea = document.querySelector(".message-list");
+        if (!chatArea) return;
+
+        clearInterval(listInterval);
+
+        const observer = new MutationObserver(() => {
+            const target = chatArea.querySelector(
+                `.message-item[data-message-no="${targetMsg}"]`
+            );
+            if (target) {
+                target.scrollIntoView({ behavior: "smooth", block: "center" });
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(chatArea, { childList: true, subtree: true });
+    }, 100);
+}
+
 
 async function selectChatList(query = null){
 
@@ -46,10 +113,10 @@ document.addEventListener('click', e => {
 });
 
 
-window.addEventListener('load', () => {
-    
-    connectSocket();
-});
+// window.addEventListener('load', () => {
+//     
+//     connectSocket();
+// });
 
 
 
@@ -291,9 +358,7 @@ document.getElementById('room-create-btn').addEventListener('click', async e => 
 
         enterChatRoom(result);
 
-        showChatRoomUI();
 
-        await loadChatRoom(result)
     }
     
 });
@@ -1350,6 +1415,7 @@ function afterFuncLoad(){
     bindMessageReportEvent();
     bindProfileCardEvents();
     bindMentionInput();
+    bindTypingEvent();
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -1565,6 +1631,11 @@ function sendMessage(chatRoomNo, content) {
     console.log("msg : ", msg);
 
     stompClient.send('/devtalk/chat.send', {}, JSON.stringify(msg));
+    
+    // 메세지 전송 시 타이핑 false
+    sendTyping(false);
+    isTyping = false;
+    
 }
 
 
@@ -1619,6 +1690,13 @@ function onMessageReceived(payload) {
 
     } else{
 
+        if(msg.type == 'Typing') {
+
+            handleTyping(msg);
+
+            return;
+        }
+
         if(msg.type == 'SYSTEM'){
 
             addSystemMessage(msg);
@@ -1637,6 +1715,23 @@ function onMessageReceived(payload) {
     }
 }
 
+function handleTyping(msg) {
+    const typingBox = document.querySelector(".typing-box");
+    if (!typingBox) return;
+
+        if(msg.memberNo != myNo) {
+
+            if(msg.typing){
+                typingBox.innerText = `${msg.memberNickname} 입력중...`;
+                typingBox.classList.remove("display-none");
+
+            }else {
+
+                typingBox.classList.add("display-none");
+            }
+        }
+
+}
 
 
 
@@ -2137,31 +2232,31 @@ function bindSendImage(){
 
 // ======================================================================
 // 신고 모달 띄우기
-function openReportModal(reportedNo, targetNo) {
-
-    fetch(`/report/modal?memberNo=${reportedNo}`)
-        .then(res => res.text())
-        .then(html => {
-        const root = document.getElementById("modal-root");
-        root.innerHTML = html;              
-        const modal = root.querySelector("#reportModal");
-        modal.classList.remove("display-none");
-
-        modal.dataset.targetType = 'MESSAGE';
-        modal.dataset.targetNo = targetNo;
-
-        bindReportModalEvents();
-    });
-}
-
-const reOverlay = document.getElementById("reportModal");
-
-reOverlay?.addEventListener('click', e => {
-    if (e.target.id === "reportModal") {
-        closeReportModal();
-    }
-});
-
+// function openReportModal(reportedNo, targetNo) {
+// 
+//     fetch(`/report/modal?memberNo=${reportedNo}`)
+//         .then(res => res.text())
+//         .then(html => {
+//         const root = document.getElementById("modal-root");
+//         root.innerHTML = html;              
+//         const modal = root.querySelector("#reportModal");
+//         modal.classList.remove("display-none");
+// 
+//         modal.dataset.targetType = 'MESSAGE';
+//         modal.dataset.targetNo = targetNo;
+// 
+//         bindReportModalEvents();
+//     });
+// }
+// 
+// const reOverlay = document.getElementById("reportModal");
+// 
+// reOverlay?.addEventListener('click', e => {
+//     if (e.target.id === "reportModal") {
+//         closeReportModal();
+//     }
+// });
+// 
 
 
 
@@ -2252,4 +2347,48 @@ function insertMention(nickname) {
     textarea.value = before + after;
     mentionBox.classList.add('display-none');
     textarea.focus();
+}
+
+
+
+
+
+// -=================================================
+// 타이핑 이벤트
+
+let isTyping = false;
+function bindTypingEvent() {
+
+    const textArea = document.getElementById('send-message');
+    if (!textArea) return;
+
+
+
+    textArea.addEventListener('input', () => {
+
+        const value = textArea.value.trim().length > 0;
+
+        if (value && !isTyping) {
+            
+            sendTyping(true);
+            isTyping = true;
+        }
+
+
+        if(!value && isTyping) {
+            sendTyping(false)
+            isTyping = false;
+        }
+
+    });
+}
+
+// 타이핑 전송
+function sendTyping(state) {
+    stompClient.send("/devtalk/chat.typing", {}, JSON.stringify({
+        roomNo: currentRoomNo,
+        memberNo: myNo,
+        memberNickname: myNick,
+        typing: state
+    }));
 }

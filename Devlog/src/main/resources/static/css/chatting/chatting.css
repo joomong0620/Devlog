@@ -1302,6 +1302,17 @@ input[name='msgSearch'] {
     overflow-y: auto;
 }
 
+.typing-box {
+    position: absolute;
+    bottom: 50px;
+    left: 12px;
+    background: linear-gradient(135deg, #e6d9ff, #d2b9ff);
+    color: #5b3fa6;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(111, 66, 193, 0.25);
+    z-index: 1000;
+    padding: 8px 12px;
+}
 
 .mention-item {
     padding: 8px 12px;
