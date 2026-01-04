@@ -50,7 +50,7 @@ body {
 /* 댓글 아이템 */
 .comment-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     border-bottom: 1px solid #e5e5e5;
     padding: 15px 0;
 }
@@ -69,12 +69,12 @@ body {
     flex-grow: 1;
 }
 
-.comment-name {
+.comment-nickname {
     font-weight: 700;
     font-size: 32px;
 }
 
-.comment-text {
+.comment-content {
     font-size: 32px;
     color: #000;
 }
@@ -87,9 +87,12 @@ body {
 
 .action-btn {
     margin-left: 10px;
+    margin-right: 25px;
     font-size: 25px;
-    color: #666;
+    color: #777;
     cursor: pointer;
+    border: none;
+    background-color: white;
 }
 
 .action-btn:hover {
@@ -98,6 +101,7 @@ body {
 
 
 /* 입력 박스 영역 */
+/* textarea + 버튼 정렬 */
 .comment-write-wrapper{
     display: flex;
     flex-direction: row;
@@ -105,7 +109,7 @@ body {
     align-items: center;
 }
 
-/* 입력 박스 */
+/* 댓글 입력 박스: 상세화면 댓글 textarea */
 .comment-input {
     width:85%;
     border: 2px solid #ccc;
@@ -117,10 +121,15 @@ body {
     margin-top: 35px;
 }
 
-/* 댓글 등록 버튼 */
-.submit-box {
-    text-align: right;
-    margin-top: 12px;
+/* 댓글 수정 입력 박스: 수정버튼 클릭시 생성되는 수정 댓글 textarea */
+.update-textarea {
+    width:65%;
+    border: 2px solid #ccc;
+    padding: 9px;
+    font-size: 16px;
+    line-height: 1.7;
+    border-radius: 6px;
+    color: #000;
 }
 
 .submit-btn {
@@ -131,8 +140,26 @@ body {
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    margin-left: 10px;
+
+    flex-shrink: 0; 
 }
 
 .submit-btn:hover {
     background: #E5B0EA;
+}
+
+.comment-date {
+    font-size: 20px;
+    color: #999;
+    margin-left: 8px;
+}
+
+.comment-info > div:first-child {
+    display: flex;
+    align-items: center;
+}
+
+.comment-row {
+    list-style: none;
 }

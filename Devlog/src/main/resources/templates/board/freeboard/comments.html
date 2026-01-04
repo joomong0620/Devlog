@@ -1,70 +1,67 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>댓글</title>
+<div class="container">
 
-    <link rel="stylesheet" href="../../../static/css/board/freeboard/comments.css">
-    <link rel="stylesheet" href="../../static/css/common/font.css">
-</head>
-<body>
+    <!-- 상단 라인 -->
+    <hr class="line">
 
-
-    <div class="container">
-
-        <!-- 상단 라인 -->
-        <hr class="line">
-
+    <div id="commentTitle">
         <h3 class="title">댓글</h3>
+    </div>
 
-        <hr class="line">
+    <hr class="line">
 
-        <!-- 댓글 1 -->
-        <div class="comment-item">
-            <img src="../../../static/images/board/freeboard/fbComment_img1.png" class="profile-img">
+    <!-- 댓글 영역: [A] 달린 댓글(리스트) + [B] 댓글 창 -->
+    <div id="commentArea">
 
-            <div class="comment-info">
-                <div class="comment-name">묘소연</div>
-                <div class="comment-text">글 잘 봤습니다. ^^</div>
-            </div>
+        <!-- [A] 달린 댓글 목록 -->
+        <div class="comment-list-area">
+            <ul id="commentList">
+                <!-- 댓글 1 -->
+                <li class="comment-row" th:each="comment : ${commentList}"
+                    th:classappend="${comment.parentCommentNo != 0} ? 'reply'" th:data-comment-id="${comment.commentNo}">
+                    <div class="comment-item">
+                        <!-- 작성자 프로필 이미지 -->
+                        <img 
+                            th:if="${comment.profileImg != null}"
+                            th:src="@{${comment.profileImg}}" 
+                            class="profile-img"/>
+                        <img 
+                            th:unless="${comment.profileImg != null}"
+                            th:src="@{/images/user.png}" 
+                            class="profile-img"/>
 
-            <div class="comment-actions">
-                <span class="action-btn">수정</span>
-                <span class="action-btn">삭제</span>
-            </div>
+                        <!-- 작성자 닉네임 + 작성 답글 -->
+                        <div class="comment-info">
+                            <div>
+                                <div class="comment-nickname" th:text="${comment.memberNickname}">답글작성자닉네임</div>
+                                <div class="comment-date" th:text="${comment.cCreateDate}" >답글작성일</div>
+                            </div>
+                            <div class="comment-content"  th:text="${comment.commentContent}">답글 내용</div>
+                        </div>
+                        <!-- 수정/삭제버튼, 로그인회원==작성자 -->
+                        <th:block
+                        th:if="${session.loginMember != null and session.loginMember.memberNo == comment.memberNo}"
+                        >
+                            <div class="comment-actions">
+                                <button class="action-btn" th:onclick="|showUpdateComment(${comment.commentNo}, this)|">수정</button>
+                                <button class="action-btn" th:onclick="|deleteComment(${comment.commentNo})|">삭제</button>
+                            </div>
+                        </th:block>
+                    </div>
+
+                </li>
+
+            </ul>
         </div>
 
-        <!-- 댓글 2 -->
-        <div class="comment-item">
-            <img src="../../../static/images/board/freeboard/fbComment_img2.png" class="profile-img">
-
-            <div class="comment-info">
-                <div class="comment-name">줌-웅</div>
-                <div class="comment-text">글 잘 봤습니다. ^^</div>
-            </div>
-
-            <div class="comment-actions">
-                <span class="action-btn">수정</span>
-                <span class="action-btn">삭제</span>
-            </div>
-        </div>
-
+        <!-- [B] 댓글 작성: (로그인 회원만, 비회원처리?) -->            
         <div class="comment-write-wrapper">
             <!-- 입력 박스 -->
-            <div class="comment-input">
-                진짜 팀 구성은 기술보다 인간 가치가 더 중요한 것 같아요… 가끔은 그냥 파티원 모집 게시판에
-                운 좋은 사람이 나타나기만을 기도하는 느낌입니다😂
-            </div>
-
+            <textarea id="commentContent" class="comment-input" placeholder="댓글을 입력하세요"></textarea>
             <!-- 등록 버튼 -->
-            <div class="submit-box">
-                <button class="submit-btn">댓글등록</button>
-            </div>
+            <button id="addComment" class="submit-btn">댓글등록</button>
+
         </div>
 
     </div>
 
-
-</body>
-</html>
+</div>
