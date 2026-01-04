@@ -1,6 +1,8 @@
 package com.devlog.project.board.ITnews.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,6 +95,27 @@ public class CommentServiceImpl implements CommentService{
 	@Override
 	public int delete(Comment comment) {
 		return mapper.delete(comment);
+	}
+
+
+	// 댓글 좋아요 싫어요
+	@Override
+	public Map<String, Object> updateLikeDislike(Map<String, Integer> param) {
+		// 좋아요/싫어요 상태 변경
+	    mapper.updateLikeDislike(param);
+	    
+	    // 이 댓글의 최신 좋아요, 싫어요 개수 및 현재 내 상태를 한번에 조회
+	    int likeCount = mapper.countCommentLikes(param.get("commentNo"));
+	    int dislikeCount = mapper.countCommentDislikes(param.get("commentNo"));
+	    int currentStatus = mapper.checkLikeDislikeStatus(param);
+	    
+	    // 맵에 담아서 한번에 리턴
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("likeCount", likeCount);
+	    result.put("dislikeCount", dislikeCount);
+	    result.put("currentStatus", currentStatus);
+	    
+	    return result;
 	}
 
 }

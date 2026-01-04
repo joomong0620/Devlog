@@ -24,7 +24,7 @@ import com.github.pagehelper.PageInfo;
 
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/manager")
 public class ManagerController {
 	
 	@Autowired PayService payService;
