@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,7 +32,7 @@
           <p><strong>김소연</strong> 님, <br>오늘은 어떤 하루였나요? 😊</p>
           <button class="write-btn" th:onclick="|location.href='@{/blog/write}'|">글 작성</button>
         </div>
-      
+
         <div class="friends-section">
           <h4>지금 활동중인 친구들</h4>
           <div class="friends-list" id="friendsList">
@@ -39,7 +40,7 @@
           </div>
         </div>
       </div>
-      
+
     </section>
 
     <!-- 최신 피드 -->
@@ -48,7 +49,7 @@
         <h2 class="section-title">최신 피드</h2>
         <a th:href="@{/board/list}" class="more-link">더보기 &gt;</a>
       </div>
-      
+
       <div class="post-grid" id="latestFeedGrid">
         <!-- 여기도 카드 10개~ -->
       </div>
@@ -60,12 +61,12 @@
         <h2>지식을 더하는 뉴스</h2>
         <a th:href="@{/news/list}" class="more-link">더보기 &gt;</a>
       </div>
-    
+
       <div class="news-grid" id="newsGrid">
         <!-- 뉴스 카드 추가 예정 -->
       </div>
     </section>
-    
+
 
     <!-- 카페 추천 -->
     <section class="cafe-section">
@@ -74,12 +75,12 @@
         <p class="cafe-sub">분위기 좋은 카페에서 작업하면 버그가 도망간다는 소문이 있어요 ☕</p>
         <a th:href="@{/cafe/list}" class="cafe-more">더 많은 카페 추천받기 &gt;</a>
       </div>
-    
+
       <div class="cafe-list" id="cafeList">
         <!-- JS에서 데이터 렌더링 -->
       </div>
     </section>
-     
+
   </main>
 
   <!-- footer -->
@@ -89,10 +90,15 @@
   <script th:src="@{/js/common/theme.js}"></script>
 
   <!-- 알림창 띄우기 -->
-  <script th:inline="javascript"> 
+  <script th:inline="javascript">
     const message = /*[[${message}]]*/ "전달 받은 message";
-    if(message != null) alert(message); // message12가 없으면 null값
+    if (message != null) alert(message); // message12가 없으면 null값
   </script>
-  
+
 </body>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
 </html>
