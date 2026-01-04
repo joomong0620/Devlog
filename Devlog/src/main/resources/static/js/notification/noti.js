@@ -196,7 +196,40 @@ notiMenuBtn.addEventListener('click', e=>{
 
 
 
+// 알림 전체 삭제
+document.getElementById("allDeleteNoti").addEventListener("click", async e => {
 
+    
+    if(confirm("정말 알림을 모두 삭제하시겠습니까 ? ")) {
+        const resp = await fetch("/notification/allDelete", {method : "DELETE"});
+    
+        if(resp.ok) {
+            selectNotiList("ALL");
+            notiCount();
+            notiMenuArea.classList.toggle('display-none');
+        }
+
+    }
+
+    
+        
+
+
+})
+
+
+// 알림 전ㅊ ㅔ읽기
+document.getElementById("allReadNoti").addEventListener("click", async e=> {
+
+    const resp = await fetch("/notification/allRead", {method : "POST"});
+
+    if(resp.ok) {
+        selectNotiList("ALL");
+        notiCount();
+        notiMenuArea.classList.toggle('display-none');
+    }
+
+})
 
 
 

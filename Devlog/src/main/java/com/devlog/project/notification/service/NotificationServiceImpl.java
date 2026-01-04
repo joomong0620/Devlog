@@ -162,7 +162,7 @@ public class NotificationServiceImpl implements NotificationService {
 	    return switch (boardCode) {
 	        case 1 -> "/blog/" + boardNo;
 	        case 21, 22, 23, 24, 25, 26 -> "/ITnews/" + boardNo;
-	        case 3 -> "/freeboard/" + boardNo;
+	        case 3 -> "/board/freeboard/" + boardNo;
 	        default -> throw new IllegalArgumentException("Invalid boardCode: " + boardCode);
 	    };
 	}
@@ -170,12 +170,34 @@ public class NotificationServiceImpl implements NotificationService {
 	
 	// 알림 삭제
 	@Override
+	@Transactional
 	public void deleteNoti(Long notiNo) {
 		
 		NotificationEntity noti = notificationRepository.findById(notiNo)
 									.orElseThrow();
 		
 		notificationRepository.deleteById(notiNo);
+		
+	}
+
+	
+	
+	// 알림 전체 삭제
+	@Override
+	@Transactional
+	public void deleteAllNotification(Long memberNo) {
+		
+		notificationRepository.deleteAllByReceiver_MemberNo(memberNo);
+		
+	}
+
+	
+	// 알림 전체 읽기
+	@Override
+	@Transactional
+	public void readAllNotification(Long memberNo) {
+		
+		notificationRepository.readAllNotification(memberNo);
 		
 	}
 

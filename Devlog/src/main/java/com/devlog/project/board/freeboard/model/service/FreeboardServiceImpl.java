@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import com.devlog.project.board.freeboard.model.dto.Freeboard;
 import com.devlog.project.board.freeboard.model.dto.PaginationFB;
 import com.devlog.project.board.freeboard.model.mapper.FreeboardMapper;
+import com.devlog.project.notification.NotiEnums;
+import com.devlog.project.notification.dto.NotifiactionDTO;
+import com.devlog.project.notification.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class FreeboardServiceImpl implements FreeboardService {
 
 	private final FreeboardMapper mapper;
+	private final NotificationService notiService;
 	
 	@Override
 	public List<Map<String, Object>> selectBoardTypeList() {
@@ -84,6 +88,29 @@ public class FreeboardServiceImpl implements FreeboardService {
 		if(paramMap.get("check") == 0) { // 좋아요 X 상태
 			// BOARD_LIKE 테이블 INSERT
 			result = mapper.insertBoardLike(paramMap);
+			
+			// 본인 게시글 좋아요 아닐 경우에 알림
+			Long receiver = mapper.selectReceiverNo(paramMap.get("boardNo"));
+			Long sender = ((Number)paramMap.get("memberNo")).longValue();
+			if(result != 0 && !sender.equals(receiver)) {
+				
+				
+				String memberNickname = mapper.selectMemberNickname(receiver);
+				
+				NotifiactionDTO notification = NotifiactionDTO.builder()
+						.sender(((Number)paramMap.get("memberNo")).longValue())
+						.receiver(receiver)
+						.content(memberNickname +"님이 회원님의 게시글에 좋아요를 눌렀습니다.")
+						.preview(" ")
+						.type(NotiEnums.NotiType.LIKE)
+						.targetType(NotiEnums.TargetType.BOARD)
+						.targetId(((Number)paramMap.get("boardNo")).longValue())
+						.build();
+				
+				notiService.sendNotification(notification);
+			}
+			
+			
 
 		} else { // 좋아요 O 상태
 			// BOARD_LIKE 테이블 DELETE

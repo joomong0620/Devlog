@@ -3,6 +3,7 @@ package com.devlog.project.notification.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -43,5 +44,23 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
 			order by no.notificationNo desc
 			""")
 	List<NotificationEntity> findOptionNotiList(Long memberNo, NotiType notiType);
+
+
+	
+	// 유저 알림 전ㅊ ㅔ삭제
+	void deleteAllByReceiver_MemberNo(Long memberNo);
+
+
+	@Modifying
+	@Query("""
+	    update NotificationEntity n
+	    set n.isRead = com.devlog.project.notification.NotiEnums.IsRead.Y
+	    where n.receiver.memberNo = :memberNo
+	      and n.isRead = com.devlog.project.notification.NotiEnums.IsRead.N
+	""")
+	void readAllNotification(Long memberNo);
+
+
+
 	
 }

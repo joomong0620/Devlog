@@ -74,4 +74,28 @@ public class NotificationCotroller {
 		
 		service.deleteNoti(notiNo);
 	}
+	
+	
+	// 알림 전체 삭제
+	@DeleteMapping("/notification/allDelete")
+	@ResponseBody
+	public void deleteAllNotification(
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
+			) {
+		
+		service.deleteAllNotification(loginMember.getMemberNo());
+		
+		
+	}
+	
+	@PostMapping("/notification/allRead")
+	@ResponseBody
+	public void readAllNotification(
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
+			) {
+		
+		service.readAllNotification(loginMember.getMemberNo());
+		
+		
+	}
 }

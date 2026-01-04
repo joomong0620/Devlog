@@ -24,5 +24,11 @@ public interface NotificationService {
 	
 	// 알림 삭제
 	void deleteNoti(Long notiNo);
+	
+	// 알림 전체 삭제
+	void deleteAllNotification(Long memberNo);
+	
+	// 알림 전체 읽기
+	void readAllNotification(Long memberNo);
 
 }

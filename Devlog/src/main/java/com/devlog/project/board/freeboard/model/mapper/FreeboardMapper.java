@@ -45,6 +45,14 @@ public interface FreeboardMapper {
 	 * @param imgNo
 	 * @return
 	 */
-	public BoardImgDB selectImageByImgNo(Long imgNo);	
+	public BoardImgDB selectImageByImgNo(Long imgNo);
+	
+	
+	// 게시글 주인 조회
+	public Long selectReceiverNo(Integer boardNo);
+	
+	
+	// 작성자 닉네임 조회
+	public String selectMemberNickname(Long receiver);	
 	
 }

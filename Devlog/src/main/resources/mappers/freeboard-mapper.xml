@@ -204,6 +204,21 @@
         SELECT * FROM BOARD_IMG
         WHERE IMG_NO = ${imgNo}
     </select>	
-   
+	
+	<!-- 실시간 알림 전용 ============================================-->
+	<select id="selectReceiverNo" resultType="Long">
+		
+		SELECT MEMBER_NO
+		FROM BOARD
+		WHERE BOARD_NO = ${boardNo}
+		
+	</select>
+	
+	<select id="selectMemberNickname" resultType="string">
+		SELECT MEMBER_NICKNAME
+		FROM MEMBER
+		WHERE MEMBER_NO = ${receiver}
+		
+	</select>
    	
 </mapper>
