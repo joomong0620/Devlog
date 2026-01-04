@@ -19,28 +19,28 @@
         <p class="comment-content" th:text="${comment.commentContent}">내용</p>
 
 
-        <div class="comment-actions">
-          <button class="comment-good-btn" data-type="good">
-            <img th:src="@{/images/board/ITnews/comment_good.svg}" alt="좋아요" class="comment-icon" />
-            <span class="good-count">0</span>
-          </button>
+        <button class="comment-good-btn" data-type="good">
+          <img th:src="@{/images/board/ITnews/comment_good.svg}" alt="좋아요" class="comment-icon"
+            th:style="${comment.likeCheck == 1} ? 'filter: grayscale(0%)' : 'filter: grayscale(100%)'" />
+          <span class="good-count" th:text="${comment.likeCount}">0</span>
+        </button>
 
-          <!-- 싫어요 -->
-          <button class="comment-bad-btn" data-type="bad">
-            <img th:src="@{/images/board/ITnews/comment_bad.svg}" alt="싫어요" class="comment-icon" />
-          </button>
+        <button class="comment-bad-btn" data-type="bad">
+          <img th:src="@{/images/board/ITnews/comment_bad.svg}" alt="싫어요" class="comment-icon"
+            th:style="${comment.badCheck == 1} ? 'filter: grayscale(0%)' : 'filter: grayscale(100%)'" />
+          <span class="count" th:text="${comment.badCount}">0</span> </button>
 
-          <!-- 버튼 영역 -->
-          <div class="comment-btn-area">
-            
-            <button th:if="${session.loginMember}"
-              th:onclick="|showInsertComment(${comment.commentNo}, this)|">답글</button>
-            <th:block th:if="${session.loginMember?.memberNo == comment.memberNo}">
-              <button th:onclick="|showUpdateComment(${comment.commentNo}, this)|">수정</button>
-              <button th:onclick="|deleteComment(${comment.commentNo})|">삭제</button>
-            </th:block>
-          </div>
-        </li>
+        <!-- 버튼 영역 -->
+        <div class="comment-btn-area">
+
+          <button th:if="${session.loginMember}"
+            th:onclick="|showInsertComment(${comment.commentNo}, this)|">답글</button>
+          <th:block th:if="${session.loginMember?.memberNo == comment.memberNo}">
+            <button th:onclick="|showUpdateComment(${comment.commentNo}, this)|">수정</button>
+            <button th:onclick="|deleteComment(${comment.commentNo})|">삭제</button>
+          </th:block>
+        </div>
+      </li>
     </ul>
   </div>
 

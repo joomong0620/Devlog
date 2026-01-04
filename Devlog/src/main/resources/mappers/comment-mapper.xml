@@ -23,19 +23,24 @@
 
      <!-- 특정 게시글 댓글 조회(계층형 쿼리) -->
 	<select id="select" resultMap="comment_rm">
-		SELECT LEVEL, C.* FROM(
-		    SELECT COMMENT_NO, COMMENT_CONTENT
-		    , TO_CHAR(C_CREATE_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분" SS"초"') C_CREATE_DATE
-		    , BOARD_NO, MEMBER_NO, MEMBER_NICKNAME, PROFILE_IMG, PARENTS_COMMENT_NO, COMMENT_DEL_FL
-		    , MODIFY_YN
-		    FROM "COMMENT"
-		    JOIN MEMBER USING(MEMBER_NO)
-		    WHERE BOARD_NO = ${boardNo}) C 
-		START WITH PARENTS_COMMENT_NO IS NULL
-		CONNECT BY PRIOR COMMENT_NO = PARENTS_COMMENT_NO
-		ORDER SIBLINGS BY COMMENT_NO
+	    SELECT LEVEL, C.* FROM (
+	        SELECT COMMENT_NO, COMMENT_CONTENT,
+	            TO_CHAR(C_CREATE_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분" SS"초"') C_CREATE_DATE,
+	            BOARD_NO, MEMBER_NO, MEMBER_NICKNAME, PROFILE_IMG, 
+	            NVL(PARENTS_COMMENT_NO, 0) AS PARENTS_COMMENT_NO, COMMENT_DEL_FL, MODIFY_YN,
+	            (SELECT COUNT(*) FROM COMMENT_LIKE L WHERE L.COMMENT_NO = C_INNER.COMMENT_NO AND STATUS = 1) LIKE_COUNT,
+	            (SELECT COUNT(*) FROM COMMENT_LIKE L WHERE L.COMMENT_NO = C_INNER.COMMENT_NO AND STATUS = 2) BAD_COUNT,
+	            (SELECT NVL(MAX(STATUS), 0) FROM COMMENT_LIKE L 
+	             WHERE L.COMMENT_NO = C_INNER.COMMENT_NO AND L.MEMBER_NO = #{memberNo}) LIKE_CHECK
+	        FROM "COMMENT" C_INNER
+	        JOIN MEMBER USING(MEMBER_NO)
+	        WHERE BOARD_NO = #{boardNo}
+	    ) C 
+	    START WITH PARENTS_COMMENT_NO = 0 CONNECT BY PRIOR COMMENT_NO = PARENTS_COMMENT_NO
+	    ORDER SIBLINGS BY COMMENT_NO
 	</select>
 
+   <!-- 댓글 삽입 -->
 	<insert id="insert" parameterType="Comment">
 		<selectKey order="BEFORE" resultType="int"
 			keyProperty="commentNo">
@@ -87,6 +92,34 @@
 		FROM MEMBER
 		WHERE MEMBER_NO = ${memberNo}
 		
+	</select>
+	
+	
+	<update id="updateLikeDislike">
+    MERGE INTO COMMENT_LIKE L
+    USING DUAL
+    ON (L.COMMENT_NO = #{commentNo} AND L.MEMBER_NO = #{memberNo})
+    WHEN MATCHED THEN
+        UPDATE SET STATUS = CASE 
+            WHEN L.STATUS = #{status} THEN 0
+            ELSE #{status}
+        END
+    WHEN NOT MATCHED THEN
+        INSERT (COMMENT_NO, MEMBER_NO, STATUS)
+        VALUES (#{commentNo}, #{memberNo}, #{status})
+	</update>
+	
+	<select id="countCommentLikes" resultType="_int">
+	    SELECT COUNT(*) FROM COMMENT_LIKE WHERE COMMENT_NO = #{commentNo} AND STATUS = 1
+	</select>
+	
+	<select id="countCommentDislikes" resultType="_int">
+	    SELECT COUNT(*) FROM COMMENT_LIKE WHERE COMMENT_NO = #{commentNo} AND STATUS = 2
+	</select>
+	
+	<select id="checkLikeDislikeStatus" resultType="_int">
+	    SELECT NVL(MAX(STATUS), 0) FROM COMMENT_LIKE 
+	    WHERE COMMENT_NO = #{commentNo} AND MEMBER_NO = #{memberNo}
 	</select>
 	
 	

@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>자유게시판 - 상세보기</title>
 
-    <link rel="stylesheet" th:href="@{/css/board/freeboard/freeboardDetail.css}">
     <link rel="stylesheet" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" th:href="@{/css/common/common.css}" />
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+    <link rel="stylesheet" th:href="@{/css/board/freeboard/freeboardDetail.css}">
+    <link rel="stylesheet" th:href="@{/css/board/freeboard/comments.css}">
 </head>
 <body>
     <!-- <p th:text="${freeboard}" th:if="${freeboard != null}"></p>     -->
@@ -14,11 +17,12 @@
     <main>
 
         <!-- 헤더 -->
-        <header class="main-header">header</header>
+        <!-- <header class="main-header">header</header> -->
         <!-- header.html (fragment) 추가 -->
         <!-- <th:block th:replace="~{/common/header}">header.html</th:block> -->
         <!-- 또는 -->
-        <!-- <div th:replace="common/header :: header"></div> -->
+        <div th:replace="common/header :: header"></div>
+        <script th:src="@{/js/common/header.js}"></script>
 
         <!-- 네비게이션 -->
         <nav class="main-nav"></nav>
@@ -104,13 +108,16 @@
             </div>
 
         </div>
-
+        
+		<th:block th:replace="~{board/freeboard/comments}"></th:block>  
+		   
         <!--  ###################################################### -->
-        <footer class="main-footer">footer</footer>
+        <!-- <footer class="main-footer">footer</footer> -->
         <!-- footer.html 추가 -->
         <!-- <th:block th:replace="~{common/footer}">footer.html</th:block> -->
         <!-- 또는 -->
-        <!-- <div th:replace="common/footer :: footer"></div> -->
+        <div th:replace="common/footer :: footer"></div>
+        
     </main>
 
     <script th:inline="javascript"> // freeboardDetail.js처럼 JS에서 사용할 전역 변수들을 선언~~
@@ -130,12 +137,13 @@
     
     <!-- 알림창 띄우기 -->
     <script th:inline="javascript"> 
-        //const message = /*[ [ ${message} ] ]*/ "전달 받은 message";
         let message = /*[[${message}]]*/ null;
         if(message != null) alert(message); // message12가 없으면 null값
     </script>
     
     <!-- freeboardDetail.js 추가 -->
     <script th:src="@{/js/board/freeboard/freeboardDetail.js}"></script>    
+    <!-- freeboardComment.js 추가 -->
+    <script th:src="@{/js/board/freeboard/freeboardComment.js}"></script>        
 </body>
 </html>

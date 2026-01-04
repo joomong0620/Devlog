@@ -58,8 +58,11 @@ public class ITnewsServiceImpl implements ITnewsService {
 	        if (os.contains("win")) {
 	            // Windows
 	            pythonCmd = "python";
+	        } else if (os.contains("mac")) {
+	            // macOS
+	            pythonCmd = "/usr/bin/python3";
 	        } else {
-	            // Linux / Ubuntu / Mac
+	            // Linux
 	            pythonCmd = "/home/yypark/miniconda3/bin/python3";
 	        }
 
@@ -160,5 +163,27 @@ public class ITnewsServiceImpl implements ITnewsService {
 	    }
 
 	    return result;
+	}
+
+	// 스크랩
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public int toggleScrap(Map<String, Object> paramMap) {
+		int check = ITnewsmapper.checkScrap(paramMap);
+		
+		if(check == 0) {
+			ITnewsmapper.insertScrap(paramMap);
+			return 1;
+		}else {
+			ITnewsmapper.deleteScrap(paramMap);
+			return 0;
+		}
+		
+	}
+	
+	// 스크랩 확인
+	@Override
+	public int checkScrap(Map<String, Object> scrapMap) {
+		return ITnewsmapper.checkScrap(scrapMap);
 	}
 }
