@@ -109,25 +109,39 @@
         </thead>
 
         <tbody>
-          <!-- 추후 th:each 로 교체 -->
-          <tr th:onclick="|openModal('게시글')|">
-            <td>01</td>
-            <td>스팸/광고</td>
-            <td>게시글</td>
-            <td>이 사용자가 광고성 링크를 게시했습니다.</td>
-            <td>김소연</td>
-            <td>홍준홍</td>
-            <td>2025.01.12</td>
-            <td>2025.01.13</td>
+          <tr th:each="report : ${reportList}"
+              th:data-target-type="${report.targetType}"
+              th:data-report-no="${report.reportNo}"
+              onclick="openModal(this)">
+
+            <!-- 번호 -->
+            <td th:text="${report.reportNo}">1</td>
+            <td th:text="${report.reportType}">스팸/광고</td>
+            <td th:text="${report.targetType}">BOARD</td>
+            <td th:text="${report.reportReason}">내용</td>
+            <td th:text="${report.reporterNickname}">신고자</td>
+            <td th:text="${report.targetNickname}">대상자</td>
+            <td th:text="${#temporals.format(report.reportDate, 'yyyy.MM.dd')}">
+              2025.01.12
+            </td>
+            <td th:text="${report.processDate != null 
+                ? #temporals.format(report.processDate, 'yyyy.MM.dd') 
+                : '-'}">
+              -
+            </td>
+
+            <!-- 상태 -->
             <td>
-              <div class="status-wrapper">
-                <select class="status-select">
-                  <option>처리전</option>
-                  <option>처리완료</option>
-                  <option selected>반려</option>
+              <div class="status-wrapper" onclick="event.stopPropagation()">
+                <select class="status-select"
+                        th:value="${report.status}">
+                  <option th:value="PENDING">처리전</option>
+                  <option th:value="RESOLVED">처리완료</option>
+                  <option th:value="REJECTED">반려</option>
                 </select>
               </div>
             </td>
+
           </tr>
         </tbody>
       </table>
@@ -180,24 +194,37 @@
     const moveButton = document.getElementById("moveButton");
 
     function openModal(type) {
+    //   modal.style.display = "flex";
+
+    //   if (type === "게시글") {
+    //     moveButton.textContent = "해당 게시글 이동";
+    //     moveButton.onclick = () => {
+    //       // TODO: Spring Boot 게시글 상세 페이지 이동
+    //       // location.href = `/post/detail?postId=xxx`;
+    //       alert("우하하 아직 스프링부트 연동 전이에요");
+    //     };
+    //   } else {
+    //     moveButton.textContent = "해당 채팅 보기";
+    //     moveButton.onclick = () => {
+    //       // TODO: Spring Boot 채팅 상세 보기
+    //       // location.href = `/chat/report?chatId=xxx`;
+    //       alert("우하하 아직 스프링부트 연동 전이에요");
+    //     };
+    //   }
+    // }
+    function openModal(row) {
+      const targetType = row.dataset.targetType;
+      const reportId = row.dataset.reportId;
+
       modal.style.display = "flex";
 
-      if (type === "게시글") {
+      if (targetType === 'BOARD') {
         moveButton.textContent = "해당 게시글 이동";
-        moveButton.onclick = () => {
-          // TODO: Spring Boot 게시글 상세 페이지 이동
-          // location.href = `/post/detail?postId=xxx`;
-          alert("우하하 아직 스프링부트 연동 전이에요");
-        };
       } else {
         moveButton.textContent = "해당 채팅 보기";
-        moveButton.onclick = () => {
-          // TODO: Spring Boot 채팅 상세 보기
-          // location.href = `/chat/report?chatId=xxx`;
-          alert("우하하 아직 스프링부트 연동 전이에요");
-        };
       }
     }
+
 
     function closeModal() {
       modal.style.display = "none";

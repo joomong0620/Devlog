@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.devlog.project.manager.model.dto.ReportManagerDTO;
+import com.devlog.project.manager.model.service.ManagerReportService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.pay.dto.PayDTO;
 import com.devlog.project.pay.service.PayService;
@@ -22,11 +24,16 @@ import com.devlog.project.pay.service.PayService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/manager")
 public class ManagerController {
 	
+    private final ManagerReportService managerReportService;
+    
 	@Autowired PayService payService;
 	
 	
@@ -35,6 +42,18 @@ public class ManagerController {
     @GetMapping("/dashboard")
     public String adminDashboard() {
         return "manager/manager-home";
+    }
+    
+    // 신고 목록 조히
+    @GetMapping("/dashboard/report")
+    public String reportList(Model model) {
+
+        List<ReportManagerDTO> reportList =
+                managerReportService.getReportList();
+
+        model.addAttribute("reportList", reportList);
+
+        return "manager/manager-report";
     }
     
     
