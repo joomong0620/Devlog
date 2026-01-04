@@ -58,8 +58,11 @@ public class ITnewsServiceImpl implements ITnewsService {
 	        if (os.contains("win")) {
 	            // Windows
 	            pythonCmd = "python";
+	        } else if (os.contains("mac")) {
+	            // macOS
+	            pythonCmd = "/usr/bin/python3";
 	        } else {
-	            // Linux / Ubuntu / Mac
+	            // Linux
 	            pythonCmd = "/home/yypark/miniconda3/bin/python3";
 	        }
 
