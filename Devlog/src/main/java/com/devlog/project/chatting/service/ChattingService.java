@@ -7,6 +7,8 @@ import java.util.Map;
 import com.devlog.project.chatting.dto.ChattingDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.GroupCreateDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.RoomInfoDTO;
+import com.devlog.project.chatting.dto.MentionDTO;
+import com.devlog.project.chatting.dto.MessageDTO.ChatMessageResponse;
 import com.devlog.project.chatting.dto.ParticipantDTO;
 
 public interface ChattingService {
@@ -32,7 +34,7 @@ public interface ChattingService {
 	
 	
 	// 채팅방 마지막 메세지 업데이트
-	void updateLastRead(Long roomNo, Long memberNo);
+	Long updateLastRead(Long roomNo, Long memberNo);
 	
 	
 	
@@ -50,6 +52,14 @@ public interface ChattingService {
 	
 	// 채팅방 주인 여부
 	boolean isOwner(Long roomNo, Long memberNo);
+	
+	
+	// 멘션 후보 조회
+	List<MentionDTO> mentionUsersSelect(Long roomNo, String keyword, Long memberNo);
+	
+	
+	// 텍스트 내용중에 @닉네임 있나 검색
+	void processMention(ChatMessageResponse res);
 	
 
 }

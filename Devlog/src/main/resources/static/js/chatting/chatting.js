@@ -1348,7 +1348,8 @@ function afterFuncLoad(){
     bindSendImage();
     imagebigViewer();
     bindMessageReportEvent();
-    bindProfileCardEvents()
+    bindProfileCardEvents();
+    bindMentionInput();
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -1602,6 +1603,15 @@ function onMessageReceived(payload) {
     const msg = JSON.parse(payload.body);
     
     console.log(msg);
+
+/*     if(msg.type == "READ") {
+
+        console.log("그럼 여기는 ?");
+        updateUnreadChange(msg);
+        // lastReadMsgCache = msg;
+
+        return ;
+    } */
 
     if(msg.status == 'MOD' || msg.status == 'DEL'){
 
@@ -1923,6 +1933,49 @@ function createOtherMessage(msg) {
 }
 
 
+// 채팅방 유저 들어올 시 메세지 카운트 업데이트
+function updateUnreadChange(msg) {
+    console.log("여기 오긴 하니 ? ? ");
+
+    const targets = getMessagesAfter(msg.last_read_no);
+
+//     for (let target of targets) {
+// 
+//         const unread =  target.querySelector('.unread-people');
+//         if(!unread) continue;
+// 
+//         const previousCount = Number(unread.innerText);
+// 
+//         const currentCount = previousCount - 1;
+// 
+//         if(currentCount == 0 ) {
+//             unread.innerText = '';
+//         }else {
+//             unread.innerText = currentCount;
+//         }
+
+        for (const target of targets) {
+            const unread = target.querySelector('.unread-people');
+            if (!unread) continue;
+
+            const prev = Number(unread.innerText) || 0;
+            const next = Math.max(prev - 1, 0);
+
+            unread.innerText = next === 0 ? '' : next;
+        }
+        
+
+        
+    
+
+}
+
+function getMessagesAfter(baseNo) {
+    return [...document.querySelectorAll('.message-item')]
+        .filter(el => Number(el.dataset.messageNo) > baseNo);
+}
+
+
 
 
 
@@ -2109,3 +2162,94 @@ reOverlay?.addEventListener('click', e => {
     }
 });
 
+
+
+
+
+// ======================================================
+// 멘션 함수    
+
+// 아래 함수에서 공통으로 쓸 변수들 전역으로 뺴둠
+let mentionContext = {
+    textarea: null,
+    mentionBox: null
+};
+
+// 채팅방 정보 로드 후 바인딩 될 함수
+function bindMentionInput() {
+
+    // 현재 채팅방의 메세지 입력창 멘션 박스 
+    const textarea = document.getElementById('send-message');
+    const mentionBox = document.getElementById('mention-box');
+
+    mentionContext.textarea = textarea;
+    mentionContext.mentionBox = mentionBox;
+
+    if (!textarea || !mentionBox) return;
+
+    // 입력 이벤트 감지
+    textarea.addEventListener('input', e => {
+        const value = textarea.value;
+        // 현재 커서 위치
+        const cursor = textarea.selectionStart;
+
+        // 커서 위치 직전까지 문자열
+        const text = value.slice(0, cursor);
+
+        // 커서 앞에 @로 시작하는 단어 검사
+        // 멘션 트리거
+        const match = text.match(/@([\w가-힣]*)$/);
+        if (!match) {
+            mentionBox.classList.add('display-none');
+            return;
+        }
+
+        const keyword = match[1];
+        showMentionCandidates(keyword);
+    });
+}
+
+
+// 멘션 후보 목록 조회
+function showMentionCandidates(keyword) {
+
+    const { mentionBox } = mentionContext;
+
+    fetch(`/devtalk/mention?keyword=${keyword}&roomNo=${currentRoomNo}`)
+        .then(resp => resp.json())
+        .then(list => {
+
+            // 기존 목록 초기화
+            mentionBox.innerHTML = '';
+
+            for (const user of list) {
+                const div = document.createElement('div');
+                div.className = 'mention-item';
+                div.innerText = user.member_nickname;
+                div.dataset.memberNo = user.member_no;
+                div.onclick = () => insertMention(user.member_nickname);
+                mentionBox.appendChild(div);
+            }
+
+            mentionBox.classList.remove('display-none');
+        });
+}
+
+
+// 멘션 목록 클릭 시 입력창 실제로 삽입 @닉네임 이런식
+function insertMention(nickname) {
+
+    const { textarea, mentionBox } = mentionContext;
+
+    const cursor = textarea.selectionStart;
+    const text = textarea.value;
+
+    const before = text.slice(0, cursor)
+        .replace(/@[\w가-힣]*$/, `@${nickname} `);
+
+    const after = text.slice(cursor);
+
+    textarea.value = before + after;
+    mentionBox.classList.add('display-none');
+    textarea.focus();
+}

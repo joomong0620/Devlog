@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.devlog.project.chatting.chatenums.ChatEnums.Role;
+import com.devlog.project.chatting.dto.MentionDTO;
 import com.devlog.project.chatting.dto.ParticipantDTO;
 import com.devlog.project.chatting.dto.ParticipantDTO.ChatListUpdateDTO;
 import com.devlog.project.chatting.entity.ChattingUser;
@@ -90,6 +91,36 @@ public interface ChattingUserRepository extends JpaRepository<ChattingUser, Chat
 	
 	// 방장 여붖 ㅗ회
 	boolean existsByChatUserIdRoomNoAndChatUserIdMemberNoAndRole(Long roomNo, Long memberNo, Role owner);
+
+
+	
+	// 업데이트 전 마지막 읽은 메세지 조회
+	@Query("""
+			select cu.lastReadNo
+			from ChattingUser cu
+			where cu.member.memberNo = :memberNo
+			and cu.chattingRoom.roomNo = :roomNo
+			""")
+	Long selectLastReadMessagNo(Long roomNo, Long memberNo);
+
+	
+	
+	
+	
+	@Query("""
+		    select new com.devlog.project.chatting.dto.MentionDTO(
+		        m.memberNo,
+		        m.memberNickname,
+		        m.profileImg
+		    )
+		    from ChattingUser cu
+		    join cu.member m
+		    where cu.chattingRoom.roomNo = :roomNo
+		      and m.memberNo <> :memberNo
+		      and m.memberNickname like concat('%', :keyword, '%')
+		    order by m.memberNickname
+		""")
+	List<MentionDTO> findByUser(Long roomNo, String keyword, Long memberNo);
 
 	
 	

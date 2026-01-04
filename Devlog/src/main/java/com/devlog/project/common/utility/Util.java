@@ -53,4 +53,18 @@ public class Util {
 
 		    return time.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 		}
+	   
+	   // 시rks 변경 메소드
+	   public static String formatNotiTime(LocalDateTime time) {
+		    if (time == null) return "";
+
+		    LocalDate today = LocalDate.now();
+		    LocalDate date = time.toLocalDate();
+
+		    if (date.equals(today)) {
+		        return time.format(DateTimeFormatter.ofPattern("HH:mm"));
+		    }
+
+		    return time.format(DateTimeFormatter.ofPattern("MM.dd"));
+		}
 }

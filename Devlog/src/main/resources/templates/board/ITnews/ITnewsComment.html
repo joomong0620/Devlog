@@ -33,14 +33,14 @@
           <!-- 버튼 영역 -->
           <div class="comment-btn-area">
             
+            <button th:if="${session.loginMember}"
+              th:onclick="|showInsertComment(${comment.commentNo}, this)|">답글</button>
             <th:block th:if="${session.loginMember?.memberNo == comment.memberNo}">
-              <button th:if="${session.loginMember}"
-                th:onclick="|showInsertComment(${comment.commentNo}, this)|">답글</button>
               <button th:onclick="|showUpdateComment(${comment.commentNo}, this)|">수정</button>
               <button th:onclick="|deleteComment(${comment.commentNo})|">삭제</button>
             </th:block>
           </div>
-      </li>
+        </li>
     </ul>
   </div>
 
