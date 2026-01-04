@@ -1286,3 +1286,28 @@ input[name='msgSearch'] {
     box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
     user-select: none;
 }
+
+
+/*  멘션 박스  */
+.mention-box {
+    position: absolute;
+    bottom: 60px;
+    left: 12px;
+    width: 240px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+
+.mention-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.mention-item:hover {
+    background: #f2f4f7;
+}

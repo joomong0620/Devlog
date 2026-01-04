@@ -103,6 +103,16 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 			order by m.sendTime desc
 			""")
 	List<QueryMessageResponseDTO> searchMessage(Long roomNo, String query);
+
+
+	
+	@Query("""
+			select m.chattingRoom.roomNo
+			from Message m
+			where m.messageNo = :targetId
+			
+			""")
+	Long findRoomNoByMessageNo(Long targetId);
 	
 	
 }

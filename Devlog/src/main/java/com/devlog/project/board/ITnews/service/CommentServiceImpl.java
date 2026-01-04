@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.devlog.project.board.ITnews.dto.Comment;
 import com.devlog.project.board.ITnews.mapper.CommentMapper;
 import com.devlog.project.common.utility.Util;
+import com.devlog.project.notification.NotiEnums;
+import com.devlog.project.notification.dto.NotifiactionDTO;
+import com.devlog.project.notification.service.NotificationService;
 
 
 
@@ -18,6 +21,9 @@ public class CommentServiceImpl implements CommentService{
 	
 	@Autowired
 	private CommentMapper mapper;
+	
+	@Autowired
+	private NotificationService notiService;
 	
 	// 댓글 목록 조회
 	@Override
@@ -44,6 +50,32 @@ public class CommentServiceImpl implements CommentService{
 //	    System.out.println("DB 삽입 직전 객체: " + comment);
 	    
 	    int result = mapper.insert(comment);
+	    
+	    // 대댓글 알림 생성 
+	    if(result > 0 && comment.getParentCommentNo() != 0) {
+	    	
+	    	int parentMemberNo = mapper.getParentMemberNo(comment.getParentCommentNo());
+	    	
+	    	if(parentMemberNo == comment.getMemberNo()) {
+	    		
+	    		String memberNickname = mapper.selectMemberNickname(comment.getMemberNo());
+	    		
+	    		NotifiactionDTO notification = NotifiactionDTO.builder()
+						.sender((long) comment.getMemberNo())
+						.receiver((long) parentMemberNo)
+						.content(memberNickname +"님이 회원님의 댓글에 답글을 남겼습니다.")
+						.preview(comment.getCommentContent())
+						.type(NotiEnums.NotiType.COMMENT)
+						.targetType(NotiEnums.TargetType.COMMENT)
+						.targetId((long) comment.getCommentNo())
+						.build();
+	    		
+	    		notiService.sendNotification(notification);
+	    		
+	    		
+	    	}
+	    	
+	    }
 	    
 //	    System.out.println("Mapper 반환값: " + result);
 	    

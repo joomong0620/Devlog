@@ -45,6 +45,8 @@ public class MessageController {
 	
 	private final ChattingService chatService;
 	
+	
+	
 	// 현재 채팅방에 참여중인 회원 목록을 담을 Map
 	// key = roomNo, value = 해당 채팅방에 접속한 memberNo 집합
 	// ConcurrentHashMap + newKeySet() → 멀티스레드 환경에서도 안전하게 관리
@@ -81,6 +83,12 @@ public class MessageController {
 		
 		
 		ChatMessageResponse res = service.insertMsg(msg);
+		
+		
+		if(res.getContent().contains("@")) {
+			
+			chatService.processMention(res);
+		}
 		
 		int totalViewers = msg.getTotalCount();
 		int onlineViewers = roomViewers.getOrDefault(msg.getChatRoomNo(), Set.of()).size();
@@ -120,10 +128,21 @@ public class MessageController {
 	@MessageMapping("/chat.read")
 	public void messageRead(@Payload MessageDTO.messageReadRequest req) {
 		
-		System.out.println("req = " + req);
+		// System.out.println("req = " + req);
 		
-		chatService.updateLastRead(req.getRoomNo(), req.getMemberNo());
+		Long lastReadMessageNo = chatService.updateLastRead(req.getRoomNo(), req.getMemberNo());
 		
+		
+		System.out.println("업데이트 전 마지막 읽은 메세지 : " + lastReadMessageNo);
+		
+		Map<String, Object> result = new HashMap<>();
+		
+		/*
+		 * result.put("type", "READ"); result.put("LastReadNo", lastReadMessageNo);
+		 * 
+		 * 
+		 * templete.convertAndSend( "/topic/room/" + req.getRoomNo(), result );
+		 */
 		
 	}
 	
@@ -248,8 +267,6 @@ public class MessageController {
 		
 		return "chatting/chatting :: #searchMsgArea";
 	}
-
-
 	
 
 }

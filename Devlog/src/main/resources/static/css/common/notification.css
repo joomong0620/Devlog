@@ -31,6 +31,7 @@
     border-radius: 10px;
     list-style: none;
     padding: 6px 0;
+    z-index: 1300;
 }
 
 .noti-menu-dropdown li {
@@ -173,4 +174,29 @@
 
 .noAlarm > span {
     color: #777;
+}
+
+
+.notiUnread, .allUnread, .likeUnread, .commentUnread, .followUnread, .mentionUnread {
+    position: absolute;
+    border-radius: 50%;
+    background-color: #BD83CE;
+    width: 20px;
+    height: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+
+    top: -10px;
+    right: -10px;
+}
+
+#noti-btn, #allNoti, #likeNoti, #commentNoti, #followNoti, #mentionNoti{
+    position: relative;
+    
 }

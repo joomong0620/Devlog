@@ -70,6 +70,26 @@
 		    WHERE COMMENT_NO = #{commentNo}
 
 	</update>
+	
+	
+	<!-- 부모 댓글 회원 조회-->
+	<select id="getParentMemberNo" resultType="_int">
+		
+		SELECT MEMBER_NO
+		FROM "COMMENT"
+		WHERE "COMMENT_NO" = ${parentMemberNo}
+		
+	</select>
+	
+	
+	<select id="selectMemberNickname" resultType="string">
+		SELECT MEMBER_NICKNAME
+		FROM MEMBER
+		WHERE MEMBER_NO = ${memberNo}
+		
+	</select>
+	
+	
 
 
 </mapper>

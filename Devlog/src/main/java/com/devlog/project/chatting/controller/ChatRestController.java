@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.devlog.project.chatting.dto.ChattingDTO;
+import com.devlog.project.chatting.dto.MentionDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.ChattingListDTO;
 import com.devlog.project.chatting.service.ChattingService;
 import com.devlog.project.common.utility.Util;
@@ -170,6 +171,23 @@ public class ChatRestController {
 		
 		return ResponseEntity.ok().build();
 		
+	}
+	
+	// 멘션 후보 조회
+	@GetMapping("/devtalk/mention")
+	public ResponseEntity<List<MentionDTO>> mentionUsers(
+			@RequestParam("roomNo") Long roomNo,
+			@RequestParam("keyword") String keyword,
+			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
+			) {
+		
+		Long memberNo = loginMember.getMemberNo();
+		
+		List<MentionDTO> resp = chattingService.mentionUsersSelect(roomNo, keyword, memberNo);
+		
+		System.out.println("멘션 후보 확인 : "+ resp);
+		
+		return ResponseEntity.ok(resp);
 	}
 	
 }	

@@ -14,15 +14,15 @@
 
 </head>
 <body>
-    <th:block th:replace="~{common/header}">header.html</th:block>
-    
-    
-    <div id="modal-root"></div>
-    <script th:src="@{/js/common/report.js}"></script>
-
-
+    <!-- <th:block th:replace="~{common/header}">header.html</th:block> -->
+    <div th:replace="common/header :: header"></div>
     <script th:src="@{/js/notification/noti.js}"></script>
     <script th:src="@{/js/common/header.js}"></script>
+    <div id="modal-root"></div>
+    <script th:src="@{/js/common/report.js}"></script>
+    
+
+
 
     <!-- 이미지 라이트박스 -->
     <div id="imageViewer" class="image-viewer display-none flex-center">
@@ -501,6 +501,8 @@
                             <img id="send-image-preview" src="" alt="">
                             <span id="send-image-delete" class="fw-600 fs-14">x</span>
                         </div>
+
+                        <div id="mention-box" class="mention-box display-none"></div>
 
                         <textarea id="send-message"
                                 name="messageContent"

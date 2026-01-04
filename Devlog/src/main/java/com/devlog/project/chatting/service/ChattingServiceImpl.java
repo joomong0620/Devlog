@@ -7,10 +7,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.ibatis.javassist.bytecode.stackmap.BasicBlock.Catch;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +32,9 @@ import com.devlog.project.chatting.dto.ChattingDTO.FollowListDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.GroupCreateDTO;
 import com.devlog.project.chatting.dto.ChattingDTO.RoomInfoDTO;
 import com.devlog.project.chatting.dto.EmojiDTO;
+import com.devlog.project.chatting.dto.MentionDTO;
 import com.devlog.project.chatting.dto.MessageDTO;
+import com.devlog.project.chatting.dto.MessageDTO.ChatMessageResponse;
 import com.devlog.project.chatting.dto.MessageDTO.systemMessage;
 import com.devlog.project.chatting.dto.ParticipantDTO;
 import com.devlog.project.chatting.dto.ParticipantDTO.ChatListUpdateDTO;
@@ -44,6 +50,9 @@ import com.devlog.project.chatting.repository.MessageRepository;
 import com.devlog.project.common.utility.Util;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.MemberRepository;
+import com.devlog.project.notification.NotiEnums;
+import com.devlog.project.notification.dto.NotifiactionDTO;
+import com.devlog.project.notification.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +72,8 @@ public class ChattingServiceImpl implements ChattingService {
 	
 	private final MessageRepository messageRepository;
 	private final MessageEmojiRepository emojiRepository;
+	
+	private final NotificationService notiService;
 	
 	
 	private final SimpMessagingTemplate template;
@@ -337,13 +348,20 @@ public class ChattingServiceImpl implements ChattingService {
 	// 마지막으로 읽은 메세지 업데이트
 	@Override
 	@Transactional
-	public void updateLastRead(Long roomNo, Long memberNo) {
+	public Long updateLastRead(Long roomNo, Long memberNo) {
 		
 		
 		log.info("roomNo : {}", roomNo);
 		log.info("memberNo : {}", memberNo);
 		
+		Long lastReadNo = chattingUserRepository.selectLastReadMessagNo(roomNo, memberNo);
+		
+		
+		
+		
 		chattingUserRepository.updateLastReadMessageNo(roomNo, memberNo);
+		
+		return lastReadNo;
 	}
 
 
@@ -477,6 +495,75 @@ public class ChattingServiceImpl implements ChattingService {
 	            .existsByChatUserIdRoomNoAndChatUserIdMemberNoAndRole(
 	                    roomNo, memberNo, ChatEnums.Role.OWNER
 	                );
+	}
+
+	
+	
+	// 멘션 후보 조회
+	@Override
+	public List<MentionDTO> mentionUsersSelect(Long roomNo, String keyword, Long memberNo) {
+
+		
+		
+		
+		return  chattingUserRepository.findByUser(roomNo, keyword, memberNo);
+	}
+
+	
+	
+	// 멘션 내용중 닉네임 
+	@Override
+	@Transactional
+	public void processMention(ChatMessageResponse res) {
+		
+		
+		Set<String> mentionNicknames = extractMentions(res.getContent());
+		
+		System.out.println("추출 닉네임 리스트 확인 : " + mentionNicknames);
+
+		
+		if(mentionNicknames.isEmpty()) return;
+		
+		
+		List<Member> targets = memberRepository.findByMemberNicknameIn(mentionNicknames);
+		
+		System.out.println("멘션 대상 수: " + targets.size());
+		
+		for (Member target : targets) {
+			
+			if(target.getMemberNo().equals(res.getSenderNo())) continue;
+			
+			NotifiactionDTO notification = NotifiactionDTO.builder()
+							.sender(res.getSenderNo())
+							.receiver(target.getMemberNo())
+							.content(res.getSenderName()+"님이 회원님을 언급했습니다.")
+							.preview(res.getContent())
+							.type(NotiEnums.NotiType.MENTION)
+							.targetType(NotiEnums.TargetType.MESSAGE)
+							.targetId(res.getMessageNo())
+							.build();
+			
+			notiService.sendNotification(notification);
+			
+		}
+	}
+	
+	
+	private Set<String> extractMentions(String content) {
+		
+		// 중복 자동 제거 @규식 @규식 @규식 -->>> 규식 하나만
+		Set<String> result = new HashSet<>();
+		
+		Matcher matcher = Pattern.compile("@([\\w가-힣]+)")
+							.matcher(content);
+		// matcher.find() 다음 패턴을 계속 찾아서 더 없을 때까지 반복함
+		
+		// group(1) 괄호 안의 내용만 반환  [\\w가-힣]+) 이 부분만
+		while(matcher.find()) {
+			result.add(matcher.group(1));
+		}
+		
+		return result;
 	}
 
 

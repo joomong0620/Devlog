@@ -17,7 +17,7 @@ function selectCommentList() {
         }
 
         commentRow.setAttribute("data-comment-id", comment.commentNo);
-
+        commentRow.id = "comment-" + comment.commentNo;
         // 삭제된 댓글 처리
         if (comment.commentDeleteFlag === "Y") {
           const deleteMsg = document.createElement("p");
@@ -85,7 +85,7 @@ function selectCommentList() {
                 }">
             <span class="count">${comment.badCount}</span>
         </button>
-    `;
+        `;
 
         commentRow.append(commentWriter, commentContent, commentActions);
 
@@ -137,6 +137,7 @@ function selectCommentList() {
 
         commentList.append(commentRow);
       }
+      scrollToHashIfExists();
     });
 }
 
@@ -442,3 +443,15 @@ function insertChildComment(parentCommentNo, btn) {
 
 // 서비스 호출
 selectCommentList();
+
+
+
+function scrollToHashIfExists() {
+  const hash = location.hash;      // 예: "#comment-6"
+  if (!hash) return;
+
+  const target = document.querySelector(hash);
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}

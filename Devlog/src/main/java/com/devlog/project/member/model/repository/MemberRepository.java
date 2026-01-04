@@ -1,6 +1,8 @@
 package com.devlog.project.member.model.repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,5 +16,12 @@ public interface MemberRepository extends JpaRepository<Member, Long>  {
     boolean existsByMemberEmail(String memberEmail); // 회원가입중복체크
     
     boolean existsByMemberNickname(String memberNickname); // 닉네임중복체크
+    
+    
+    // 닉네임 일치하는 회원 반환
+	List<Member> findByMemberNicknameIn(Set<String> mentionNicknames);
+	
+	
+	
 }
 

@@ -11,7 +11,8 @@
 
   <!-- ===== Header ===== -->
   <header class="hd">
-
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}">
+    <link rel="stylesheet" th:href="@{/css/common/font.css}">
     <div class="hd-in">
       <!-- 왼쪽 영역 -->
       <div class="hd-l">
@@ -112,11 +113,12 @@
         </div>
 
         <!-- 알림 -->
-        <button class="btn-ico" id="noti-btn" aria-label="notification">
+        <button th:if="${session.loginMember}" class="btn-ico" id="noti-btn" aria-label="notification">
           <img th:src="@{/images/common/notifications.svg}" class="theme-icon" alt="notification" />
+          <span id="notiUnread"></span>
         </button>
 
-        <div class="alarm-panel display-none">
+        <div class="alarm-panel display-none" >
 
           <!-- 헤더 -->
           <div class="alarm-header flex-between">
@@ -133,116 +135,72 @@
 
           <!-- 필터 탭 -->
           <div class="alarm-filters flex gap-8">
-            <button class="filter is-active fs-12 fw-600">⭐ 전체</button>
-            <button class="filter  flex-center gap-4">
+            <button class="filter is-active flex-center" id="allNoti" style="border: 1px solid #E0CAFF;">
+              <span class="fs-12 fw-600">⭐ 전체</span>
+              <span id="allUnread"></span>
+            </button>
+            <button class="filter  flex-center gap-4" id="likeNoti" style="border: 1px solid #E0CAFF;">
               <img th:src="@{/images/notification/like.svg}">
               <span class="fs-12 fw-600">좋아요</span>
+              <span id="likeUnread"></span>
             </button>
-            <button class="filter flex-center gap-4">
+            <button class="filter flex-center gap-4" id="commentNoti" style="border: 1px solid #E0CAFF;">
               <img th:src="@{/images/notification/comment.svg}">
               <span class="fs-12 fw-600">댓글</span>
-
+              <span id="commentUnread"></span>
             </button>
-            <button class="filter flex-center gap-4">
-              <img th:src="@{/images/notification/fllow.svg}" alt="">
+            <button class="filter flex-center gap-4" id="followNoti" style="border: 1px solid #E0CAFF;">
+              <img th:src="@{/images/notification/follow.svg}" alt="">
               <span class="fs-12 fw-600">팔로우</span>
+              <span id="followUnread"></span>
             </button>
-            <button class="filter flex-center gap-4">
+            <button class="filter flex-center gap-4" id="mentionNoti" style="border: 1px solid #E0CAFF;">
               <img th:src="@{/images/notification/@.svg}">
               <span class="fs-12 fw-600">언급</span>
+              <span id="mentionUnread"></span>
             </button>
           </div>
 
           <!-- 알림 리스트 -->
-          <div>
+          <div id="alarm-panel">
             <!-- 알람이 없을 경우 -->
-            <div class="noAlarm flex-center display-none">
+            <div th:if="${#lists.isEmpty(notiList)}" class="noAlarm flex-center">
               <span class="fw-600 fs-24">/notifications 응답: 204 No Content</span>
             </div>
             <!-- 알람이 있을 경우 -->
-            <ul class="alarm-list flex-col gap-12">
-
-              <li class="alarm-item flex-between">
+            <ul th:if="${notiList != null and !#lists.isEmpty(notiList)}" class="alarm-list flex-col gap-12">
+              
+              <li th:each="list : ${notiList}" class="alarm-item flex-between"  th:data-id="${list.notiNo}" th:data-target-type="${list.targetType}"
+                th:classappend="${list.isRead == 'Y'} ? ' read-noti' : ''"
+              >
                 <div class="alarm-left flex gap-12">
                   <div class="alarm-icon comment">
-                    <img src="../../static/images/chatting/comment.svg">
+                    <img th:if="${list.type == 'LIKE'}"
+                        th:src="@{/images/notification/like.svg}">
+
+                    <img th:if="${list.type == 'COMMENT'}"
+                        th:src="@{/images/notification/comment.svg}">
+
+                    <img th:if="${list.type == 'FOLLOW'}"
+                        th:src="@{/images/notification/follow.svg}">
+
+                    <img th:if="${list.type == 'MENTION'}"
+                        th:src="@{/images/notification/@.svg}">
                   </div>
+                  
                   <div class="alarm-text">
-                    <p><b>소연님</b>이 회원님의 게시글에 댓글을 남겼습니다.</p>
-                    <span class="sub">파라요 ~</span>
+                    <p th:text="${list.content}"></p>
+                    <span class="sub" th:if="${list.preview != null}" th:text="${list.preview}">
+                    </span>
                   </div>
                 </div>
                 <div class="alarm-right">
-                  <span class="time">5분전</span>
+                  <span class="time" th:text="${list.formatTime}">5분전</span>
                   <button class="close">✕</button>
                 </div>
+
+                <input type="hidden" class="targetId" th:value="${list.targetId}">
               </li>
-
-              <li class="alarm-item flex-between">
-                <div class="alarm-left flex gap-12">
-                  <div class="alarm-icon mention">
-                    <img src="../../static/images/chatting/@.svg">
-                  </div>
-                  <div class="alarm-text">
-                    <p><b>종구님</b>이 회원님을 언급했습니다.</p>
-                    <span class="sub">@홀릭 언급이요 ~</span>
-                  </div>
-                </div>
-                <div class="alarm-right">
-                  <span class="time">7시간 전</span>
-                  <button class="close">✕</button>
-                </div>
-              </li>
-
-              <li class="alarm-item flex-between">
-                <div class="alarm-left flex gap-12">
-                  <div class="alarm-icon like">
-                    <img src="../../static/images/chatting/like.svg">
-                  </div>
-                  <div class="alarm-text">
-                    <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
-                    <span class="sub">게시글 제목</span>
-                  </div>
-                </div>
-                <div class="alarm-right">
-                  <span class="time">12-08</span>
-                  <button class="close">✕</button>
-                </div>
-              </li>
-
-              <li class="alarm-item flex-between read-noti">
-                <div class="alarm-left flex gap-12">
-                  <div class="alarm-icon like">
-                    <img src="../../static/images/chatting/like.svg">
-                  </div>
-                  <div class="alarm-text">
-                    <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
-                    <span class="sub">게시글 제목</span>
-                  </div>
-                </div>
-                <div class="alarm-right">
-                  <span class="time">12-08</span>
-                  <button class="close">✕</button>
-                </div>
-              </li>
-
-              <li class="alarm-item flex-between">
-                <div class="alarm-left flex gap-12">
-                  <div class="alarm-icon like">
-                    <img src="../../static/images/chatting/like.svg">
-                  </div>
-                  <div class="alarm-text">
-                    <p><b>주연님</b>이 회원님의 게시글을 좋아합니다.</p>
-                    <span class="sub">게시글 제목</span>
-                  </div>
-                </div>
-                <div class="alarm-right">
-                  <span class="time">12-08</span>
-                  <button class="close">✕</button>
-                </div>
-              </li>
-
-
 
             </ul>
 
@@ -275,7 +233,15 @@
       </div>
     </div>
 
+    <script th:inline="javascript">
+  
+      const loginCheck = [[${session.loginMember != null}]];
+  
+    </script>
+  
+    
   </header>
+
 </body>
 
 </html>

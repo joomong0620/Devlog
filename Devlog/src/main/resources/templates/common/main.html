@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DevLog Main</title>
   <link rel="stylesheet" th:href="@{/css/common/main.css}" />
-  <link rel="stylesheet" th:href="@{/css/common/common.css}" />
   <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+  <link rel="stylesheet" th:href="@{/css/common/common.css}" />
 </head>
 
 <body>
   <!-- header -->
   <div th:replace="common/header :: header"></div>
   <script th:src="@{/js/common/header.js}"></script>
+  <script th:src="@{/js/notification/noti.js}"></script>
   <!-- ===== Main Contents ===== -->
   <main class="main-container">
     <!-- 오늘의 인기글 + 활동중인 친구들 -->
@@ -85,7 +86,6 @@
   <div th:replace="common/footer :: footer"></div>
 
   <script th:src="@{/js/common/main.js}"></script>
-  <script th:src="@{/js/notification/noti.js}"></script>
   <script th:src="@{/js/common/theme.js}"></script>
 
   <!-- 알림창 띄우기 -->

@@ -22,5 +22,17 @@ public interface CommentMapper {
 	
 	// 댓글 삭제
 	public int delete(Comment comment);
+	
+	
+	
+	// 부모 댓글 회원 조회
+	public int getParentMemberNo(int parentCommentNo);
+	
+	// 닉네임 조회
+	public String selectMemberNickname(int memberNo);
+	
+	
+	// 해당 댓글 게시글 조회
+	public Long selectBoardNo(Long targetId);
 
 }
