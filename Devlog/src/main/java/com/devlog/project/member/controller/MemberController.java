@@ -1,5 +1,6 @@
 package com.devlog.project.member.controller;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -121,6 +122,31 @@ public class MemberController {
 	        // --------------------------------------------------
 			// 로그인 성공 시 response DTO에 로그인회원정보 담겨있다
 			// 1) 세션에 로그인한 회원 정보 추가
+	        
+	        // ===== [추가] 하루 1회 로그인 경험치 지급 (쿠키 기반) =====
+	        String today = LocalDate.now().toString();
+
+	        Cookie dailyExpCookie = null;
+	        if (request.getCookies() != null) {
+	            for (Cookie c : request.getCookies()) {
+	                if ("DAILY_EXP_GAIN".equals(c.getName())) {
+	                    dailyExpCookie = c;
+	                    break;
+	                }
+	            }
+	        }
+
+	        if (dailyExpCookie == null || !today.equals(dailyExpCookie.getValue())) {
+	            // 경험치 지급
+	            memberService.increaseExp(response.getMemberNo(), 50);
+
+	            // 쿠키 저장
+	            Cookie expCookie = new Cookie("DAILY_EXP_GAIN", today);
+	            expCookie.setPath("/");
+	            expCookie.setMaxAge(60 * 60 * 24);
+	            resp.addCookie(expCookie);
+	        }
+	        // ==================================================
 	        
 	        // 세션 고정 공격 방지 + 이전 사용자 정보 제거
 	        HttpSession oldSession = request.getSession(false);

@@ -268,5 +268,21 @@ public class MessageController {
 		return "chatting/chatting :: #searchMsgArea";
 	}
 	
+	@MessageMapping("/chat.typing")
+	public void typing(
+			@RequestBody Map<String, Object> paramMap
+			) {
+			
+		paramMap.put("type", "Typing");
+		System.out.println(paramMap);
+		
+		templete.convertAndSend(
+				"/topic/room/" + paramMap.get("roomNo"),
+				
+				paramMap
+				);
+		
+	}
+	
 
 }

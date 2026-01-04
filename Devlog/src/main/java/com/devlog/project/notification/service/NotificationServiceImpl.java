@@ -132,14 +132,14 @@ public class NotificationServiceImpl implements NotificationService {
 
 	            int boardCode = notiMapper.selectBoardCode(boardNo);
 
-	            yield resolveBoardUrl(boardCode, boardNo)
+	            yield returnBoardUrl(boardCode, boardNo)
 	                    + "#comment-" + noti.getTargetId();
 	        }
 
 	        case BOARD -> {
 	            int boardCode = notiMapper.selectBoardCode(noti.getTargetId());
 
-	            yield resolveBoardUrl(boardCode, noti.getTargetId());
+	            yield returnBoardUrl(boardCode, noti.getTargetId());
 	        }
 
 	        case MESSAGE -> {
@@ -148,8 +148,14 @@ public class NotificationServiceImpl implements NotificationService {
 	            if (roomNo == null)
 	                throw new IllegalStateException("roomNo null, messageNo = " + noti.getTargetId());
 
-	            yield "/devtalk/room?roomNo=" + roomNo
-	                    + "#msg-" + noti.getTargetId();
+	            yield "/devtalk?roomNo=" + roomNo
+	            		+ "&targetMsg=" + noti.getTargetId();
+	        }
+	        
+	        case USER -> {
+	        	
+	        	
+	        	yield "/devtalk/blog"; // 블로그 상세페이지 이동 sender 회원 
 	        }
 
 	        default -> throw new IllegalArgumentException("Unknown targetType: " + noti.getTargetType());
@@ -157,7 +163,7 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	
-	private String resolveBoardUrl(int boardCode, Long boardNo) {
+	private String returnBoardUrl(int boardCode, Long boardNo) {
 
 	    return switch (boardCode) {
 	        case 1 -> "/blog/" + boardNo;
