@@ -92,5 +92,27 @@
 	    INSERT INTO BOARD_IMG (IMG_NO, IMG_PATH, IMG_RENAME, BOARD_NO, IMG_ORDER)
 	    VALUES (SEQ_IMG_NO.NEXTVAL, #{imgPath}, #{imgRename}, #{boardNo}, 0)
 	</insert>
+	
+	<!-- 스크랩 확인 -->
+	<select id="checkScrap" resultType="_int">
+    SELECT COUNT(*) FROM USER_SCRAP
+    WHERE MEMBER_NO = #{memberNo}
+    AND TARGET_NO = #{targetNo}
+    AND TYPE = #{type}
+	</select>
+	
+	<insert id="insertScrap">
+	    INSERT INTO USER_SCRAP (SCRAP_NO, MEMBER_NO, TYPE, TARGET_NO)
+	    VALUES (SEQ_SCRAP_NO.NEXTVAL, #{memberNo}, #{type}, #{targetNo})
+	</insert>
+	
+	<delete id="deleteScrap">
+	    DELETE FROM USER_SCRAP
+	    WHERE MEMBER_NO = #{memberNo}
+	    AND TARGET_NO = #{targetNo}
+	    AND TYPE = #{type}
+	</delete>
+	
+	
 
 </mapper>

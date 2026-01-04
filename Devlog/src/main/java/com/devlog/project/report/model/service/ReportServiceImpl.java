@@ -3,6 +3,7 @@ package com.devlog.project.report.model.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.devlog.project.chatting.entity.Message;
@@ -15,6 +16,7 @@ import com.devlog.project.report.model.dto.ReportTargetDTO;
 import com.devlog.project.report.model.dto.ReportTypeDTO;
 import com.devlog.project.report.model.entity.Report;
 import com.devlog.project.report.model.entity.ReportCode;
+import com.devlog.project.report.model.mapper.ReportMapper;
 import com.devlog.project.report.model.reporitory.ReportCodeRepository;
 import com.devlog.project.report.model.reporitory.ReportRepository;
 
@@ -24,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
 	
+	@Autowired ReportMapper reportMapper;
 	private final MemberRepository memberRepository;
 	private final ReportCodeRepository codeRepository;
 	private final MessageRepository messageRepository;
@@ -122,6 +125,26 @@ public class ReportServiceImpl implements ReportService {
 		
 		
 		return result;
+	}
+
+
+	@Override
+	public String reportInsertBoard(ReportRequestDTO req) {
+	    // 중복 신고 확인
+	    int count = reportMapper.checkReportExist(req);
+	    
+	    if (count > 0) {
+	        return "이미 신고한 게시글입니다.";
+	    }
+
+	    // 신고 정보 삽입
+	    int result = reportMapper.insertBoardReport(req);
+
+	    if (result > 0) {
+	        return "신고가 성공적으로 접수되었습니다.";
+	    } else {
+	        return "신고 접수에 실패했습니다.";
+	    }
 	}
 	
 }

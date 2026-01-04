@@ -100,3 +100,39 @@ if (updateBtn != null) {
     location.href = `/ITnews/${boardNo}/update`;
   });
 }
+
+// 스크랩
+function toggleScrap(element, boardNo) {
+  if (loginMemberNo == 0) {
+    alert("로그인 후 이용해주세요.");
+    return;
+  }
+
+  const data = {
+    targetNo: boardNo,
+    type: "1", // 1: 게시글
+  };
+
+  fetch("/ITnews/scrap", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+    .then((resp) => resp.text())
+    .then((result) => {
+      const scrapIcon = document.getElementById("scrapIcon");
+
+      if (result > 0) {
+        // 스크랩 성공(삽입)
+        scrapIcon.src = "/images/common/scrap-filled.png";
+        alert("스크랩 목록에 추가되었습니다.");
+      } else if (result == 0) {
+        // 스크랩 취소(삭제)
+        scrapIcon.src = "/images/common/scrap-empty.png";
+        alert("스크랩이 취소되었습니다.");
+      } else {
+        alert("처리 중 오류가 발생했습니다.");
+      }
+    })
+    .catch((err) => console.log(err));
+}

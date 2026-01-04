@@ -19,4 +19,8 @@ public interface ReportService {
 	// 신고 정보 삽입
 	String reportInsertJpa(ReportRequestDTO req);
 
+	
+	// 게시글 신고
+	String reportInsertBoard(ReportRequestDTO req);
+
 }

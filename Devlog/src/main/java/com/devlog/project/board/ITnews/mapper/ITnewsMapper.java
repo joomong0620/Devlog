@@ -46,6 +46,15 @@ public interface ITnewsMapper {
 	
 	// 이미지 수정 
 	public int imageUpdate(ITnewsDTO itnews);
+	
+	// 스크랩 확인
+	public int checkScrap(Map<String, Object> scrapMap);
+
+	// 스크랩 삽입
+	public void insertScrap(Map<String, Object> paramMap);
+
+	// 스크랩 삭제
+	public void deleteScrap(Map<String, Object> paramMap);
 
 
 

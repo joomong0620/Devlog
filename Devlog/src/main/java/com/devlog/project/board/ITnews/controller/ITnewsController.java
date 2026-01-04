@@ -54,12 +54,13 @@ public class ITnewsController {
 			RedirectAttributes ra, HttpServletRequest req, HttpServletResponse resp, HttpSession session)
 			throws ParseException {
 
-		// 1. 상세 데이터 조회
+		// 상세 데이터 조회
 		ITnewsDTO news = itnewsService.selectNewsDetail(boardNo);
 
 		int likeCount = itnewsService.countBoardLike(boardNo);
 		model.addAttribute("likeCount", likeCount);
 
+		
 		if (news == null) {
 			ra.addFlashAttribute("message", "해당 뉴스가 존재하지 않습니다.");
 			return "redirect:/ITnews";
@@ -74,6 +75,15 @@ public class ITnewsController {
 			int likeCheck = itnewsService.newsLikeCheck(map);
 			if (likeCheck > 0)
 				model.addAttribute("likeCheck", "yes");
+			
+		    //  스크랩 여부 확인 
+		    Map<String, Object> scrapMap = new HashMap<>();
+		    scrapMap.put("targetNo", boardNo);           // USER_SCRAP 테이블의 TARGET_NO
+		    scrapMap.put("memberNo", loginMember.getMemberNo()); // 내 번호
+		    scrapMap.put("type", "1");                   // 1:게시글 타입 고정
+
+		    int scrapCheck = itnewsService.checkScrap(scrapMap); 
+		    model.addAttribute("scrapCheck", scrapCheck);
 		}
 
 		// 쿠키를 이용한 조회수 증가 로직
@@ -211,4 +221,26 @@ public class ITnewsController {
 		return path;
 	}
 
+	
+	
+	
+	// 스크랩 처리
+	@PostMapping("/ITnews/scrap")
+	@ResponseBody
+	public int toggleScrap(
+	    @RequestBody Map<String, Object> paramMap,
+	    @SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember) {
+	    
+	    if (loginMember == null) return -1;
+	    
+	    paramMap.put("memberNo", loginMember.getMemberNo());
+	    paramMap.put("type", "1"); 
+	    
+	    return itnewsService.toggleScrap(paramMap);
+	}
 }
+
+
+
+
+
