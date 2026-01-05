@@ -37,6 +37,20 @@
             </div>
         </section>
 
+        <section class="thumbnail-section">
+            <div class="thumbnail-upload-box" onclick="document.getElementById('thumbInput').click()">
+                <img id="thumbPreview"
+                    th:src="${post != null and post.thumbnailUrl != null ? post.thumbnailUrl : 'https://cdn-icons-png.flaticon.com/512/3342/3342137.png'}"
+                    alt="썸네일 미리보기">
+                <div class="upload-hint">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>대표 이미지(썸네일) 등록</span>
+                </div>
+            </div>
+            <input type="file" id="thumbInput" accept="image/*" style="display:none;">
+            <input type="hidden" id="thumbnailUrl" th:value="${post != null ? post.thumbnailUrl : ''}">
+        </section>
+
         <div class="spell-check-area">
             <span>스마트 맞춤법 검사</span>
             <label class="toggle-switch">
