@@ -38,6 +38,9 @@ public interface PayService {
 	// 커피콩 거래
 	int insertTrade(PayDTO trade);
 
+	// 구독 
+	int insertSubscription(PayDTO trade);
+
 
 
 }

@@ -26,16 +26,19 @@
 		    T.CONTENT_ID AS contentId,
 		    E.EXCHANGE_NO AS exchangeNo,
 		    CASE 
-		        -- 1. 환전 신청 내역인 경우
-		        WHEN E.EXCHANGE_NO IS NOT NULL THEN '환전'
-		        -- 2. 거래 내역(POST, SUBSCRIBE 등)인 경우
-		        WHEN T.TRADE_NO IS NOT NULL THEN T.CONTENT_TYPE
-		        -- 3. 거래/환전이 아니고 음수면 취소
-		        WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 THEN '취소'
-		        -- 4. 양수면 충전
-		        WHEN H.PAY_AMOUNT > 0 THEN '충전'
-		        ELSE '기타'
-		    END AS contentType
+			      /* 1. 거래 내역(TRADE_NO)이 있으면 무조건 그 타입을 따름 (SUBSCRIBE, POST 등) */
+	            WHEN T.TRADE_NO IS NOT NULL THEN T.CONTENT_TYPE
+	            
+	            /* 2. 환전 신청 내역인 경우 */
+	            WHEN E.EXCHANGE_NO IS NOT NULL THEN '환전'
+	            
+	            /* 3. 거래/환전이 아니고 음수면 그제서야 '취소' */
+	            WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 THEN '취소'
+	            
+	            /* 4. 양수면 충전 */
+	            WHEN H.PAY_AMOUNT > 0 THEN '충전'
+	            ELSE '기타'
+	        END AS contentType
 		FROM COFFEE_BEANS_HISTORY H
 		-- 거래 JOIN
 		LEFT JOIN COFFEE_BEANS_TRADE T ON (H.TRADE_NO = T.TRADE_NO)
@@ -237,7 +240,29 @@
 	    )
 	</insert>
 
-
+	<!-- 구독 -->
+	<insert id="insertSubscriptionRecord" parameterType="PayDTO">
+	    INSERT INTO "SUBSCRIBE" (
+	        SUBSCRIBE_NO, 
+	        SUBSCRIBER_ID, 
+	        CREATOR_ID, 
+	        START_AT
+	    ) VALUES (
+	        SEQ_SUB_NO.NEXTVAL, 
+	        #{buyerNo},   -- SUBSCRIBER_ID
+	        #{sellerNo},  -- CREATOR_ID
+	        SYSDATE
+	    )
+	</insert>
+	<!-- 구독 30일 -->
+	<select id="selectExpiringSubscriptions" resultType="PayDTO">
+    SELECT 
+        SUBSCRIBER_ID AS buyerNo,
+        CREATOR_ID AS sellerNo,
+        PRICE AS price
+    FROM "SUBSCRIBE"
+    WHERE TRUNC(START_AT + 30) = TRUNC(SYSDATE)
+</select>
 
 		
 </mapper>

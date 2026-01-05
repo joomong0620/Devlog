@@ -155,7 +155,38 @@ public class PayController {
 	        return ResponseEntity.badRequest().body(e.getMessage());
 	    }
 	}
-
+	
+	@GetMapping("/payment/myBeans")
+	@ResponseBody
+	public PayDTO getMyBeans(@SessionAttribute(name="loginMember", required=false) MemberLoginResponseDTO loginMember) {
+	    
+	    // 1. 로그인 체크
+	    if (loginMember == null) {
+	        // 로그인이 안 되어 있으면 null이나 빈 객체를 반환
+	        return null; 
+	    }
+	    
+	    // 2. 콩 잔액 조회
+	    PayDTO result = payService.selectMyBeans(loginMember.getMemberNo());
+	    
+	    // 3. 로그 찍어보기 (서버 콘솔에서 확인용)
+	    System.out.println("조회된 콩: " + (result != null ? result.getBeansAmount() : "데이터 없음"));
+	    
+	    return result;
+	}
+	// 구독
+	@PostMapping("/payment/subscribe")
+	@ResponseBody
+	public int insertSubscription(
+	    @RequestBody PayDTO trade, 
+	    @SessionAttribute("loginMember") MemberLoginResponseDTO loginMember) {
+	    
+	    // 구매자(구독자) 번호 세팅
+	    trade.setBuyerNo(loginMember.getMemberNo());
+	    
+	    // 서비스에서 잔액 체크 -> 콩 차감 -> 구독 테이블 인서트 -> 히스토리 인서트 수행
+	    return payService.insertSubscription(trade);
+	}
 }
 	
 	

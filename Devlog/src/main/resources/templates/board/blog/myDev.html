@@ -8,7 +8,7 @@
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
 
     <link rel="stylesheet" th:href="@{/css/common/common.css}">
     <link rel="stylesheet" th:href="@{/css/common/font.css}">
@@ -44,13 +44,12 @@
                     </div>
                     <div class="lv-row">
                         <span class="user-name" th:text="${levelTitle}">칭호</span>
-                        <div class="exp-container"  th:if="${isOwner}" role="progressbar"
-                            aria-valuemin="0"
+                        <div class="exp-container" th:if="${isOwner}" role="progressbar" aria-valuemin="0"
                             th:attr="aria-valuemax=${nextExp}, aria-valuenow=${currentExp}">
-                            <div class="exp-fill" th:style="'width:' + (${currentExp} * 100 / ${nextExp}) + '%'"></div> 
+                            <div class="exp-fill" th:style="'width:' + (${currentExp} * 100 / ${nextExp}) + '%'"></div>
                             <span class="lv-text" th:text="|LV ${memberLevel}|">회원 레벨</span>
                         </div>
-                        
+
                         <div class="exp-info fs-12 fw-600" th:if="${isOwner}">
                             <span th:text="|다음 레벨까지 ${nextExp - currentExp} EXP|"></span>
                         </div>
@@ -188,6 +187,60 @@
 
     <button id="goTopBtn" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
 
+
+
+    <div id="subModal" class="modal-overlay">
+        <div class="sub-modal-content">
+            <div class="sub-modal-header">
+                <span class="crown-icon">👑</span>
+                <h2>유료 정기 구독하기</h2>
+                <i class="fa-solid fa-xmark close-sub-modal" id="closeSubModal"></i>
+            </div>
+
+            <div class="sub-modal-body">
+                <div class="sub-body-left">
+                    <h3>결제 수단</h3>
+                    <p class="sub-desc">회원님의 결제 수단을 선택해주세요!</p>
+
+                    <div class="bean-balance-card">
+                        <div class="bean-title">
+                            <img th:src="@{/images/common/coffebean.png}" alt="콩">
+                            <span>내 보유 커피콩</span>
+                        </div>
+                        <div class="bean-amount">
+                            <strong id="myBeanBalance">0</strong>콩
+                        </div>
+                    </div>
+
+                    <div class="check-area">
+                        <input type="checkbox" id="useBeanCheck" checked>
+                        <label for="useBeanCheck">커피콩 결제 사용</label>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="sub-body-right">
+                    <h3>구매 정보</h3>
+                    <p class="sub-desc">정기구독은 한 달 마다 결제됩니다.</p>
+
+                    <div class="info-row">
+                        <span>블로거:</span>
+                        <strong id="subBlogOwner">이름</strong>
+                    </div>
+
+                    <div class="info-row price-row">
+                        <span>가격:</span>
+                        <strong><span id="subDisplayPrice">0</span>원</strong>
+                    </div>
+
+                    <button id="btnFinalSubscribe" class="btn-subscribe-confirm">구매하기</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
     <div th:replace="~{common/footer :: footer}"></div>
     <script th:src="@{/js/notification/noti.js}"></script>
     <script th:src="@{/js/common/header.js}"></script>
@@ -199,6 +252,10 @@
             userProfile 안에 있는 id(이메일)를 가져옵니다.
         */
         const blogOwnerId = [[${ userProfile.id }]];
+        const loginMemberNo = [[${ session.loginMember?.memberNo }]];
+        const blogOwnerNo = [[${ userProfile.memberNo }]];
+
+        const subPrice = /*[[${subPrice}]]*/ 0;
 
         console.log("현재 블로그 주인 ID:", blogOwnerId); // 확인용 로그
     </script>

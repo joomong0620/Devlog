@@ -47,7 +47,14 @@ public interface PayMapper {
 	// 관리자용 조회
 	public List<PayDTO> selectAllBeansHistory(Map<String, Object> paramMap);
 
+	// 거래
 	public int insertBeansTrade(PayDTO trade);
+
+	// 구독
+	public int insertSubscriptionRecord(PayDTO trade);
+
+	// 30일마다 조회
+	public List<PayDTO> selectExpiringSubscriptions();
 
 
 }

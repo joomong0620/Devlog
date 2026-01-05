@@ -39,10 +39,16 @@ public class PayDTO {
 	
 	// 커피콩 거래
 	private int tradeNo;
+	
+	@JsonProperty("buyerNo")
 	private Long buyerNo; //구매자
+	
+	@JsonProperty("sellerNo")
 	private Long sellerNo; //구매당한사람
 	private String contentType; //컨텐츠, 구독, 챗봇
 	private String tradeAt; // 거래 일시
+	
+	@JsonProperty("contentId")
 	private Long contentId; // 대상 ID(게시글번호, 회원번호, 챗봇번호)
 	
 	// 사용 타입
@@ -68,6 +74,16 @@ public class PayDTO {
     private String status; // "요청", "완료"
     private String memberNickname;
     private String returnBankName;
+    
+    
+    // 구독
+    @JsonProperty("subscribeNo")
+    private int subscribeNo;
+    
+    @JsonProperty("subscriberId")
+    private int subscriberId;
+    private int creatorId;
+    private int startAt;
 	
 	
 	
