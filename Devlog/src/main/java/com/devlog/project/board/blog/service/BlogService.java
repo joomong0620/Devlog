@@ -15,7 +15,7 @@ public interface BlogService {
 	Map<String, Object> getBlogList(int page, int size, String sort);
 
 	// 내 블로그 목록 조회
-	Map<String, Object> getMyBlogList(String blogId, String type, int page, int size, String sort);
+	Map<String, Object> getMyBlogList(String blogId, String type, String query, String tag, int page, int size, String sort);
 
 	// 글 작성
 	Long writeBlog(BlogDTO blogDTO);
@@ -49,6 +49,12 @@ public interface BlogService {
 
 	// 게시글 수정
 	void updateBlog(BlogDTO blogDTO);
+	
+	// 게시글 스크랩 토글
+	boolean toggleBoardScrap(Long boardNo, Long memberNo);
+	
+	// 게시글 스크랩 여부
+	boolean isScraped(Long boardNo, Long memberNo);
 	
 	
 	

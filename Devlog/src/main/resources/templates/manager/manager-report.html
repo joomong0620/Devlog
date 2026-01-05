@@ -110,12 +110,20 @@
 
         <tbody>
           <tr th:each="report : ${reportList}"
+              th:data-report-no="${report.reportId}"
+              th:data-target-id="${report.targetId}"
               th:data-target-type="${report.targetType}"
-              th:data-report-no="${report.reportNo}"
+              th:data-target-url="${report.targetUrl}"
+              th:data-report-type="${report.reportType}"
+              th:data-report-reason="${report.reportReason}"
+              th:data-reporter="${report.reporterNickname}"
+              th:data-target="${report.targetNickname}"
+              th:data-report-date="${#temporals.format(report.reportDate, 'yyyy.MM.dd')}"
+              th:data-message-content="${report.messageContent}"
               onclick="openModal(this)">
 
             <!-- 번호 -->
-            <td th:text="${report.reportNo}">1</td>
+            <td th:text="${report.reportId}">1</td>
             <td th:text="${report.reportType}">스팸/광고</td>
             <td th:text="${report.targetType}">BOARD</td>
             <td th:text="${report.reportReason}">내용</td>
@@ -134,10 +142,21 @@
             <td>
               <div class="status-wrapper" onclick="event.stopPropagation()">
                 <select class="status-select"
-                        th:value="${report.status}">
-                  <option th:value="PENDING">처리전</option>
-                  <option th:value="RESOLVED">처리완료</option>
-                  <option th:value="REJECTED">반려</option>
+                        th:disabled="${report.status.name() != 'PENDING'}">
+                  <option value="PENDING"
+                          th:selected="${report.status.name() == 'PENDING'}">
+                    처리전
+                  </option>
+
+                  <option value="RESOLVED"
+                          th:selected="${report.status.name() == 'RESOLVED'}">
+                    처리완료
+                  </option>
+
+                  <option value="REJECTED"
+                          th:selected="${report.status.name() == 'REJECTED'}">
+                    반려
+                  </option>
                 </select>
               </div>
             </td>
@@ -156,29 +175,31 @@
       <h3 class="modal-title">신고내역</h3>
 
       <div class="modal-profile">
+        <p class="profile-name" id="modalTargetName"></p>
         <div class="profile-circle"></div>
-        <p class="profile-name">줌옹</p>
       </div>
 
       <div class="modal-info">
         <div class="info-item">
           <label>신고 번호</label>
-          <input type="text" value="01" readonly />
+          <!-- <input type="text" value="01" readonly /> -->
+          <input type="text" id="modalReportNo" readonly />
         </div>
         <div class="info-item">
           <label>신고 유형</label>
-          <input type="text" value="스팸/광고" readonly />
+          <!-- <input type="text" value="스팸/광고" readonly /> -->
+          <input type="text" id="modalReportType" readonly />
         </div>
         <div class="info-item">
           <label>신고 날짜</label>
-          <input type="text" value="2025.01.12" readonly />
+          <!-- <input type="text" value="2025.01.12" readonly /> -->
+          <input type="text" id="modalReportDate" readonly />
         </div>
       </div>
 
-      <textarea class="modal-content" readonly>
-이 사람이 스팸 햄 사진을 올렸는데 런천미트입니다.
-      </textarea>
-
+      <textarea class="modal-content" id="modalReason" readonly></textarea>
+      <!-- 신고된 채팅 메시지 -->
+      <div class="chat-preview" id="modalMessageContent"></div>
       <div class="modal-footer">
         <button class="move-btn" id="moveButton">해당 게시글 이동</button>
       </div>
@@ -189,53 +210,7 @@
     </div>
   </div>
 
-  <script>
-    const modal = document.getElementById("reportModal");
-    const moveButton = document.getElementById("moveButton");
-
-    function openModal(type) {
-    //   modal.style.display = "flex";
-
-    //   if (type === "게시글") {
-    //     moveButton.textContent = "해당 게시글 이동";
-    //     moveButton.onclick = () => {
-    //       // TODO: Spring Boot 게시글 상세 페이지 이동
-    //       // location.href = `/post/detail?postId=xxx`;
-    //       alert("우하하 아직 스프링부트 연동 전이에요");
-    //     };
-    //   } else {
-    //     moveButton.textContent = "해당 채팅 보기";
-    //     moveButton.onclick = () => {
-    //       // TODO: Spring Boot 채팅 상세 보기
-    //       // location.href = `/chat/report?chatId=xxx`;
-    //       alert("우하하 아직 스프링부트 연동 전이에요");
-    //     };
-    //   }
-    // }
-    function openModal(row) {
-      const targetType = row.dataset.targetType;
-      const reportId = row.dataset.reportId;
-
-      modal.style.display = "flex";
-
-      if (targetType === 'BOARD') {
-        moveButton.textContent = "해당 게시글 이동";
-      } else {
-        moveButton.textContent = "해당 채팅 보기";
-      }
-    }
-
-
-    function closeModal() {
-      modal.style.display = "none";
-    }
-
-    document.getElementById("reportModal").addEventListener("click", e => {
-      if (e.target.classList.contains("modal-overlay")) {
-        closeModal();
-      }
-    });
-  </script>
+<script th:src="@{/js/manager/manager-report.js}"></script>
 
 </body>
 </html>

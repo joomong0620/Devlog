@@ -186,3 +186,13 @@ function openReportModal(targetMemberNo, targetNo) {  //<-----------------------
         });
 }
 
+
+function scrollToHashIfExists() {
+  const hash = location.hash; // 예: "#comment-6"
+  if (!hash) return;
+
+  const target = document.querySelector(hash);
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}

@@ -2,7 +2,9 @@ console.log("myDev.js loaded");
 
 // 상태 관리 변수들
 let currentSort = 'id';
-let currentType = 'all'; // [추가됨 1] 현재 탭 상태 (all: 전체, paid: 유료)
+let currentType = 'all'; // 현재 탭 상태 (all: 전체, paid: 유료)
+let searchQuery = "";   // 검색어 상태 추가
+let selectedTag = "";   // 태그 상태 추가
 let page = 0;
 const PAGE_SIZE = 6;
 let isLoading = false;
@@ -241,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tagItems = document.querySelectorAll('.tag-item');
     const filterItems = document.querySelectorAll('.filter-item');
     const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn'); // 검색 아이콘 버튼 ID 가정
     const goTopBtn = document.getElementById('goTopBtn');
     const blogOptionBtn = document.getElementById('blogOptionBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
@@ -259,9 +262,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) {
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                alert("검색 기능은 추후 백엔드 API 연동 예정입니다.");
+                searchQuery = searchInput.value.trim();
+                renderPosts(true); // 검색어 포함하여 초기화 후 다시 불러오기
             }
         });
+    }
+    if (searchBtn) {
+        searchBtn.onclick = () => {
+            searchQuery = searchInput.value.trim();
+            renderPosts(true);
+        };
     }
 
     // [기능 3] 정렬 필터
@@ -302,8 +312,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // [기능 5] 태그 클릭
     tagItems.forEach(tag => {
         tag.addEventListener('click', () => {
-            tag.classList.toggle('selected');
-            // TODO: 선택된 태그들을 수집해서 API 호출 시 파라미터로 전달 필요
+            // 스타일 토글
+            tagItems.forEach(t => t.classList.remove('selected'));
+
+            const tagValue = tag.getAttribute('data-tag');
+            if (selectedTag === tagValue) {
+                selectedTag = ""; // 이미 선택된 걸 다시 누르면 해제
+            } else {
+                tag.classList.add('selected');
+                selectedTag = tagValue;
+            }
             renderPosts(true);
         });
     });
@@ -325,11 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ============================================================
-    // [핵심] 게시글 로딩 함수
-    // ============================================================
+    // 게시글 로딩 함수 부분
     async function renderPosts(isReset = false) {
-
         if (isLoading) return;
 
         if (isReset) {
@@ -345,78 +360,65 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loader) loader.style.display = 'block';
 
         try {
-            // [추가됨 3] URL 끝에 &type=${currentType} 추가!
-            // blogOwnerId는 HTML 파일의 th:inline="javascript"에서 넘어옴
-            const url = `/api/blog/${blogOwnerId}/list?page=${page}&size=${PAGE_SIZE}&sort=${currentSort}&type=${currentType}`;
+            const url = `/api/blog/${blogOwnerId}/list?page=${page}&size=${PAGE_SIZE}&sort=${currentSort}&type=${currentType}&query=${encodeURIComponent(searchQuery)}&tag=${encodeURIComponent(selectedTag)}`;
 
             const response = await fetch(url);
             if (!response.ok) throw new Error('데이터 로드 실패');
 
-            const data = await response.json(); // Map 반환
-            const posts = data.content; // 실제 리스트
+            const data = await response.json();
+            const posts = data.content;
 
+            // 데이터가 없을 때 메시지 (기존 유지)
             if ((!posts || posts.length === 0) && page === 0) {
-                // 목록이 비었을 때 메시지 (아이콘 추가로 조금 더 예쁘게)
-                listWrap.innerHTML = `
-                    <div style="padding:50px; text-align:center; width:100%; color:#666;">
-                        <i class="fa-regular fa-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                        <p>작성된 글이 없습니다.</p>
-                    </div>`;
-                isLastPage = true;
-            } else if (!posts || posts.length === 0) {
+                listWrap.innerHTML = `<div style="padding:50px; text-align:center; width:100%; color:#666;"><p>결과가 없습니다.</p></div>`;
                 isLastPage = true;
             }
 
             if (posts) {
                 posts.forEach(post => {
+                    const bNo = post.boardNo || post.board_no;
+                    const bTitle = post.boardTitle || post.board_title || "제목 없음";
+                    const bContent = post.boardContent || post.board_content || "";
+                    const bDate = post.bcreateDate || post.bcreate_date || "";
 
-                    // 썸네일 추출 (본문에서 이미지 꺼내기 + 없으면 로고)
-                    const thumb = extractFirstImage(post.boardContent);
+                    // 카운트 수 반영 (이미 방어코드가 잘 작성되어 있습니다)
+                    const lCount = post.likeCount ?? post.like_count ?? 0;
+                    const cCount = post.commentCount ?? post.comment_count ?? 0;
+                    const vCount = post.boardCount ?? post.board_count ?? 0;
+                    const isPaidStatus = post.isPaid || post.is_paid || 'N';
 
-                    // 본문 내용 태그 제거 (글자만 남기기)
-                    const desc = stripHtml(post.boardContent);
+                    const thumb = extractFirstImage(bContent);
+                    const desc = stripHtml(bContent);
 
-                    // 태그 리스트 처리
-                    let tagsHtml = '';
-                    if (post.tagList && post.tagList.length > 0) {
-                        post.tagList.forEach(t => {
-                            tagsHtml += `<span class="tag-pill">#${t}</span> `;
-                        });
-                    }
-
-                    // 유료 글 표시 아이콘
-                    const paidIcon = (post.isPaid === 'Y')
-                        ? '<span style="background:#ffca28; color:#fff; padding:2px 6px; border-radius:4px; font-size:12px; margin-right:5px; vertical-align: middle;">Premium</span>'
+                    // 유료글 "Premium" 텍스트를 "왕관 아이콘"으로 변경
+                    const paidIcon = (isPaidStatus === 'Y')
+                        ? '<i class="fa-solid fa-crown" style="color:#ffca28; margin-right:8px; font-size: 0.9em;"></i>'
                         : '';
 
-                    // HTML 생성
+                    let tagsHtml = '';
+                    const tagList = post.tagList || post.tag_list;
+                    if (tagList) {
+                        tagList.forEach(t => { tagsHtml += `<span class="tag-pill">#${t}</span> `; });
+                    }
+
                     const html = `
-                        <article class="post-item" onclick="location.href='/blog/detail/${post.boardNo}'" style="cursor:pointer;">
-                            <div class="post-main">
-                                <h2>${paidIcon}${post.boardTitle}</h2>
-                                <p class="post-content">${desc}</p> <div class="post-stats">
-                                    <span><i class="fa-solid fa-heart"></i> ${post.likeCount}</span>
-                                    <span><i class="fa-solid fa-comment"></i> ${post.commentCount}</span>
-                                    <span><i class="fa-solid fa-eye"></i> ${post.boardCount}</span> 
-                                    <span>${post.bcreateDate}</span> 
-                                </div>
-                                <div class="post-tags">${tagsHtml}</div>
+                    <article class="post-item" onclick="location.href='/blog/detail/${bNo}'" style="cursor:pointer;">
+                        <div class="post-main">
+                            <h2>${paidIcon}${bTitle}</h2>
+                            <p class="post-content">${desc}</p> 
+                            <div class="post-stats">
+                                <span><i class="fa-solid fa-heart"></i> ${lCount}</span>
+                                <span><i class="fa-solid fa-comment"></i> ${cCount}</span>
+                                <span><i class="fa-solid fa-eye"></i> ${vCount}</span> 
+                                <span>${bDate}</span> 
                             </div>
-                            <img src="${thumb}" class="post-thumb-img" alt="thumbnail" onerror="this.src='/images/logo.png'">
-                        </article>`;
+                            <div class="post-tags">${tagsHtml}</div>
+                        </div>
+                        <img src="${thumb}" class="post-thumb-img" alt="thumbnail" onerror="this.src='/images/logo.png'">
+                    </article>`;
 
                     listWrap.insertAdjacentHTML('beforeend', html);
                 });
-
-                // [추가] 데이터가 로드됐는데 스크롤이 안 생길 정도로 적으면, 자동으로 다음 페이지 로드 시도
-                const observerEl = document.getElementById('infinite-sentinel');
-                if (observerEl && !isLastPage && document.body.scrollHeight <= window.innerHeight) {
-                    // 약간의 딜레이 후 재호출
-                    setTimeout(() => {
-                        page++; // 페이지 수동 증가 후 호출
-                        renderPosts();
-                    }, 500);
-                }
             }
 
             if (data.last) {
@@ -428,7 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Error:", error);
-            alert("데이터를 불러오는 중 오류가 발생했습니다.");
         } finally {
             isLoading = false;
         }

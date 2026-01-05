@@ -49,6 +49,13 @@
                         </div>
 
                         <div class="stats">
+                            <span class="scrap-btn" id="btnPostScrap" onclick="togglePostScrap()"
+                                th:classappend="${isScraped} ? 'active' : ''">
+                                <i th:class="${isScraped} ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'"
+                                    id="postScrapIcon"></i>
+                                <span>스크랩</span>
+                            </span>
+
                             <span class="like-btn" id="btnPostLike" onclick="togglePostLike()">
                                 <i class="fa-regular fa-heart" id="postHeartIcon"></i>
                                 <span id="postLikeCount" th:text="${post.likeCount}">0</span>

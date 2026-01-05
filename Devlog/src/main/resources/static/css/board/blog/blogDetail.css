@@ -107,6 +107,19 @@ body {
     color: #fff;
 }
 
+/* 팔로잉 중일 때의 버튼 스타일 */
+.btn-follow.active {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+.btn-follow {
+    transition: all 0.2s ease;
+}
+
+
+
 /* 수정/삭제 버튼 영역 */
 .author-actions {
     display: flex;
@@ -658,6 +671,25 @@ body {
 .reply-form-container textarea:focus {
     outline: none;
     border-color: var(--primary-color);
+}
+
+/* 스크랩 버튼 스타일 */
+.scrap-btn {
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.scrap-btn:hover {
+    transform: scale(1.1);
+    color: var(--primary-color);
+}
+
+/* 스크랩 활성화 상태 (보라색 강조) */
+.scrap-btn.active i {
+    color: var(--primary-color);
 }
 
 /* === 모달 스타일 === */

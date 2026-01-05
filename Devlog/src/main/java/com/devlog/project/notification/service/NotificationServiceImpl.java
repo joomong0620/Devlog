@@ -154,8 +154,11 @@ public class NotificationServiceImpl implements NotificationService {
 	        
 	        case USER -> {
 	        	
+	        	Member member = noti.getSender();
 	        	
-	        	yield "/devtalk/blog"; // 블로그 상세페이지 이동 sender 회원 
+	        	String email = member.getMemberEmail();
+	        	
+	        	yield "/blog/" + email; // 블로그 상세페이지 이동 sender 회원 
 	        }
 
 	        default -> throw new IllegalArgumentException("Unknown targetType: " + noti.getTargetType());
@@ -166,7 +169,7 @@ public class NotificationServiceImpl implements NotificationService {
 	private String returnBoardUrl(int boardCode, Long boardNo) {
 
 	    return switch (boardCode) {
-	        case 1 -> "/blog/" + boardNo;
+	        case 1 -> "/blog/detail/" + boardNo;
 	        case 21, 22, 23, 24, 25, 26 -> "/ITnews/" + boardNo;
 	        case 3 -> "/board/freeboard/" + boardNo;
 	        default -> throw new IllegalArgumentException("Invalid boardCode: " + boardCode);

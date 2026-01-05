@@ -23,6 +23,7 @@ import com.devlog.project.board.blog.service.ReplyService;
 import com.devlog.project.member.enums.CommonEnums;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.MemberRepository;
+import com.devlog.project.member.model.service.MemberService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +37,7 @@ public class BlogController {
 	private final BlogService blogService;
 	private final ReplyService replyService;
 	private final MemberRepository memberRepository;
+	private final MemberService memberService;
 	
 
 	// 1. 블로그 목록 화면
@@ -76,6 +78,8 @@ public class BlogController {
 	@ResponseBody
 	public ResponseEntity<String> writeBlog(@RequestBody BlogDTO blogDTO) {
 		blogService.writeBlog(blogDTO);
+		memberService.increaseExp(blogDTO.getMemberNo(), 100);
+		
 		return ResponseEntity.ok("저장 성공");
 	}
 
@@ -129,8 +133,12 @@ public class BlogController {
             model.addAttribute("postCount", myBlogData.getPostCount());
             model.addAttribute("todayVisit", myBlogData.getTodayVisit());
             
-            // 구독료
             model.addAttribute("subPrice", myBlogData.getSubPrice());
+            
+            model.addAttribute("memberLevel", myBlogData.getMemberLevel());
+            model.addAttribute("currentExp", myBlogData.getCurrentExp());
+            model.addAttribute("nextExp", myBlogData.getNextExp());
+            model.addAttribute("levelTitle", myBlogData.getLevelTitle());
             
          // 4. 내가 팔로우 중인지 여부 확인
             boolean isFollowing = false;
@@ -175,17 +183,20 @@ public class BlogController {
         ));
     }
 
-	// 7. 내 블로그 목록 (API) - [수정] type 파라미터 받기
+	// 7. 내 블로그 목록 (API)
     @GetMapping("/api/blog/{blogId:.+}/list")
     @ResponseBody
-    public Map<String, Object> getMyBlogListApi(@PathVariable("blogId") String blogId,
-            @RequestParam(value = "type", required = false, defaultValue = "all") String type, // [추가]
+    public Map<String, Object> getMyBlogListApi(
+            @PathVariable("blogId") String blogId,
+            @RequestParam(value = "type", required = false, defaultValue = "all") String type,
+            @RequestParam(value = "query", required = false) String query, 
+            @RequestParam(value = "tag", required = false) String tag,    
             @PageableDefault(size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
 
         String sortProp = pageable.getSort().stream().findFirst().map(Sort.Order::getProperty).orElse("id");
         
-        // Service로 type 전달
-        return blogService.getMyBlogList(blogId, type, pageable.getPageNumber(), pageable.getPageSize(), sortProp);
+        // Service로 검색어(query)와 태그(tag)를 함께 전달
+        return blogService.getMyBlogList(blogId, type, query, tag, pageable.getPageNumber(), pageable.getPageSize(), sortProp);
     }
     
     // 8. 블로그 상세 게시글 조회 (수정됨)
@@ -246,6 +257,16 @@ public class BlogController {
             }
             if (!isPurchased) isLocked = true;
         }
+        
+        boolean isScraped = false;
+        if (loginEmail != null) {
+            Member me = memberRepository.findByMemberEmailAndMemberDelFl(loginEmail, CommonEnums.Status.N).orElse(null);
+            if (me != null) {
+                // 서비스에 추가한 isScraped 메서드 호출
+                isScraped = blogService.isScraped(boardNo, me.getMemberNo());
+            }
+        }
+        model.addAttribute("isScraped", isScraped); // 화면(HTML)에서 쓸 수 있도록 전달
 
         // 5. 로그인 유저 정보 (잔액 등)
         if (loginEmail != null) {
@@ -295,6 +316,21 @@ public class BlogController {
         // TODO: 추후 구독(Payment) 로직 구현 시 Mapper/Service 추가 필요
         // 현재는 빈 리스트 반환
         return ResponseEntity.ok(List.of()); 
+    }
+    
+    // 게시글 스크랩
+ // BlogController.java 내 추가
+    @PostMapping("/api/blog/scrap/{boardNo}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> toggleBoardScrap(@PathVariable Long boardNo) {
+        // 헬퍼 메서드 getMyMember()를 사용하여 현재 로그인 유저 정보 가져오기
+        Member me = getMyMember(); 
+        if (me == null) return ResponseEntity.status(401).body(Map.of("message", "로그인 필요"));
+
+        // 서비스 호출 (게시글 번호와 유저 번호 전달)
+        boolean isScraped = blogService.toggleBoardScrap(boardNo, me.getMemberNo());
+        
+        return ResponseEntity.ok(Map.of("success", true, "isScraped", isScraped));
     }
     
     // 게시글 좋아요

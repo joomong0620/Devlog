@@ -3,6 +3,9 @@
 <mapper namespace="com.devlog.project.board.blog.mapper.ReplyMapper">
 
     <insert id="insertReply" parameterType="com.devlog.project.board.blog.dto.ReplyDto">
+        <selectKey keyProperty="commentNo" resultType="long" order="BEFORE">
+       		 SELECT SEQ_COMMENT_NO.NEXTVAL FROM DUAL
+   		 </selectKey>
 	    INSERT INTO "COMMENT" (
 	        COMMENT_NO, 
 	        BOARD_NO, 
@@ -14,7 +17,7 @@
 	        SECRET_YN, 
 	        MODIFY_YN
 	    ) VALUES (
-	        SEQ_COMMENT_NO.NEXTVAL,
+	        ${commentNo},
 	        #{boardNo},
 	        #{memberNo},
 	        #{commentContent}, 
@@ -25,6 +28,7 @@
 	        SYSDATE, 'N', 'N', 'N'
 	    )
 	</insert>
+	
     
     <select id="selectReplyList" parameterType="map" resultType="com.devlog.project.board.blog.dto.ReplyDto">
     SELECT 
@@ -128,5 +132,29 @@
     <select id="selectBoardWriter" resultType="long">
         SELECT MEMBER_NO FROM "BOARD" WHERE BOARD_NO = #{boardNo}
     </select>
+    
+    
+   	<select id="getBoardMemberNo" resultType="_int">
+		
+		SELECT MEMBER_NO
+		FROM BOARD
+		WHERE BOARD_NO = ${boardNo}
+		
+	</select>
+	
+	<select id="selectMemberNickname" resultType="string">
+		
+		SELECT MEMBER_NICKNAME
+		FROM MEMBER
+		WHERE MEMBER_NO = ${memberNo}
+	</select>
+	
+	<select id="getParentMemberNo" resultType="_int">
+		
+		SELECT MEMBER_NO
+		FROM "COMMENT"
+		WHERE "COMMENT_NO" = ${parentCommentNo}
+		
+	</select>
 
 </mapper>

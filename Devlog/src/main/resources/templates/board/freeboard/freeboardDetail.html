@@ -14,7 +14,7 @@
 </head>
 <body>
     <!-- <p th:text="${freeboard}" th:if="${freeboard != null}"></p>     -->
-
+    <!-- <p th:text="${session.loginMember}"></p>  -->
     <main>
 
         <!-- 헤더 -->
@@ -30,6 +30,7 @@
         <!--  ###################################################### -->        
 
         <div class="container-wrapper">
+            <div class="top-space-bw-header"> </div>
             <!-- 상단 제목 -->
             <h2 class="title-main fw-800">자유게시판</h2>
             <div class="container">
@@ -99,7 +100,11 @@
 
                 <!-- 하단 버튼 -->
                 <div class="bottom-btn-box">
-                    <th:block th:if="${session.loginMember?.memberNo == freeboard.memberNo}">
+                    <!-- <th:block th:if="${session.loginMember?.memberAdmin == T(com.devlog.project.member.enums.Status).Y
+                                        or session.loginMember?.memberNo == freeboard.memberNo}"> -->
+                    <th:block th:if="${session.loginMember != null 
+                                        and (session.loginMember.memberNo == freeboard.memberNo 
+                                            or session.loginMember.role == 'ROLE_ADMIN')}">
                         <button class="bottom-btn" id="updateBtn">수정</button>
                         <button class="bottom-btn" id="deleteBtn">삭제</button>
                     </th:block>

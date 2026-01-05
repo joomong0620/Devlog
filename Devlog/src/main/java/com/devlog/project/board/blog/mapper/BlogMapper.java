@@ -75,4 +75,13 @@ public interface BlogMapper {
     int updateBlog(BlogDTO blogDTO);
     int deleteBlogTags(Long boardNo);
     
+    // 실시간 알림
+	Long selectReceiverNo(Long boardNo);
+	String selectBoardTitle(Long boardNo);
+	String selectMemberNickname(Long receiver);
+    // 게시글 스크랩 관련
+    int checkScrapStatus(Map<String, Object> params);
+    int insertScrap(Map<String, Object> params);
+    int deleteScrap(Map<String, Object> params);
+    
 }

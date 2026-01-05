@@ -21,8 +21,13 @@ import com.devlog.project.board.blog.dto.TagDto;
 import com.devlog.project.board.blog.dto.UserProfileDto;
 import com.devlog.project.board.blog.mapper.BlogMapper;
 import com.devlog.project.member.enums.CommonEnums;
+import com.devlog.project.member.model.entity.Level;
 import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.LevelRepository;
 import com.devlog.project.member.model.repository.MemberRepository;
+import com.devlog.project.notification.NotiEnums;
+import com.devlog.project.notification.dto.NotifiactionDTO;
+import com.devlog.project.notification.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +37,10 @@ public class BlogServiceImpl implements BlogService {
 
     private final BlogMapper blogMapper;
     private final MemberRepository memberRepository;
+    private final LevelRepository levelRepository;
 
+    private final NotificationService notiService;
+    
     @Value("${my.blogWrite.location}")
     private String uploadLocation;
 
@@ -93,21 +101,32 @@ public class BlogServiceImpl implements BlogService {
 
     // 3. 내 블로그 목록 조회
     @Override
-    public Map<String, Object> getMyBlogList(String blogId, String type, int page, int size, String sort) {
+    public Map<String, Object> getMyBlogList(String blogId, String type, String query, String tag, int page, int size, String sort) {
         Map<String, Object> params = new HashMap<>();
         params.put("blogId", blogId);
         params.put("type", type);
+        params.put("query", query); 
+        params.put("tag", tag);     
         params.put("offset", page * size);
         params.put("limit", size);
         params.put("sort", sort);
-
+        
+        // [추가] 현재 로그인한 사람의 번호를 가져와서 넘겨줌 (스크랩 조회용)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            Member loginUser = memberRepository.findByMemberEmailAndMemberDelFl(auth.getName(), CommonEnums.Status.N).orElse(null);
+            if (loginUser != null) {
+                params.put("loginMemberNo", loginUser.getMemberNo()); // 쿼리에서 us.MEMBER_NO와 비교됨
+            }
+        }
+        
         List<BlogDTO> list = blogMapper.selectMyBlogList(params);
         int totalCount = blogMapper.countMyBlogList(params);
 
+        System.out.println(">>> [디버깅] 탭타입: " + type + ", 조회된 글 수: " + list.size() + ", 전체 수: " + totalCount);
+        
         Map<String, Object> result = new HashMap<>();
         result.put("content", list);
-        result.put("totalElements", totalCount);
-        result.put("totalPages", (int) Math.ceil((double) totalCount / size));
         result.put("last", (page + 1) * size >= totalCount);
 
         return result;
@@ -198,6 +217,24 @@ public class BlogServiceImpl implements BlogService {
             return false; // 언팔로우됨
         } else {
             blogMapper.insertFollow(params);
+            
+            String memberNickname = blogMapper.selectMemberNickname(followerId);
+            
+            
+            
+            
+            NotifiactionDTO notification = NotifiactionDTO.builder()
+					.sender(followerId)
+					.receiver(targetId)
+					.content(memberNickname +"님이 회원님을 팔로우 하였습니다.")
+					.preview(" ")
+					.type(NotiEnums.NotiType.FOLLOW)
+					.targetType(NotiEnums.TargetType.USER)
+					.targetId(targetId)
+					.build();
+    		
+    		notiService.sendNotification(notification);
+            
             return true; // 팔로우됨
         }
     }
@@ -259,6 +296,26 @@ public class BlogServiceImpl implements BlogService {
         response.setSubscriberCount(0);
         
         response.setSubPrice(blogOwner.getSubscriptionPrice());
+        
+        // 회원 현재 레벨
+        response.setMemberLevel(blogOwner.getMemberLevel().getLevelNo());
+        response.setCurrentExp(blogOwner.getCurrentExp());
+        
+        
+        Integer nextLv = null;
+        
+        if(blogOwner.getMemberLevel().getLevelNo() < 30) {
+        	nextLv = blogOwner.getMemberLevel().getLevelNo() + 1;
+        } else {
+        	nextLv = blogOwner.getMemberLevel().getLevelNo();
+        }
+        
+        Level level = levelRepository.findById(nextLv).orElseThrow();
+        
+        response.setNextExp(level.getRequiredTotalExp());
+        
+        response.setLevelTitle(level.getTitle());
+        
 
         return response;
     }
@@ -284,6 +341,37 @@ public class BlogServiceImpl implements BlogService {
         }
     }
     
+    // 게시글 스크랩
+    @Override
+    @Transactional
+    public boolean toggleBoardScrap(Long boardNo, Long memberNo) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("boardNo", boardNo);
+        params.put("memberNo", memberNo);
+
+        // 1. 이미 스크랩했는지 확인
+        int count = blogMapper.checkScrapStatus(params);
+
+        if (count > 0) {
+            // 2-1. 이미 있으면 삭제 (스크랩 취소)
+            blogMapper.deleteScrap(params);
+            return false;
+        } else {
+            // 2-2. 없으면 삽입 (스크랩 등록)
+            blogMapper.insertScrap(params);
+            return true;
+        }
+    }
+    
+    // 게시글 스크랩
+    @Override
+    public boolean isScraped(Long boardNo, Long memberNo) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("boardNo", boardNo);
+        params.put("memberNo", memberNo);
+        return blogMapper.checkScrapStatus(params) > 0;
+    }
+    
     // 게시글 좋아요
     @Override
     @Transactional
@@ -297,6 +385,29 @@ public class BlogServiceImpl implements BlogService {
             return false; // 취소됨
         } else {
             blogMapper.insertBoardLike(params);
+            
+            Long receiver = blogMapper.selectReceiverNo(boardNo);
+			Long sender = memberNo;
+			if(!sender.equals(receiver)) {
+				
+				String boardTitle = blogMapper.selectBoardTitle(boardNo);
+				
+				
+				String memberNickname = blogMapper.selectMemberNickname(receiver);
+				
+				NotifiactionDTO notification = NotifiactionDTO.builder()
+						.sender(sender)
+						.receiver(receiver)
+						.content(memberNickname +"님이 회원님의 게시글에 좋아요를 눌렀습니다.")
+						.preview(boardTitle)
+						.type(NotiEnums.NotiType.LIKE)
+						.targetType(NotiEnums.TargetType.BOARD)
+						.targetId(boardNo)
+						.build();
+				
+				notiService.sendNotification(notification);
+			}
+            
             return true; // 등록됨
         }
     }

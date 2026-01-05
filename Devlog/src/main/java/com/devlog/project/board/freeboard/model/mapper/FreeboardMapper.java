@@ -53,6 +53,9 @@ public interface FreeboardMapper {
 	
 	
 	// 작성자 닉네임 조회
-	public String selectMemberNickname(Long receiver);	
+	public String selectMemberNickname(Long receiver);
+	
+	// 보드 타이틀 조회
+	public String selectBoardTitle(Integer integer);	
 	
 }

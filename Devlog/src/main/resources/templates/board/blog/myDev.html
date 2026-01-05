@@ -8,8 +8,10 @@
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
 
     <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <link rel="stylesheet" th:href="@{/css/common/font.css}">
     <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
 
     <link rel="stylesheet" th:href="@{/css/board/blog/myDev.css}">
@@ -41,11 +43,19 @@
                         </div>
                     </div>
                     <div class="lv-row">
-                        <span class="user-name" th:text="${userProfile.username}">실명</span>
-                        <div class="exp-container" th:if="${isOwner}">
-                            <div class="exp-fill" style="width: 70%;"></div> <span class="lv-text">Lv.12</span>
+                        <span class="user-name" th:text="${levelTitle}">칭호</span>
+                        <div class="exp-container"  th:if="${isOwner}" role="progressbar"
+                            aria-valuemin="0"
+                            th:attr="aria-valuemax=${nextExp}, aria-valuenow=${currentExp}">
+                            <div class="exp-fill" th:style="'width:' + (${currentExp} * 100 / ${nextExp}) + '%'"></div> 
+                            <span class="lv-text" th:text="|LV ${memberLevel}|">회원 레벨</span>
+                        </div>
+                        
+                        <div class="exp-info fs-12 fw-600" th:if="${isOwner}">
+                            <span th:text="|다음 레벨까지 ${nextExp - currentExp} EXP|"></span>
                         </div>
                     </div>
+
                     <p class="job-tag" th:text="${userProfile.job} ?: '개발자'">직업 태그</p>
                     <div class="social-links">
                         <a th:href="${userProfile.githubUrl}" th:if="${userProfile.githubUrl}"><i
