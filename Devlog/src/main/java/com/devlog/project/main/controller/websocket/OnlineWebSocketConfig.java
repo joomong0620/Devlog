@@ -47,14 +47,14 @@ public class OnlineWebSocketConfig {
             sessionUserMap.put(sessionId, new OnlineUser(name, profileImg));
             
             // 중복 제거
-            var distinctUsers = sessionUserMap.values().stream()
+            java.util.Collection<OnlineUser> distinctUsers = sessionUserMap.values().stream()
                 .collect(java.util.stream.Collectors.toMap(
                     OnlineUser::getName, // 키: 이름
                     u -> u,             // 값: 유저 객체
                     (existing, replacement) -> existing // 중복 시 기존 것 유지
                 )).values();
             // 모든 접속자에게 "누가 온라인인지" 목록을 쏴줌
-            messagingTemplate.convertAndSend("/topic/friends", sessionUserMap.values());
+            messagingTemplate.convertAndSend("/topic/friends", distinctUsers);
             
             System.out.println("접속 감지: " + name);
         }
@@ -69,8 +69,11 @@ public class OnlineWebSocketConfig {
         sessionUserMap.remove(sessionId);
         
         // 나갔을 때도 최신 목록 갱신
-        messagingTemplate.convertAndSend("/topic/friends", sessionUserMap.values());
-        
-        System.out.println("연결 종료"+ sessionId);
+        java.util.Collection<OnlineUser> distinctUsers = sessionUserMap.values().stream()
+                .collect(java.util.stream.Collectors.toMap(
+                    OnlineUser::getName, u -> u, (existing, replacement) -> existing
+                )).values();
+
+        messagingTemplate.convertAndSend("/topic/friends", distinctUsers);
     }
 }

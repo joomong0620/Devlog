@@ -321,18 +321,26 @@ function updateFriendsUI(users) {
 
   friendsList.innerHTML = "";
 
+  const myEmail = document.getElementById("loginUserEmail")?.value || "";
+
   if (users.length === 0) {
     friendsList.innerHTML =
       "<p style='font-size:12px; color:#999;'>현재 활동중인 친구가 없어요.</p>";
     return;
   }
 
-  users.forEach((user) => {
+
+users.filter(user => user.name !== myEmail).forEach((user) => {
+  const displayName = user.name.split('@')[0];
+
+  const profileUrl = `/blog/${user.name}`
   const friendHtml = `
-        <div class="friend active" title="${user.name}">
+        <div class="friend active" title="${user.name}"
+        onclick ="location.href='${profileUrl}'"
+        style = "cursor: pointer;">
           <img src="${user.profile_img}" alt="${user.name}">
           <span class="friend-name" style="font-size:11px; display:block; text-align:center; margin-top:4px;">
-            ${user.name.split('@')[0]}
+            ${displayName}
           </span>
         </div>
       `;
@@ -343,7 +351,6 @@ function updateFriendsUI(users) {
 document.addEventListener("DOMContentLoaded", function () {
   connectOnlineStatus();
 });
-
 
 
 
