@@ -182,7 +182,7 @@ function createCommentElement(data, isReply = false) {
                     <span class="comment-date">${data.cCreateDate || '방금 전'}</span>
                 </div>
             </div>
-            <div class="comment-text" id="text-${data.commentNo}">${data.commentContent}</div>
+            <div class="comment-text" id="comment-${data.commentNo}">${data.commentContent}</div>
             <div class="comment-actions">
                 <button class="action-btn like-comment-btn ${likeClass}" onclick="toggleCommentLike(${data.commentNo}, this)">
                     <i class="${heartIcon} fa-heart"></i>
@@ -291,6 +291,21 @@ function deleteComment(commentId) {
     fetch(`/api/comments/${commentId}`, { method: 'DELETE' }).then(res => { if (res.ok) loadComments(); });
 }
 
+
+// LKS 댓글 추가
+function scrollToHashIfExists() {
+  const hash = location.hash; // 예: "#comment-6"
+  if (!hash) return;
+
+  const target = document.querySelector(hash);
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+
+
+
 // 게시글 수정
 function enableEditMode(id) {
     const textEl = document.getElementById(`text-${id}`);
@@ -369,22 +384,26 @@ function processPayment() {
             price: price             // 소모될 콩 개수
         })
     })
-    .then(resp => resp.json())
+    .then(resp => {
+    if(!resp.ok) {
+        // 서버가 에러(400, 500 등)를 보낸 경우
+        return resp.json().then(err => { throw new Error(err.message) });
+    }
+    return resp.json();
+    })
     .then(result => {
-        // 서비스에서 리턴한 결과값(int)이 0보다 크면 성공
-        if (result > 0) {
-            // 성공 시
-            document.getElementById("modalPurchase").classList.add("hidden");
-            document.getElementById("modalSuccess").classList.remove("hidden");
-        } else {
-            // 실패 시 
-            document.getElementById("modalPurchase").classList.add("hidden");
-            document.getElementById("modalNoBalance").classList.remove("hidden");
-        }
+        // 성공 시
+        document.getElementById("modalPurchase").classList.add("hidden");
+        document.getElementById("modalSuccess").classList.remove("hidden");
     })
     .catch(err => {
-        console.error("구매 처리 중 오류 발생:", err);
-        alert("구매 처리 중 서버 오류가 발생했습니다.");
+        // 여기서 에러 메시지에 따라 분기 처리
+        if(err.message.includes("잔액")) {
+            document.getElementById("modalPurchase").classList.add("hidden");
+            document.getElementById("modalNoBalance").classList.remove("hidden");
+        } else {
+            alert("오류 발생: " + err.message);
+        }
     });
 }
 

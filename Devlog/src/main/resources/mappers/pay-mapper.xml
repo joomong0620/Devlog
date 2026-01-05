@@ -14,38 +14,48 @@
 	
 	<!-- 내 커피콩 내역 조회-->
 	<select id="selectBeansHistory" resultType="PayDTO">
-	    SELECT 
-	        H.BEANS_HISTORY,
-	        H.PAY_AMOUNT AS payAmount,
-	        ABS(H.PAY_AMOUNT) AS displayPrice,
-	        TO_CHAR(H.REG_DATE, 'YYYY-MM-DD HH24:MI') AS payDate,
-	        P.PAYMENT_ID AS paymentId,
-	        P.BEANS_PAY_NO AS beansPayNo,
-	        P.USED_AMOUNT AS usedAmount,
-	        H.TRADE_NO AS tradeNo,
-	        CASE 
-	            -- 환전인지 먼저 확인 (JOIN이 성공하면 EXCHANGE_NO가 있음)
-	            WHEN E.EXCHANGE_NO IS NOT NULL THEN '환전'
-	            -- 환전이 아닐 때, 거래 번호가 없고 음수면 '취소'
-	            WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 AND H.TRADE_NO IS NULL THEN '취소'
-	            -- 양수고 거래 번호 없으면 '충전'
-	            WHEN H.PAY_AMOUNT > 0 AND H.TRADE_NO IS NULL THEN '충전'
-	            -- 나머지는 거래 내역
-	            ELSE (SELECT T.CONTENT_TYPE FROM COFFEE_BEANS_TRADE T WHERE T.TRADE_NO = H.TRADE_NO)
-	        END AS contentType
-	    FROM COFFEE_BEANS_HISTORY H
-	    -- 충전 JOIN
-	    LEFT JOIN COFFEE_BEANS_PAY P ON (
-	        H.MEMBER_NO = P.MEMBER_NO 
-	        AND ABS(H.PAY_AMOUNT) = P.PRICE 
-	        AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(P.PAY_DATE, 'YYYYMMDDHH24MI')
-	    )
-	    LEFT JOIN COFFEE_BEANS_EXCHANGE E ON (
-	        H.MEMBER_NO = E.MEMBER_NO
-	        AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(E.EXCHANGE_REQ_DATE, 'YYYYMMDDHH24MI')
-	    )
-	    WHERE H.MEMBER_NO = #{memberNo}
-	    ORDER BY H.BEANS_HISTORY DESC
+		SELECT 
+		    H.BEANS_HISTORY,
+		    H.PAY_AMOUNT AS payAmount,
+		    ABS(H.PAY_AMOUNT) AS displayPrice,
+		    TO_CHAR(H.REG_DATE, 'YYYY-MM-DD HH24:MI') AS payDate,
+		    P.PAYMENT_ID AS paymentId,
+		    P.BEANS_PAY_NO AS beansPayNo,
+		    P.USED_AMOUNT AS usedAmount,
+		    H.TRADE_NO AS tradeNo,
+		    T.CONTENT_ID AS contentId,
+		    E.EXCHANGE_NO AS exchangeNo,
+		    CASE 
+		        -- 1. 환전 신청 내역인 경우
+		        WHEN E.EXCHANGE_NO IS NOT NULL THEN '환전'
+		        -- 2. 거래 내역(POST, SUBSCRIBE 등)인 경우
+		        WHEN T.TRADE_NO IS NOT NULL THEN T.CONTENT_TYPE
+		        -- 3. 거래/환전이 아니고 음수면 취소
+		        WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 THEN '취소'
+		        -- 4. 양수면 충전
+		        WHEN H.PAY_AMOUNT > 0 THEN '충전'
+		        ELSE '기타'
+		    END AS contentType
+		FROM COFFEE_BEANS_HISTORY H
+		-- 거래 JOIN
+		LEFT JOIN COFFEE_BEANS_TRADE T ON (H.TRADE_NO = T.TRADE_NO)
+		
+		-- 환전 JOIN (컬럼명 오류 방지를 위해 MEMBER_NO와 금액으로만 JOIN)
+		LEFT JOIN COFFEE_BEANS_EXCHANGE E ON (
+		    H.MEMBER_NO = E.MEMBER_NO
+		    AND ABS(H.PAY_AMOUNT * 0.9) = E.REQUEST_AMOUNT
+		    AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(E.EXCHANGE_REQ_DATE, 'YYYYMMDDHH24MI')
+		)
+		
+		-- 충전 JOIN (이미 환전이나 거래가 아닌 경우에만 붙도록 처리)
+		LEFT JOIN COFFEE_BEANS_PAY P ON (
+		    H.MEMBER_NO = P.MEMBER_NO 
+		    AND H.TRADE_NO IS NULL 
+		    AND ABS(H.PAY_AMOUNT) = P.PRICE
+		    AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(P.PAY_DATE, 'YYYYMMDDHH24MI')
+		)
+		WHERE H.MEMBER_NO = #{memberNo}
+		ORDER BY H.BEANS_HISTORY DESC
 	</select>
 
 	
@@ -76,18 +86,19 @@
 	    )
 	</insert>
 		
-	<insert id="insertHistory">
-	    INSERT INTO COFFEE_BEANS_HISTORY (
-	        BEANS_HISTORY, 
-	        MEMBER_NO, 
-	        PAY_AMOUNT, 
-	        TRADE_NO
-	    ) VALUES (
-	        SEQ_HISTORY_NO.NEXTVAL, 
-	        #{memberNo}, 
-	        #{price}, 
-	        NULL  )
-	</insert>
+		<insert id="insertHistory">
+		    INSERT INTO COFFEE_BEANS_HISTORY (
+		        BEANS_HISTORY, MEMBER_NO, PAY_AMOUNT, TRADE_NO
+		    ) VALUES (
+		        SEQ_HISTORY_NO.NEXTVAL, 
+		        #{memberNo}, 
+		        #{payAmount}, 
+		        <choose>
+		            <when test="tradeNo != 0">#{tradeNo}</when>
+		            <otherwise>NULL</otherwise>
+		        </choose>
+		    )
+		</insert>
 	
 	<update id="updateMemberBeans">
 	    UPDATE MEMBER 
@@ -125,7 +136,7 @@
 				#{exchangeAccount},
 				CURRENT_TIMESTAMP
 			)
-		</insert>
+	</insert>
 		
 		
 		
@@ -204,27 +215,27 @@
 	
 	
 	<insert id="insertBeansTrade" parameterType="PayDTO">
-        <selectKey keyProperty="tradeNo" resultType="_int" order="BEFORE">
-            SELECT SEQ_TRADE_NO.NEXTVAL FROM DUAL
-        </selectKey>
-        INSERT INTO COFFEE_BEANS_TRADE (
-            TRADE_NO,
-            BUYER_NO,
-            SELLER_NO,
-            CONTENT_TYPE,
-            TRADE_AT,
-            CONTENT_ID,
-            PRICE
-        ) VALUES (
-            #{tradeNo},
-            #{buyerNo},
-            #{sellerNo},
-            #{contentType},
-            SYSDATE,
-            #{contentId},
-            #{price}
-        )
-    </insert>
+	    <selectKey keyProperty="tradeNo" resultType="_int" order="BEFORE">
+	        SELECT SEQ_TRADE_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+	
+	    INSERT INTO COFFEE_BEANS_TRADE (
+	        TRADE_NO, 
+	        BUYER_NO, 
+	        SELLER_NO, 
+	        CONTENT_TYPE, 
+	        CONTENT_ID, 
+	        PRICE, 
+	        TRADE_AT
+	    ) VALUES (
+	        #{tradeNo}, #{buyerNo}, 
+	        #{sellerNo}, 
+	        #{contentType}, 
+	        #{contentId}, 
+	        #{price}, 
+	        SYSDATE
+	    )
+	</insert>
 
 
 
