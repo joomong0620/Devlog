@@ -21,7 +21,9 @@ import com.devlog.project.board.blog.dto.TagDto;
 import com.devlog.project.board.blog.dto.UserProfileDto;
 import com.devlog.project.board.blog.mapper.BlogMapper;
 import com.devlog.project.member.enums.CommonEnums;
+import com.devlog.project.member.model.entity.Level;
 import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.LevelRepository;
 import com.devlog.project.member.model.repository.MemberRepository;
 import com.devlog.project.notification.NotiEnums;
 import com.devlog.project.notification.dto.NotifiactionDTO;
@@ -35,6 +37,7 @@ public class BlogServiceImpl implements BlogService {
 
     private final BlogMapper blogMapper;
     private final MemberRepository memberRepository;
+    private final LevelRepository levelRepository;
 
     private final NotificationService notiService;
     
@@ -293,6 +296,24 @@ public class BlogServiceImpl implements BlogService {
         response.setSubscriberCount(0);
         
         response.setSubPrice(blogOwner.getSubscriptionPrice());
+        
+        // 회원 현재 레벨
+        response.setMemberLevel(blogOwner.getMemberLevel().getLevelNo());
+        response.setCurrentExp(blogOwner.getCurrentExp());
+        
+        
+        Integer nextLv = null;
+        
+        if(blogOwner.getMemberLevel().getLevelNo() < 30) {
+        	nextLv = blogOwner.getMemberLevel().getLevelNo() + 1;
+        } else {
+        	nextLv = blogOwner.getMemberLevel().getLevelNo();
+        }
+        
+        Level level = levelRepository.findById(nextLv).orElseThrow();
+        
+        response.setNextExp(level.getRequiredTotalExp());
+        
 
         return response;
     }

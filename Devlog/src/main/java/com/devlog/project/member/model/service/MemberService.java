@@ -12,6 +12,7 @@ import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.member.model.dto.MemberProfileDTO;
 import com.devlog.project.member.model.entity.Level;
 import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.LevelRepository;
 import com.devlog.project.member.model.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {  // 로그인(login) 서비스 전용
 	
 	private final MemberRepository memberRepository;
+	private final LevelRepository levelRepository;
 
     @Transactional(readOnly = true)
     public MemberLoginResponseDTO toLoginResponse(Member member,
@@ -67,7 +69,24 @@ public class MemberService {  // 로그인(login) 서비스 전용
 		member.setCurrentExp(member.getCurrentExp() + exp);
 		
 		// 현재 회원 레벨 조회
-		Integer currentLevel = member.getMemberLevel().getLevelNo();
+		Integer previousLevel = member.getMemberLevel().getLevelNo();
+		
+		// 현재 회원 레벨
+		Level level = member.getMemberLevel();
+		
+		System.out.println("이전 레벨 : " + previousLevel);
+		
+		Integer currentLevel = levelRepository.findByCurrentLevel(member.getCurrentExp());
+		
+		System.out.println("현재 레벨 : " + currentLevel);
+		
+		
+		if(previousLevel < currentLevel) {
+			
+			Level newLevel = levelRepository.findById(currentLevel).orElseThrow();
+			
+			member.setMemberLevel(newLevel);
+		}
 		
 	}
 
