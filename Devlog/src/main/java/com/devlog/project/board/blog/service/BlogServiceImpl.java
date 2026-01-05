@@ -25,6 +25,7 @@ import com.devlog.project.member.model.entity.Level;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.LevelRepository;
 import com.devlog.project.member.model.repository.MemberRepository;
+import com.devlog.project.myPage.mapper.MyPageMapper;
 import com.devlog.project.notification.NotiEnums;
 import com.devlog.project.notification.dto.NotifiactionDTO;
 import com.devlog.project.notification.service.NotificationService;
@@ -38,6 +39,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogMapper blogMapper;
     private final MemberRepository memberRepository;
     private final LevelRepository levelRepository;
+    private final MyPageMapper myPageMapper;
 
     private final NotificationService notiService;
     
@@ -456,4 +458,53 @@ public class BlogServiceImpl implements BlogService {
             }
         }
     }
+    
+    // [헬퍼] 썸네일 저장을 위한 내부 메서드 (BOARD_IMG 테이블 사용)
+    private void insertThumbnail(Long boardNo, String fullPath) {
+        // 예: /images/blog/uuid_filename.png
+        int lastSlash = fullPath.lastIndexOf("/");
+        
+        // 방어 로직: 슬래시가 없으면 전체를 파일명으로
+        String imgPath = (lastSlash > -1) ? fullPath.substring(0, lastSlash + 1) : "";
+        String imgRename = (lastSlash > -1) ? fullPath.substring(lastSlash + 1) : fullPath;
+
+        Map<String, Object> imgMap = new HashMap<>();
+        imgMap.put("boardNo", boardNo);
+        imgMap.put("imgPath", imgPath);    
+        imgMap.put("imgRename", imgRename); 
+        imgMap.put("imgOrder", 0);         // 대표 이미지는 항상 0번
+        
+        blogMapper.insertBoardImg(imgMap); 
+    }
+    
+    // 태그 처리 로직 분리
+    private void processTags(BlogDTO blogDTO) {
+        if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
+            for (String tagName : blogDTO.getTagList()) {
+                blogMapper.insertTag(tagName);
+                Long tagNo = blogMapper.selectTagNoByName(tagName);
+                
+                Map<String, Object> tagParams = new HashMap<>();
+                tagParams.put("boardNo", blogDTO.getBoardNo());
+                tagParams.put("tagNo", tagNo);
+                blogMapper.insertBlogTag(tagParams);
+            }
+        }
+    }
+    
+    // 최근 본 게시물 로직
+	@Override
+	public void insertViewLog(Long memberNo, Long boardNo) {
+		if (memberNo == null || boardNo == null) return;
+
+        try {
+            // Mapper 호출해서 DB에 저장
+            myPageMapper.insertViewLog(memberNo, boardNo);
+        } catch (Exception e) {
+            // 로그 저장하다가 에러 나도(예: DB연결 끊김 등), 
+            // 사용자가 글 보는 데는 지장 없도록 에러를 무시(로그만 찍음)합니다.
+            System.out.println("조회 로그 저장 실패 (무시됨): " + e.getMessage());
+        }
+	}
+    
 }

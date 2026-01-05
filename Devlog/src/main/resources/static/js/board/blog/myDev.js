@@ -12,14 +12,14 @@ let isLastPage = false;
 
 // HTML 태그 제거 및 길이 제한 함수
 function stripHtml(html) {
-  if (!html) return "";
-  const tmp = document.createElement("DIV");
-  tmp.innerHTML = html;
-  let text = tmp.textContent || tmp.innerText || "";
-  if (text.length > 30) {
-    text = text.substring(0, 30) + "...";
-  }
-  return text;
+    if (!html) return '';
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    let text = tmp.textContent || tmp.innerText || "";
+    if (text.length > 30) {
+        text = text.substring(0, 60) + "...";
+    }
+    return text;
 }
 
 // 본문에서 첫 번째 이미지 URL 추출 (없으면 로고 반환)

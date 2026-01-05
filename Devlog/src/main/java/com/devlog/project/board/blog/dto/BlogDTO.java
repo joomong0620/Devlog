@@ -33,6 +33,7 @@ public class BlogDTO {
     private String memberEmail;     // 작성자 아이디 (이메일)
     private String profileImg;      // 작성자 프로필 이미지
     
+    // 썸네일
     @JsonProperty("thumbnail_url")
     private String thumbnailUrl;	// 썸네일 (프로필 or 본문이미지)
     
@@ -40,5 +41,30 @@ public class BlogDTO {
     private int likeCount;			// 좋아요 수
     
     private List<String> tagList;   // 태그 리스트 (저장/조회용)
+    
+    // 화면 깜빡임 방지용 요약 메서드 ${blog.summary}로 사용하면 자동 호출됨
+    public String getSummary() {
+        if (this.boardContent == null) return "";
+
+        // 1. HTML 태그 제거 (<div>, <p>, <br> 등을 공백으로 변환)
+        String text = this.boardContent.replaceAll("<[^>]*>", " ");
+        
+        // 2. 마크다운 특수문자 제거 (#, *, _, ~, `, [ ] 등)
+        text = text.replaceAll("[#*`_~\\[\\]]", "");
+        
+        // 3. 이미지 및 링크 문법 제거 (![alt](url), (url))
+        text = text.replaceAll("!\\[.*?\\]\\(.*?\\)", ""); // 이미지 태그 제거
+        text = text.replaceAll("\\(.*?\\)", "");           // 링크 주소 제거
+
+        // 4. 공백 정리 (엔터, 탭, 연속된 공백을 한 칸으로)
+        text = text.replaceAll("\\s+", " ").trim();
+
+        // 5. 길이 제한 (30자)
+        // 화면에 보여질 길이를 조절하려면 숫자 '30'을 원하는 대로 변경하세요.
+        if (text.length() > 60) {
+            return text.substring(0, 60) + "...";
+        }
+        return text;
+    }
 
 }
