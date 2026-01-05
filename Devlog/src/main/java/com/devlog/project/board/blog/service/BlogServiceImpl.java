@@ -218,7 +218,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public MyBlogResponseDto getMyBlogPageData(String blogId, String currentLoginId) {
         MyBlogResponseDto response = new MyBlogResponseDto();
-
+        
         // 1) 프로필
         UserProfileDto profile = this.getUserProfile(blogId);
         response.setUserProfile(profile);
@@ -257,6 +257,8 @@ public class BlogServiceImpl implements BlogService {
 
         response.setPostCount(blogMapper.countTotalPosts(blogId));
         response.setSubscriberCount(0);
+        
+        response.setSubPrice(blogOwner.getSubscriptionPrice());
 
         return response;
     }

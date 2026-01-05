@@ -29,4 +29,6 @@ public class MyBlogResponseDto {
     private int totalVisit;
     private int postCount;
     private int todayVisit;
+    
+    private int subPrice;
 }

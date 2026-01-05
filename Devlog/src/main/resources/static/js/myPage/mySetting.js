@@ -119,7 +119,29 @@ async function handleUpdate(type) {
     }
     // (3) 구독 설정 (추후 구현)
     else if (type === 'sub') {
-        alert("구독 설정 기능은 준비 중입니다!");
+        const subPrice = document.getElementById("subscriptionPrice").value;
+
+        if(subPrice < 5000){
+            alert("구독료는 최소 5000입니다.");
+            return;
+        }
+
+        console.log(subPrice, "구독료 확인");
+        
+        fetch("/api/myPage/subscribe", {
+            method : "POST",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({
+                price : subPrice
+            })
+        })
+        .then(resp => {
+            if(resp.ok) {
+                alert("구독 설정 완료");
+            }
+        })
+        .catch(e => console.log("구독 설정 실패", e));
+
     }
 }
 
