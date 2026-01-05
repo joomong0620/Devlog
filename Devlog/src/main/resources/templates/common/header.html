@@ -37,7 +37,7 @@
                 </a>
               </li>
               <li th:if="${session.loginMember != null 
-                and session.loginMember.memberAdmin == T(com.devlog.project.member.enums.CommonEnums.Status).Y}"
+                and session?.loginMember?.memberAdmin?.name() == 'Y'}"
               onclick="location.href='/manager/dashboard'">
                 <img th:src="@{/images/common/dashboard.svg}" alt="dashboard" />
                 <span>Dashboard</span>

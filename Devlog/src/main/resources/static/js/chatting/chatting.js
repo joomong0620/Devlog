@@ -2232,31 +2232,31 @@ function bindSendImage(){
 
 // ======================================================================
 // 신고 모달 띄우기
-// function openReportModal(reportedNo, targetNo) {
-// 
-//     fetch(`/report/modal?memberNo=${reportedNo}`)
-//         .then(res => res.text())
-//         .then(html => {
-//         const root = document.getElementById("modal-root");
-//         root.innerHTML = html;              
-//         const modal = root.querySelector("#reportModal");
-//         modal.classList.remove("display-none");
-// 
-//         modal.dataset.targetType = 'MESSAGE';
-//         modal.dataset.targetNo = targetNo;
-// 
-//         bindReportModalEvents();
-//     });
-// }
-// 
-// const reOverlay = document.getElementById("reportModal");
-// 
-// reOverlay?.addEventListener('click', e => {
-//     if (e.target.id === "reportModal") {
-//         closeReportModal();
-//     }
-// });
-// 
+function openReportModal(reportedNo, targetNo) {
+
+     fetch(`/report/modal?memberNo=${reportedNo}`)
+        .then(res => res.text())
+        .then(html => {
+         const root = document.getElementById("modal-root");
+         root.innerHTML = html;              
+         const modal = root.querySelector("#reportModal");
+        modal.classList.remove("display-none");
+
+         modal.dataset.targetType = 'MESSAGE';
+         modal.dataset.targetNo = targetNo;
+ 
+         bindReportModalEvents();
+     });
+ }
+
+ const reOverlay = document.getElementById("reportModal");
+ 
+ reOverlay?.addEventListener('click', e => {
+     if (e.target.id === "reportModal") {
+         closeReportModal();
+     }
+ });
+ 
 
 
 
