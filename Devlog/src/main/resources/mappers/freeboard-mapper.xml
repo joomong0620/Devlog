@@ -221,4 +221,9 @@
 		
 	</select>
    	
+   	<select id="selectBoardTitle" resultType="string">
+   		SELECT BOARD_TITLE
+   		FROM BOARD
+   		WHERE BOARD_NO = ${boardNo}
+   	</select>
 </mapper>

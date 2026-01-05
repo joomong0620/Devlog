@@ -75,4 +75,9 @@ public interface BlogMapper {
     int updateBlog(BlogDTO blogDTO);
     int deleteBlogTags(Long boardNo);
     
+    // 실시간 알림
+	Long selectReceiverNo(Long boardNo);
+	String selectBoardTitle(Long boardNo);
+	String selectMemberNickname(Long receiver);
+    
 }

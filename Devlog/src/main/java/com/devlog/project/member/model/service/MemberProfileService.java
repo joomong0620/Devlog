@@ -29,6 +29,7 @@ public class MemberProfileService {
 								.profileImg(member.getProfileImg())
 								.level(member.getMemberLevel().getLevelNo())
 								.levelTitle(member.getMemberLevel().getTitle())
+								.email(member.getMemberEmail())
 								.build();
 		
 		return resp;
