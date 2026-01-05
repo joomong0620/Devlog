@@ -95,7 +95,7 @@
                         <label>구독 금액</label>
                         <div class="bean-input-wrapper">
                             <img th:src="@{/images/common/2bean.png}" class="bean-icon-img" alt="커피콩">
-                            <input type="number" id="subscriptionPrice" value="2000"> <span class="unit">콩</span>
+                            <input type="number" id="subscriptionPrice" th:value="${member.subscriptionPrice}"> <span class="unit">콩</span>
                         </div>
                     </div>
                     <div class="btn-area">

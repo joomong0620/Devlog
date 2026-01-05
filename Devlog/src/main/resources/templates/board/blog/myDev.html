@@ -80,7 +80,7 @@
                         </button>
 
                         <button class="btn-white">메시지</button>
-                        <button class="btn-purple">구독</button>
+                        <button th:if="${subPrice > 0}" class="btn-purple" th:data-sub-price="${subPrice}">구독</button>
                     </th:block>
 
                     <button class="btn-white" th:if="${isOwner}" onclick="location.href='/blog/write'">

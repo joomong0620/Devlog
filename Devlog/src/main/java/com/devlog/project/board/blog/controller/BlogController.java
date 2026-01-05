@@ -129,6 +129,9 @@ public class BlogController {
             model.addAttribute("postCount", myBlogData.getPostCount());
             model.addAttribute("todayVisit", myBlogData.getTodayVisit());
             
+            // 구독료
+            model.addAttribute("subPrice", myBlogData.getSubPrice());
+            
          // 4. 내가 팔로우 중인지 여부 확인
             boolean isFollowing = false;
             if (currentLoginId != null && owner != null) {

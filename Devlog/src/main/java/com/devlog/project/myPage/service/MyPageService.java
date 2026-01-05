@@ -10,4 +10,8 @@ public interface MyPageService {
     
     // 프로필 이미지 수정
     void updateProfileImage(String email, String imageUrl);
+    
+    
+    // 구독료 설정
+	void setSubscribePrice(Map<String, Object> paramMap);
 }
