@@ -111,11 +111,13 @@
                     </div>
                     <div class="input-group">
                         <label>변경할 비밀번호</label>
-                        <input type="password" id="newPw" placeholder="변경할 비밀번호 (영문,숫자,특수문자 8~20자)">
+                        <input type="password" id="newPw" placeholder="변경할 비밀번호 (영문,숫자,특수문자 6~20자)" autocomplete="new-password">
+                        <p id="pwMsg" class="form-msg"></p>
                     </div>
                     <div class="input-group">
                         <label>변경할 비밀번호 확인</label>
-                        <input type="password" id="newPwConfirm" placeholder="변경할 비밀번호 재입력">
+                        <input type="password" id="newPwConfirm" placeholder="변경할 비밀번호 재입력" autocomplete="new-password">
+                        <p id="pwConfirmMsg" class="form-msg"></p>
                     </div>
                     <div class="btn-area">
                         <button class="submit-btn" onclick="handleUpdate('pw')">수정하기</button>

@@ -14,4 +14,11 @@ public interface MyPageService {
     
     // 구독료 설정
 	void setSubscribePrice(Map<String, Object> paramMap);
+	
+	// 비밀번호 변경
+	Integer changePw(Map<String, Object> paramMap);
+	
+	
+	// 탈퇴
+	int withdraw(Long memberNo, String string);
 }

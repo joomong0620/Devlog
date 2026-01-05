@@ -3,6 +3,7 @@ package com.devlog.project.myPage.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     private final MemberRepository memberRepository; // 조회 및 중복검사용 (JPA)
     private final MyPageMapper myPageMapper;         // [수정] 수정용 (MyBatis)
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -81,6 +83,73 @@ public class MyPageServiceImpl implements MyPageService {
 		
 		
 		
+		
+	}
+	
+	// private final PasswordEncoder passwordEncoder;
+	// 비밀번호 변경
+	@Override
+	@Transactional
+	public Integer changePw(Map<String, Object> paramMap) {
+
+		Integer result = null;
+		
+		Long memberNo = ((Number)paramMap.get("memberNo")).longValue();
+		
+		Member member = memberRepository.findById(memberNo).orElseThrow();
+		
+		String currentPw = paramMap.get("currentPw").toString();
+		
+		System.out.println("입력 PW: [" + currentPw + "]");
+		System.out.println("DB PW: [" + member.getMemberPw() + "]");
+		System.out.println("matches 결과: " + passwordEncoder.matches(currentPw, member.getMemberPw()));
+		System.out.println("Encoder 타입: " + passwordEncoder.getClass().getName());
+		
+		if(!passwordEncoder.matches(currentPw, member.getMemberPw())){ // 비밀번호 일치
+			
+			return 0;
+		} else {
+			
+			String newPw = paramMap.get("newPw").toString();
+			
+			if (passwordEncoder.matches(newPw, member.getMemberPw())) { // 현재 비밀번호와 변경할 비밀번호 일치
+				return 1;
+			} else { // 비밀번호 변경
+				
+				String encodedPw = passwordEncoder.encode(newPw); 
+				
+				member.setMemberPw(encodedPw);
+				
+				return 2;
+			}
+			
+			
+			
+		}
+		
+		
+	}
+	
+	// 회원 탈퇴 처리
+	@Override
+	public int withdraw(Long memberNo, String checkPw) {
+		
+		try {
+			Member member = memberRepository.findById(memberNo).orElseThrow();
+			
+	        if (!passwordEncoder.matches(checkPw, member.getMemberPw())) {
+	            return 0;
+	        }
+	        
+	        member.setMemberDelFl(CommonEnums.Status.Y);
+	        
+	        return 1;
+			
+			
+		} catch (Exception e) {
+			
+			return -1;
+		}
 		
 	}
 }

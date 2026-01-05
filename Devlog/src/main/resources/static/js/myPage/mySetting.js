@@ -115,9 +115,56 @@ async function handleUpdate(type) {
     } 
     // (2) 비밀번호 변경 (추후 구현)
     else if (type === 'pw') {
-        alert("비밀번호 변경 기능은 준비 중입니다!");
-    }
-    // (3) 구독 설정 (추후 구현)
+
+        const currentPw = document.getElementById("currentPw");
+        const newPw = document.getElementById("newPw");
+        const newPwConfirm = document.getElementById("newPwConfirm");
+
+        if (!currentPw.value) {
+            alert("현재 비밀번호를 입력해주세요.");
+            currentPw.focus();
+            return;
+        }
+
+        if (!regExp.test(newPw.value)) {
+            alert("새 비밀번호 형식이 올바르지 않습니다.");
+            newPw.focus();
+            return;
+        }
+
+        if (newPw.value !== newPwConfirm.value) {
+            alert("새 비밀번호가 서로 일치하지 않습니다.");
+            newPwConfirm.focus();
+            return;
+        }
+
+        const data = {
+            currentPw : currentPw.value,
+            newPw : newPw.value,
+        }
+
+        const resp = await fetch("/api/changePw", {
+            method : "POST",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify(data)
+        })
+
+        const result = Number(await resp.text());
+
+        if(result === 0) {
+            alert("현재 비밀번호가 일치하지 않습니다.");
+            currentPw.focus();
+        } else if( result === 1){
+            alert("기존 비밀번호와 같은 비밀번호로 바꿀 수 없습니다.");
+            newPw.value = '';
+            newPwConfirm.value = '';
+            newPw.focus();
+        }else {
+            alert("비밀번호가 변경되었습니다.");
+            location.reload();
+        }
+    }   
+    // (3) 구독 설정 
     else if (type === 'sub') {
         const subPrice = document.getElementById("subscriptionPrice").value;
 
@@ -148,13 +195,82 @@ async function handleUpdate(type) {
 // -------------------------------------------------------
 // 4. 회원 탈퇴 (추후 구현)
 // -------------------------------------------------------
-function handleWithdraw() {
+async function handleWithdraw() {
     const agree = document.getElementById('agreeTerm');
     if (agree && !agree.checked) {
         alert("약관 동의가 필요합니다.");
         return;
     }
+
+    const withdrawPw = document.getElementById("withdrawPw");
+    if(withdrawPw.value.trim() == ''){
+        alert("비밀번호를 입력해주세요.");
+        return;
+    }
+
     if (confirm("정말 탈퇴하시겠습니까? (복구 불가)")) {
-        alert("탈퇴 기능은 준비 중입니다.");
+        
+        const resp = await fetch("/api/withdraw", {
+            method : "DELETE",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({
+                checkPw : withdrawPw.value
+            })
+        })
+
+        const result = Number(await resp.text());
+
+        if (result === 0) {
+            alert("비밀번호가 일치하지 않습니다.");
+            withdrawPw.focus();
+        }
+        else if (result === -1) {
+            alert("탈퇴 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        }
+        else {
+            alert("탈퇴가 완료되었습니다.");
+            location.href = "/";
+        }
+
+
     }
 }
+
+
+
+
+const newPw = document.getElementById("newPw");
+const newPwConfirm = document.getElementById("newPwConfirm");
+const pwMsg = document.getElementById("pwMsg");
+const pwConfirmMsg = document.getElementById("pwConfirmMsg");
+
+const regExp = /^[\w!@#\-_]{6,20}$/;
+
+function validatePassword() {
+    const pw = newPw.value;
+    const confirm = newPwConfirm.value;
+
+    if (!regExp.test(pw)) {
+        pwMsg.textContent = "비밀번호는 6~20자, 영문·숫자·!@#-_ 만 사용할 수 있습니다.";
+        pwMsg.className = "form-msg error";
+    } else {
+        pwMsg.textContent = "사용 가능한 비밀번호입니다.";
+        pwMsg.className = "form-msg success";
+    }
+
+    if (confirm.length === 0) {
+        pwConfirmMsg.textContent = "";
+        return;
+    }
+
+    if (pw === confirm) {
+        pwConfirmMsg.textContent = "비밀번호가 일치합니다.";
+        pwConfirmMsg.className = "form-msg success";
+    } else {
+        pwConfirmMsg.textContent = "비밀번호가 일치하지 않습니다.";
+        pwConfirmMsg.className = "form-msg error";
+    }
+}
+
+newPw.addEventListener("input", validatePassword);
+newPwConfirm.addEventListener("input", validatePassword);
