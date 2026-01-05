@@ -58,7 +58,7 @@ public class CommentServiceImpl implements CommentService{
 	    	
 	    	int parentMemberNo = mapper.getParentMemberNo(comment.getParentCommentNo());
 	    	
-	    	if(parentMemberNo == comment.getMemberNo()) {
+	    	if(parentMemberNo != comment.getMemberNo()) {
 	    		
 	    		String memberNickname = mapper.selectMemberNickname(comment.getMemberNo());
 	    		

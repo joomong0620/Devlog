@@ -171,11 +171,14 @@ function notiCount() {
     fetch("/notiCount")
         .then(resp => resp.text())
         .then(count => {
+            const badge = document.getElementById("notiUnread");
 
             if (count > 0) {
-                const badge = document.getElementById("notiUnread");
                 badge.classList.add("notiUnread");
                 badge.innerText = count;
+            } else {
+                badge.classList.remove('notiUnread')
+                badge.innerText = '';
             }
         })
         .catch(() => console.log("안 읽은 알림 조회 실패"));
@@ -204,8 +207,8 @@ document.getElementById("allDeleteNoti").addEventListener("click", async e => {
         const resp = await fetch("/notification/allDelete", {method : "DELETE"});
     
         if(resp.ok) {
-            selectNotiList("ALL");
             notiCount();
+            selectNotiList("ALL");
             notiMenuArea.classList.toggle('display-none');
         }
 
@@ -224,8 +227,8 @@ document.getElementById("allReadNoti").addEventListener("click", async e=> {
     const resp = await fetch("/notification/allRead", {method : "POST"});
 
     if(resp.ok) {
-        selectNotiList("ALL");
         notiCount();
+        selectNotiList("ALL");
         notiMenuArea.classList.toggle('display-none');
     }
 

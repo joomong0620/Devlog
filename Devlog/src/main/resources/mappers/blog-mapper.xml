@@ -392,7 +392,26 @@
 	
 	
 	
+		<select id="selectReceiverNo" resultType="Long">
+		
+		SELECT MEMBER_NO
+		FROM BOARD
+		WHERE BOARD_NO = ${boardNo}
+		
+	</select>
 	
+	<select id="selectMemberNickname" resultType="string">
+		SELECT MEMBER_NICKNAME
+		FROM MEMBER
+		WHERE MEMBER_NO = ${receiver}
+		
+	</select>
+   	
+   	<select id="selectBoardTitle" resultType="string">
+   		SELECT BOARD_TITLE
+   		FROM BOARD
+   		WHERE BOARD_NO = ${boardNo}
+   	</select>
 	
 	
 

@@ -92,6 +92,21 @@
 	      AND COMMENT_DEL_FL = 'N'
 	    ORDER BY COMMENT_NO
 	</select>    
-    
+
+
+	<select id="getBoardMemberNo" resultType="_int">
+		
+		SELECT MEMBER_NO
+		FROM BOARD
+		WHERE BOARD_NO = ${boardNo}
+		
+	</select>
+	
+	<select id="selectMemberNickname" resultType="string">
+		
+		SELECT MEMBER_NICKNAME
+		FROM MEMBER
+		WHERE MEMBER_NO = ${memberNo}
+	</select>
 
 </mapper>

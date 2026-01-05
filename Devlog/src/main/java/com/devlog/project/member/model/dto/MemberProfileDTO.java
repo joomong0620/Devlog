@@ -20,5 +20,6 @@ public class MemberProfileDTO {
 	private String levelTitle;
 	private String profileImg;
 	private String memberNickname;
+	private String email;
 
 }
