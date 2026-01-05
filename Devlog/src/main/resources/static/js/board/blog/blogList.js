@@ -19,7 +19,7 @@ function stripHtml(html) {
     tmp.innerHTML = html;
     // 2. 텍스트만 추출 (태그는 사라짐)
     let text = tmp.textContent || tmp.innerText || "";
-    
+
     // 3. 너무 길면 100자까지만 자르고 ... 붙이기 (카드 모양 유지용)
     if (text.length > 30) {
         text = text.substring(0, 30) + "...";
@@ -27,23 +27,35 @@ function stripHtml(html) {
     return text;
 }
 
-// 본문에서 첫 번째 이미지 URL 추출 (없으면 로고 반환)
-function extractFirstImage(html) {
-    if (!html) return '/images/logo.png';
-    
-    // 1. HTML 문자열을 DOM으로 변환
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    
-    // 2. img 태그 찾기
-    const img = doc.querySelector('img');
-    
-    // 3. 이미지가 있으면 src 반환, 없으면 로고 반환
-    if (img) {
-        return img.src;
-    } else {
-        return '/images/logo.png';
+// 본문에서 첫 번째 이미지 URL 추출 (정규식 추가 버전)
+function extractFirstImage(htmlOrMd) {
+    if (!htmlOrMd) return '/images/logo.png';
+
+    // 1. HTML 태그 형태의 img src 추출 (<img src="...">)
+    const imgTagRegex = /<img[^>]+src=["']([^"']+)["']/;
+    const match = htmlOrMd.match(imgTagRegex);
+    if (match && match[1]) {
+        return match[1];
     }
+
+    // 2. 마크다운 형태의 이미지 추출 (![alt](url))
+    const mdImgRegex = /!\[.*?\]\((.*?)\)/;
+    const mdMatch = htmlOrMd.match(mdImgRegex);
+    if (mdMatch && mdMatch[1]) {
+        return mdMatch[1];
+    }
+
+    // 3. 둘 다 없으면 DOMParser 시도 (최후의 수단)
+    try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlOrMd, 'text/html');
+        const img = doc.querySelector('img');
+        if (img && img.src) return img.src;
+    } catch (e) {
+        console.error("Image parsing error", e);
+    }
+
+    return '/images/logo.png'; // 없으면 기본 이미지
 }
 
 // 1. 카드 생성 함수
@@ -51,7 +63,8 @@ function createCard(post) {
     const card = document.createElement('div');
     card.className = 'blog-card';
 
-    const imgSrc = extractFirstImage(post.board_content);
+    const content = post.board_content || post.boardContent || "";
+    const imgSrc = extractFirstImage(content);
     const detailUrl = `/blog/detail/${post.board_no}`;
     const paidIcon = (post.is_paid === 'Y') ? '<i class="fa-solid fa-crown" style="color:#ffd700; margin-right:5px;"></i>' : '';
 
@@ -62,6 +75,7 @@ function createCard(post) {
             <div class="card-image">
                 <img src="${imgSrc}" alt="썸네일" onerror="this.src='/images/logo.png'">
             </div>
+
             <div class="card-content">
                 <h3 class="card-title">${paidIcon}${post.board_title}</h3> 
                 
@@ -86,7 +100,7 @@ function createCard(post) {
 // 2. 데이터 페치
 function fetchPosts(isReset = false) {
     if (isLoading) return;
-    
+
     if (isReset) {
         blogGrid.innerHTML = '';
         currentPage = 0; // 초기화 시 0부터
@@ -107,7 +121,7 @@ function fetchPosts(isReset = false) {
         })
         .then(data => {
             // [수정] Service에서 Map으로 리턴하므로 data.content가 리스트임
-            const posts = data.content; 
+            const posts = data.content;
             const last = data.last;
 
             if (!posts || posts.length === 0) {
@@ -166,36 +180,29 @@ scrollTopBtn.addEventListener('click', () => {
 });
 
 // 초기 로딩 카드 내 게시글 내용 태그 제거 처리
-document.addEventListener("DOMContentLoaded", function() {
-    // 1. 모든 카드들을 찾기
+document.addEventListener("DOMContentLoaded", function () {
     const cards = document.querySelectorAll('.blog-card');
-    
+
     cards.forEach(card => {
-        // [내용 처리]
         const descEl = card.querySelector('.card-desc');
-        let rawContent = "";
+        const imgEl = card.querySelector('.card-image img');
         
         if (descEl) {
-            // th:text로 뿌려졌다면 태그가 그대로 text로 들어있으므로 innerText로 가져옴
-            rawContent = descEl.innerText || descEl.textContent;
-            
-            // stripHtml 돌려서 다시 넣기
+            // 1. th:text로 인해 문자열로 들어온 HTML 원본을 가져옴
+            const rawContent = descEl.innerText || descEl.textContent;
+
+            // 2. 썸네일 처리 (텍스트를 깎기 전에 원본 문자열에서 추출)
+            if (imgEl) {
+                const newSrc = extractFirstImage(rawContent);
+                imgEl.src = newSrc;
+                
+                imgEl.onerror = function () {
+                    this.src = '/images/logo.png';
+                };
+            }
+
+            // 3. 내용 처리 (이미지 추출이 끝난 후 태그를 제거하고 화면에 출력)
             descEl.innerText = stripHtml(rawContent);
-        }
-        
-        // 썸네일 처리
-        const imgEl = card.querySelector('.card-image img');
-        if (imgEl && rawContent) {
-            // extractFirstImage로 썸네일 주소 뽑기
-            const newSrc = extractFirstImage(rawContent);
-            
-            // 이미지 주소 교체 (원래 있던 프로필 사진 -> 본문 이미지 or 로고)
-            imgEl.src = newSrc;
-            
-            // 혹시라도 이미지가 깨지면 로고로 방어
-            imgEl.onerror = function() {
-                this.src = '/images/logo.png';
-            };
         }
     });
 });

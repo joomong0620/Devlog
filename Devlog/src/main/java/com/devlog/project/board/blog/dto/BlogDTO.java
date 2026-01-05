@@ -2,6 +2,8 @@ package com.devlog.project.board.blog.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -30,6 +32,8 @@ public class BlogDTO {
     private String memberNickname;  // 작성자 닉네임 (화면에 표시될 이름)
     private String memberEmail;     // 작성자 아이디 (이메일)
     private String profileImg;      // 작성자 프로필 이미지
+    
+    @JsonProperty("thumbnail_url")
     private String thumbnailUrl;	// 썸네일 (프로필 or 본문이미지)
     
     private int commentCount; 		// 댓글 수

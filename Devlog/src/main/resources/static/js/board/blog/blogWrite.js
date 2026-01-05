@@ -4,7 +4,7 @@ console.log('blogWrite.js loaded');
 const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
     height: '600px',
-    // [수정 1] 마크다운 대신 '위지윅' 모드로 시작 (수정 시 보기 편함)
+    // 마크다운 대신 '위지윅' 모드로 시작 (수정 시 보기 편함)
     initialEditType: 'wysiwyg', 
     previewStyle: 'vertical',
     placeholder: '내용을 입력하세요.',
@@ -227,6 +227,41 @@ function applySingleFix(range, afterText) {
     }, 0);
 }
 
+// ------------------ 오탈자 검출 끝 --------------------------
+
+// 썸네일 처리 변수
+const thumbInput = document.getElementById('thumbInput');
+const thumbPreview = document.getElementById('thumbPreview');
+const thumbnailUrlInput = document.getElementById('thumbnailUrl');
+
+// 썸네일 파일 업로드 이벤트
+thumbInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file); // 기존 이미지 업로드 API 재활용
+
+    fetch('/api/blog/imageUpload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if(!response.ok) throw new Error("업로드 실패");
+        return response.text();
+    })
+    .then(url => {
+        thumbPreview.src = url;         // 미리보기 변경
+        thumbnailUrlInput.value = url;  // hidden input에 URL 저장
+        console.log("썸네일 업로드 성공:", url);
+    })
+    .catch(error => {
+        console.error('Thumbnail Upload Error:', error);
+        alert('썸네일 업로드에 실패했습니다.');
+    });
+});
+
+
 // 2. 태그 입력 시스템
 const tagInput = document.getElementById('tagInput');
 const tagList = document.getElementById('tagList');
@@ -345,6 +380,9 @@ function savePost(isTemp) {
     const content = editor.getHTML().trim();
     const isPaidChecked = document.querySelector('input[name="content-type"]:checked').value === 'paid';
 
+    // 썸네일 URL 값 가져오기
+    const thumbnailUrl = document.getElementById('thumbnailUrl').value;
+
     if (!title) {
         alert('제목을 입력해주세요.');
         return document.querySelector('.input-title').focus();
@@ -364,6 +402,7 @@ function savePost(isTemp) {
         "board_no": boardNo ? parseInt(boardNo) : null,
         "board_title": title,
         "board_content": content,
+        "thumbnail_url": thumbnailUrl,
         "tag_list": Array.from(tags),
         "is_paid": isPaidChecked ? "Y" : "N",
         "price": isPaidChecked ? parseInt(priceInput.value) : 0,

@@ -63,6 +63,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @Transactional
     public Long writeBlog(BlogDTO blogDTO) {
+    	// 로그인 유저 정보 설정
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
             throw new AccessDeniedException("로그인이 필요합니다.");
@@ -73,10 +74,17 @@ public class BlogServiceImpl implements BlogService {
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보 없음"));
 
         blogDTO.setMemberNo(member.getMemberNo());
-
+        
         blogMapper.insertBoard(blogDTO);
+        
         blogMapper.insertBlog(blogDTO);
-
+        
+        // 썸네일 처리
+        if (blogDTO.getThumbnailUrl() != null && !blogDTO.getThumbnailUrl().isEmpty()) {
+            insertThumbnail(blogDTO.getBoardNo(), blogDTO.getThumbnailUrl());
+        }
+        
+        // 태그 처리
         if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
             for (String tagName : blogDTO.getTagList()) {
                 blogMapper.insertTag(tagName);
@@ -364,6 +372,13 @@ public class BlogServiceImpl implements BlogService {
 
         // 4. 옵션 수정 (BLOG 테이블 - 유료여부, 가격 등)
         blogMapper.updateBlog(blogDTO);
+        
+        // 2. [썸네일 수정] 기존 썸네일(ORDER 0) 삭제 후 새로 삽입
+        if (blogDTO.getThumbnailUrl() != null && !blogDTO.getThumbnailUrl().isEmpty()) {
+            blogMapper.deleteThumbnail(blogDTO.getBoardNo()); // IMG_ORDER = 0 삭제 Mapper 필요
+            insertThumbnail(blogDTO.getBoardNo(), blogDTO.getThumbnailUrl());
+        }
+        
 
         // 5. 태그 수정 (기존 태그 삭제 -> 새 태그 등록)
         // 5-1. 기존 태그 연결 끊기
@@ -386,4 +401,37 @@ public class BlogServiceImpl implements BlogService {
             }
         }
     }
+    
+    // 썸네일 저장을 위한 내부 공통 메서드
+    private void insertThumbnail(Long boardNo, String fullPath) {
+        // fullPath 예시: "/images/blog/uuid_filename.png"
+        // DB 구조에 맞게 PATH와 RENAME 분리 (마지막 '/' 기준으로 분리)
+        int lastSlash = fullPath.lastIndexOf("/");
+        String imgPath = fullPath.substring(0, lastSlash + 1);
+        String imgRename = fullPath.substring(lastSlash + 1);
+
+        Map<String, Object> imgMap = new HashMap<>();
+        imgMap.put("boardNo", boardNo);
+        imgMap.put("imgPath", imgPath);    // "/images/blog/"
+        imgMap.put("imgRename", imgRename); // "uuid_filename.png"
+        imgMap.put("imgOrder", 0);         // 대표 이미지는 항상 0번
+        
+        blogMapper.insertBoardImg(imgMap); // Mapper에 추가해야 함
+    }
+    
+    // 태그 처리 로직 분리
+    private void processTags(BlogDTO blogDTO) {
+        if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
+            for (String tagName : blogDTO.getTagList()) {
+                blogMapper.insertTag(tagName);
+                Long tagNo = blogMapper.selectTagNoByName(tagName);
+                Map<String, Object> tagParams = new HashMap<>();
+                tagParams.put("boardNo", blogDTO.getBoardNo());
+                tagParams.put("tagNo", tagNo);
+                blogMapper.insertBlogTag(tagParams);
+            }
+        }
+    }
+    
+    
 }
