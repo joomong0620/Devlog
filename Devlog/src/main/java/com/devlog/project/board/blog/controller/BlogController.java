@@ -23,6 +23,7 @@ import com.devlog.project.board.blog.service.ReplyService;
 import com.devlog.project.member.enums.CommonEnums;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.MemberRepository;
+import com.devlog.project.member.model.service.MemberService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +37,7 @@ public class BlogController {
 	private final BlogService blogService;
 	private final ReplyService replyService;
 	private final MemberRepository memberRepository;
+	private final MemberService memberService;
 	
 
 	// 1. 블로그 목록 화면
@@ -76,6 +78,8 @@ public class BlogController {
 	@ResponseBody
 	public ResponseEntity<String> writeBlog(@RequestBody BlogDTO blogDTO) {
 		blogService.writeBlog(blogDTO);
+		memberService.increaseExp(blogDTO.getMemberNo(), 100);
+		
 		return ResponseEntity.ok("저장 성공");
 	}
 
@@ -128,6 +132,13 @@ public class BlogController {
             model.addAttribute("totalVisit", myBlogData.getTotalVisit());
             model.addAttribute("postCount", myBlogData.getPostCount());
             model.addAttribute("todayVisit", myBlogData.getTodayVisit());
+            
+            model.addAttribute("subPrice", myBlogData.getSubPrice());
+            
+            model.addAttribute("memberLevel", myBlogData.getMemberLevel());
+            model.addAttribute("currentExp", myBlogData.getCurrentExp());
+            model.addAttribute("nextExp", myBlogData.getNextExp());
+            model.addAttribute("levelTitle", myBlogData.getLevelTitle());
             
          // 4. 내가 팔로우 중인지 여부 확인
             boolean isFollowing = false;

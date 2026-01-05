@@ -115,6 +115,42 @@ body[data-user-type="owner"] .visitor-only {
     align-items: center;
     gap: 12px;
     margin-bottom: 15px;
+    position: relative;
+}
+
+.exp-info{
+    position: absolute;
+    left: 50%;
+    top: 140%;
+    transform: translateX(-50%);
+    background: rgba(139, 92, 246, 0.95);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.user-name {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    color: #6d28d9;
+    box-shadow: 0 4px 10px rgba(139, 92, 246, 0.25);
+    user-select: none;
+}
+
+.lv-row:hover .exp-info {
+    opacity: 1;
+    top: 120%;
 }
 
 .exp-container {

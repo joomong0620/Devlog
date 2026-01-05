@@ -31,4 +31,8 @@ public interface ReplyMapper {
     int checkCommentLike(@Param("commentNo") Long commentNo, @Param("memberNo") Long memberNo);
     int insertCommentLike(@Param("commentNo") Long commentNo, @Param("memberNo") Long memberNo);
     int deleteCommentLike(@Param("commentNo") Long commentNo, @Param("memberNo") Long memberNo);
+    
+	int getBoardMemberNo(Long boardNo);
+	String selectMemberNickname(Long memberNo);
+	int getParentMemberNo(Long parentCommentNo);
 }

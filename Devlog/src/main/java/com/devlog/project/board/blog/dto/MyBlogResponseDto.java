@@ -31,4 +31,13 @@ public class MyBlogResponseDto {
     private int todayVisit;
     
     private int subPrice;
+    
+    
+    private Integer memberLevel;
+    
+    private Integer currentExp;
+    
+    private Integer nextExp;
+    
+    private String levelTitle;
 }

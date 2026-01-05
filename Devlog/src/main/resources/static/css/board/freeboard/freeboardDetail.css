@@ -11,6 +11,16 @@ body {
     margin: 0;
 }
 
+/* header와의 간격벌리기 */
+.top-space-bw-header{
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    margin-bottom: 150px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
 /* 상단 타이틀 */
 .title-main {
     /*background-color: #F1C6E7;*/
@@ -54,7 +64,8 @@ body {
 .post-title {
     font-size: 40px;
     font-weight: 800;
-    margin-top: 20px;
+    /* margin-top: 20px; */
+    margin-top: 100px;
     margin-bottom: 60px;
 }
 

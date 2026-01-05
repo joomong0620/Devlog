@@ -51,6 +51,7 @@ public class PayServiceImpl implements PayService {
 		int result = paymapper.insertPayment(payment);
 		
 		if(result > 0) {
+			payment.setPayAmount(payment.getPrice());
 			paymapper.insertHistory(payment);
 			paymapper.updateMemberBeans(payment);
 		}
@@ -101,6 +102,8 @@ public class PayServiceImpl implements PayService {
 	         
 	            // DTO의 금액을 음수로 전환 (잔액 차감 및 히스토리 기록용)
 	            payment.setPrice(-payment.getPrice()); 
+	            
+	            payment.setPayAmount(payment.getPrice());
 
 	            // 회원 테이블의 보유 콩 잔액 차감
 	            int updateResult = paymapper.updateMemberBeans(payment);
@@ -113,6 +116,7 @@ public class PayServiceImpl implements PayService {
 
 	    } catch (Exception e) {
 	        throw new RuntimeException("포트원 결제 취소 실패", e);
+	        
 	    }
 
 	    return false;
@@ -190,7 +194,7 @@ public class PayServiceImpl implements PayService {
 	@Transactional(rollbackFor = Exception.class)
 	public int insertTrade(PayDTO trade) {
 	    
-	    // 1. 판매자 식별 (작성하신 코드와 동일)
+	    // 1. 판매자 식별 로직
 	    Long sellerNo = 0L;
 	    if ("POST".equals(trade.getContentType())) {
 	        sellerNo = replyMapper.selectBoardWriter(trade.getContentId());
@@ -209,22 +213,45 @@ public class PayServiceImpl implements PayService {
 	        throw new RuntimeException("커피콩 잔액이 부족합니다.");
 	    }
 
+	    // 3. 데이터 처리
 	    // 구매자 차감
 	    PayDTO deduction = new PayDTO();
 	    deduction.setMemberNo(trade.getBuyerNo());
-	    deduction.setPrice(-trade.getPrice()); // 음수 처리
+	    deduction.setPrice(-trade.getPrice());
 	    if(paymapper.updateMemberBeans(deduction) == 0) throw new RuntimeException("차감 실패");
 
 	    // 판매자 지급 (본인 제외)
 	    if (!trade.getBuyerNo().equals(sellerNo)) {
 	        PayDTO addition = new PayDTO();
 	        addition.setMemberNo(sellerNo);
-	        addition.setPrice(trade.getPrice()); // 양수 처리
+	        addition.setPrice(trade.getPrice());
 	        if(paymapper.updateMemberBeans(addition) == 0) throw new RuntimeException("지급 실패");
 	    }
 
-	    //  내역 저장
-	    return paymapper.insertBeansTrade(trade);
+	 // 4. 거래 원장 저장
+	    int result = paymapper.insertBeansTrade(trade);
+	    if(result == 0) throw new RuntimeException("거래 저장 실패");
+
+	    // 5. 히스토리 저장
+	    // [구매자 히스토리]
+	    PayDTO buyerHistory = new PayDTO();
+	    buyerHistory.setMemberNo(trade.getBuyerNo()); // 정확히 세팅
+	    buyerHistory.setPayAmount(-trade.getPrice()); 
+	    buyerHistory.setTradeNo(trade.getTradeNo());  // 매퍼에서 <selectKey>가 잘 작동해야 함
+	    
+	    // 로그를 찍어보세요! 여기서 0이 나오면 매퍼의 selectKey 문제임
+	    System.out.println("거래번호 체크: " + trade.getTradeNo());
+	    
+	    paymapper.insertHistory(buyerHistory); 
+
+	    // [판매자 히스토리]
+	    if (!trade.getBuyerNo().equals(sellerNo)) {
+	        PayDTO sellerHistory = new PayDTO();
+	        sellerHistory.setMemberNo(sellerNo);
+	        sellerHistory.setPayAmount(trade.getPrice()); 
+	        sellerHistory.setTradeNo(trade.getTradeNo());
+	        paymapper.insertHistory(sellerHistory);
+	    }
+	    return result;
 	}
-	
 }

@@ -22,4 +22,11 @@ public interface FbCommentMapper {
 	
 	// 댓글 수정
 	public int update(CommentFB comment);
+	
+	
+	// 게시글 부모 주인 조회
+	public int getBoardMemberNo(Long boardNo);
+	
+	// 댓글 작성자 닉네임 조회
+	public String selectMemberNickname(Long memberNo);
 }

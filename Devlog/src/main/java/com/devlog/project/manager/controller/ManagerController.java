@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import com.devlog.project.manager.model.dto.ReportManagerDTO;
 import com.devlog.project.manager.model.service.ManagerReportService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
+import com.devlog.project.report.enums.ReportStatus;
+
 import com.devlog.project.pay.dto.PayDTO;
 import com.devlog.project.pay.service.PayService;
 
@@ -48,14 +50,44 @@ public class ManagerController {
     @GetMapping("/dashboard/report")
     public String reportList(Model model) {
 
+        managerReportService.syncResolvedReports();
+
         List<ReportManagerDTO> reportList =
-                managerReportService.getReportList();
+            managerReportService.getReportList();
 
-        model.addAttribute("reportList", reportList);
-
+        model.addAttribute(
+            "reportList",
+            managerReportService.getReportList()
+        );
         return "manager/manager-report";
     }
+
     
+    // 신고 처리 - 삭제
+    @PostMapping("/dashboard/report/resolve")
+    @ResponseBody
+    public void resolveReport(@RequestBody Map<String, Long> body) {
+
+        Long reportId = body.get("reportId");
+
+        managerReportService.updateReportStatus(
+            reportId,
+            ReportStatus.RESOLVED
+        );
+    }
+    
+    // 신고 반려
+    @PostMapping("/dashboard/report/reject")
+    @ResponseBody
+    public void rejectReport(@RequestBody Map<String, Long> body) {
+
+        Long reportId = body.get("reportId");
+
+        managerReportService.updateReportStatus(
+            reportId,
+            ReportStatus.REJECTED
+        );
+    }
     
     // 결제 관리
     @GetMapping("/dashboard/pay")

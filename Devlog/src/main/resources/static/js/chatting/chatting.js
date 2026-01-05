@@ -583,7 +583,6 @@ function bindMessageContextMenu() {
 
                 emojiArea.classList.remove('display-none');
                 emojiAreaClose(emojiArea);
-                emojiClickClose(emojiArea);
             };
         }
     });
@@ -617,26 +616,49 @@ function emojiAreaClose(emojiArea) {
 }
 
 /* 이모지 클릭 시 닫히게 하는 함수 */
-function emojiClickClose(emojiArea) {
+// function emojiClickClose(emojiArea) {
 
-    const emojis = emojiArea.querySelectorAll('span');
+//     const emojis = emojiArea.querySelectorAll('span');
 
-    for (let emoji of emojis) {
-        emoji.onclick = e => {
-            e.stopPropagation();
+//     for (let emoji of emojis) {
+//         emoji.onclick = e => {
+//             e.stopPropagation();
 
-            const emojiCode = emoji.dataset.emojiCode;
-            const messageNo = emoji.closest('.message-item').dataset.messageNo;
+//             const emojiCode = emoji.dataset.emojiCode;
+//             const messageNo = emoji.closest('.message-item').dataset.messageNo;
 
-            console.log(emojiCode, messageNo);
+//             console.log(emojiCode, messageNo);
 
-            sendEmoji(Number(emojiCode), Number(messageNo));
+//             sendEmoji(Number(emojiCode), Number(messageNo));
 
             
-            emojiArea.classList.add('display-none');
-        };
+//             emojiArea.classList.add('display-none');
+//         };
+//     }
+// }
+
+document.addEventListener("click", e => {
+
+    const emoji = e.target.closest(".emoji-area span");
+    if (!emoji) return;
+
+    e.stopPropagation();
+
+    const emojiCode = Number(emoji.dataset.emojiCode);
+    const messageEl = emoji.closest(".message-item");
+    if (!messageEl) return;
+
+    const messageNo = Number(messageEl.dataset.messageNo);
+
+    console.log(emojiCode, messageNo);
+
+    sendEmoji(emojiCode, messageNo);
+
+    const emojiArea = emoji.closest(".emoji-area");
+    if (emojiArea) {
+        emojiArea.classList.add("display-none");
     }
-}
+});
 
 
 async function sendEmoji(emojiCode, messageNo) {
@@ -1284,16 +1306,21 @@ function openProfile(data, card) {
         <p class="job-title">${data.level_title}</p>
 
         <div class="button-group">
-            <button class="btn fw-600 fs-14">프로필 보기</button>
+            <button onclick="linkProfile('${data.email}')" class="btn fw-600 fs-14">프로필 보기</button>
             <button class="btn fw-600 fs-14 start-private-chat" 
                     data-profile-no="${data.member_no}">
                 1:1 채팅 시작
             </button>
-            <button class="btn fw-600 fs-14">팔로우 하기</button>
         </div>
     `;
 }
 
+function linkProfile(email) {
+
+    location.href = `/blog/${email}`
+
+
+}
 
 function bindChatContainerEvents(){
     const container = document.getElementById('chatting-space');
@@ -1914,7 +1941,10 @@ function createMyMessage(msg) {
     // emoji area
     const emoji = document.createElement('div');
     emoji.className = 'emoji-area flex display-none';
-    emoji.innerHTML = `<span>❤️</span><span>👍</span><span>😀</span><span>😂</span><span>😮</span><span>😡</span>`;
+        emoji.innerHTML = `
+        <span data-emoji-code="1">❤️</span><span data-emoji-code="2">👍</span><span data-emoji-code="3">😀</span>
+        <span data-emoji-code="4">😂</span><span data-emoji-code="5">😮</span><span data-emoji-code="6">😡</span>
+    `;
 
     // 안 읽은 사람 수
     
@@ -2000,8 +2030,8 @@ function createOtherMessage(msg) {
     const emoji = document.createElement('div');
     emoji.className = 'emoji-area flex display-none';
     emoji.innerHTML = `
-        <span>❤️</span><span>👍</span><span>😀</span>
-        <span>😂</span><span>😮</span><span>😡</span>
+        <span data-emoji-code="1">❤️</span><span data-emoji-code="2">👍</span><span data-emoji-code="3">😀</span>
+        <span data-emoji-code="4">😂</span><span data-emoji-code="5">😮</span><span data-emoji-code="6">😡</span>
     `;
 
     let unreadCount = null;

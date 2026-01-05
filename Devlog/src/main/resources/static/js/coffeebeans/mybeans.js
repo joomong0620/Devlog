@@ -165,12 +165,32 @@ document.addEventListener("DOMContentLoaded", () => {
   // 내역 필터링
   filterButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const type = btn.dataset.type;
+      const type = btn.dataset.type; // 'all', 'charge', 'use', etc.
+
       filterButtons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
+
       historyRows.forEach((row) => {
-        row.style.display =
-          type === "all" || row.dataset.type === type ? "" : "none";
+        const rowType = row.dataset.type; // tr에 심어진 data-type 값
+
+        if (type === "all") {
+          // '전체' 탭은 무조건 모든 행을 보여줌
+          row.style.display = "";
+        } else if (type === "use") {
+          // '사용' 탭은 use, POST, SUBSCRIBE 세 가지를 모두 포함
+          if (
+            rowType === "use" ||
+            rowType === "POST" ||
+            rowType === "SUBSCRIBE"
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        } else {
+          // 그 외(charge, exchange 등)는 타입이 정확히 일치할 때만 보여줌
+          row.style.display = rowType === type ? "" : "none";
+        }
       });
     });
   });

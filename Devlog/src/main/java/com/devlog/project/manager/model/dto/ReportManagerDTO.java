@@ -14,8 +14,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ReportManagerDTO {
 
-    private Long reportNo;
+	private String targetUrl; // 관리자가 이동할 게시글 주소
+	
+    private Long reportId;
+    private Long targetId;
     private String reportType;
+    
     private ReportTargetEnums targetType;
     private String reportReason;
 
@@ -26,19 +30,24 @@ public class ReportManagerDTO {
     private LocalDateTime processDate;
 
     private ReportStatus status;
+    
+    private String messageContent;
 
     public ReportManagerDTO(
-            Long reportNo,
-            String reportType,
-            ReportTargetEnums targetType,
-            String reportReason,
-            String reporterNickname,
-            String targetNickname,
-            LocalDateTime reportDate,
-            LocalDateTime processDate,
-            ReportStatus status
-    ) {
-        this.reportNo = reportNo;
+    	    Long reportId,
+    	    Long targetId,
+    	    String reportType,
+    	    ReportTargetEnums targetType,
+    	    String reportReason,
+    	    String reporterNickname,
+    	    String targetNickname,
+    	    LocalDateTime reportDate,
+    	    LocalDateTime processDate,
+    	    ReportStatus status,
+    	    String messageContent
+    	) {
+        this.reportId = reportId;
+        this.targetId = targetId;
         this.reportType = reportType;
         this.targetType = targetType;
         this.reportReason = reportReason;
@@ -47,5 +56,6 @@ public class ReportManagerDTO {
         this.reportDate = reportDate;
         this.processDate = processDate;
         this.status = status;
+        this.messageContent = messageContent;
     }
 }

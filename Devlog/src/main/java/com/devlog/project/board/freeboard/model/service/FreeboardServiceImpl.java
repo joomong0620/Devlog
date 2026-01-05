@@ -94,6 +94,8 @@ public class FreeboardServiceImpl implements FreeboardService {
 			Long sender = ((Number)paramMap.get("memberNo")).longValue();
 			if(result != 0 && !sender.equals(receiver)) {
 				
+				String boardTitle = mapper.selectBoardTitle(paramMap.get("boardNo"));
+				
 				
 				String memberNickname = mapper.selectMemberNickname(receiver);
 				
@@ -101,7 +103,7 @@ public class FreeboardServiceImpl implements FreeboardService {
 						.sender(((Number)paramMap.get("memberNo")).longValue())
 						.receiver(receiver)
 						.content(memberNickname +"님이 회원님의 게시글에 좋아요를 눌렀습니다.")
-						.preview(" ")
+						.preview(boardTitle)
 						.type(NotiEnums.NotiType.LIKE)
 						.targetType(NotiEnums.TargetType.BOARD)
 						.targetId(((Number)paramMap.get("boardNo")).longValue())

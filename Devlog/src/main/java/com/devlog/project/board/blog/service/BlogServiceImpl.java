@@ -21,8 +21,13 @@ import com.devlog.project.board.blog.dto.TagDto;
 import com.devlog.project.board.blog.dto.UserProfileDto;
 import com.devlog.project.board.blog.mapper.BlogMapper;
 import com.devlog.project.member.enums.CommonEnums;
+import com.devlog.project.member.model.entity.Level;
 import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.LevelRepository;
 import com.devlog.project.member.model.repository.MemberRepository;
+import com.devlog.project.notification.NotiEnums;
+import com.devlog.project.notification.dto.NotifiactionDTO;
+import com.devlog.project.notification.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +37,10 @@ public class BlogServiceImpl implements BlogService {
 
     private final BlogMapper blogMapper;
     private final MemberRepository memberRepository;
+    private final LevelRepository levelRepository;
 
+    private final NotificationService notiService;
+    
     @Value("${my.blogWrite.location}")
     private String uploadLocation;
 
@@ -217,6 +225,24 @@ public class BlogServiceImpl implements BlogService {
             return false; // 언팔로우됨
         } else {
             blogMapper.insertFollow(params);
+            
+            String memberNickname = blogMapper.selectMemberNickname(followerId);
+            
+            
+            
+            
+            NotifiactionDTO notification = NotifiactionDTO.builder()
+					.sender(followerId)
+					.receiver(targetId)
+					.content(memberNickname +"님이 회원님을 팔로우 하였습니다.")
+					.preview(" ")
+					.type(NotiEnums.NotiType.FOLLOW)
+					.targetType(NotiEnums.TargetType.USER)
+					.targetId(targetId)
+					.build();
+    		
+    		notiService.sendNotification(notification);
+            
             return true; // 팔로우됨
         }
     }
@@ -278,6 +304,26 @@ public class BlogServiceImpl implements BlogService {
         response.setSubscriberCount(0);
         
         response.setSubPrice(blogOwner.getSubscriptionPrice());
+        
+        // 회원 현재 레벨
+        response.setMemberLevel(blogOwner.getMemberLevel().getLevelNo());
+        response.setCurrentExp(blogOwner.getCurrentExp());
+        
+        
+        Integer nextLv = null;
+        
+        if(blogOwner.getMemberLevel().getLevelNo() < 30) {
+        	nextLv = blogOwner.getMemberLevel().getLevelNo() + 1;
+        } else {
+        	nextLv = blogOwner.getMemberLevel().getLevelNo();
+        }
+        
+        Level level = levelRepository.findById(nextLv).orElseThrow();
+        
+        response.setNextExp(level.getRequiredTotalExp());
+        
+        response.setLevelTitle(level.getTitle());
+        
 
         return response;
     }
@@ -347,6 +393,29 @@ public class BlogServiceImpl implements BlogService {
             return false; // 취소됨
         } else {
             blogMapper.insertBoardLike(params);
+            
+            Long receiver = blogMapper.selectReceiverNo(boardNo);
+			Long sender = memberNo;
+			if(!sender.equals(receiver)) {
+				
+				String boardTitle = blogMapper.selectBoardTitle(boardNo);
+				
+				
+				String memberNickname = blogMapper.selectMemberNickname(receiver);
+				
+				NotifiactionDTO notification = NotifiactionDTO.builder()
+						.sender(sender)
+						.receiver(receiver)
+						.content(memberNickname +"님이 회원님의 게시글에 좋아요를 눌렀습니다.")
+						.preview(boardTitle)
+						.type(NotiEnums.NotiType.LIKE)
+						.targetType(NotiEnums.TargetType.BOARD)
+						.targetId(boardNo)
+						.build();
+				
+				notiService.sendNotification(notification);
+			}
+            
             return true; // 등록됨
         }
     }
