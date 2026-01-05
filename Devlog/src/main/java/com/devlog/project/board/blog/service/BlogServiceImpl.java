@@ -71,6 +71,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @Transactional
     public Long writeBlog(BlogDTO blogDTO) {
+    	// 로그인 유저 정보 설정
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
             throw new AccessDeniedException("로그인이 필요합니다.");
@@ -81,21 +82,19 @@ public class BlogServiceImpl implements BlogService {
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보 없음"));
 
         blogDTO.setMemberNo(member.getMemberNo());
-
+        
         blogMapper.insertBoard(blogDTO);
+        
         blogMapper.insertBlog(blogDTO);
-
-        if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
-            for (String tagName : blogDTO.getTagList()) {
-                blogMapper.insertTag(tagName);
-                Long tagNo = blogMapper.selectTagNoByName(tagName);
-
-                Map<String, Object> tagParams = new HashMap<>();
-                tagParams.put("boardNo", blogDTO.getBoardNo());
-                tagParams.put("tagNo", tagNo);
-                blogMapper.insertBlogTag(tagParams);
-            }
+        
+        // 썸네일 처리
+        if (blogDTO.getThumbnailUrl() != null && !blogDTO.getThumbnailUrl().isEmpty()) {
+            insertThumbnail(blogDTO.getBoardNo(), blogDTO.getThumbnailUrl());
         }
+        
+        // 태그 처리
+        processTags(blogDTO);
+        
         return blogDTO.getBoardNo();
     }
 
@@ -111,7 +110,7 @@ public class BlogServiceImpl implements BlogService {
         params.put("limit", size);
         params.put("sort", sort);
         
-        // [추가] 현재 로그인한 사람의 번호를 가져와서 넘겨줌 (스크랩 조회용)
+        // 현재 로그인한 사람의 번호를 가져와서 넘겨줌 (스크랩 조회용)
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             Member loginUser = memberRepository.findByMemberEmailAndMemberDelFl(auth.getName(), CommonEnums.Status.N).orElse(null);
@@ -433,6 +432,13 @@ public class BlogServiceImpl implements BlogService {
 
         // 4. 옵션 수정 (BLOG 테이블 - 유료여부, 가격 등)
         blogMapper.updateBlog(blogDTO);
+        
+        // 2. [썸네일 수정] 기존 썸네일(ORDER 0) 삭제 후 새로 삽입
+        if (blogDTO.getThumbnailUrl() != null && !blogDTO.getThumbnailUrl().isEmpty()) {
+            blogMapper.deleteThumbnail(blogDTO.getBoardNo()); // IMG_ORDER = 0 삭제 Mapper 필요
+            insertThumbnail(blogDTO.getBoardNo(), blogDTO.getThumbnailUrl());
+        }
+        
 
         // 5. 태그 수정 (기존 태그 삭제 -> 새 태그 등록)
         // 5-1. 기존 태그 연결 끊기
@@ -455,4 +461,39 @@ public class BlogServiceImpl implements BlogService {
             }
         }
     }
+    
+    // [헬퍼] 썸네일 저장을 위한 내부 메서드 (BOARD_IMG 테이블 사용)
+    private void insertThumbnail(Long boardNo, String fullPath) {
+        // 예: /images/blog/uuid_filename.png
+        int lastSlash = fullPath.lastIndexOf("/");
+        
+        // 방어 로직: 슬래시가 없으면 전체를 파일명으로
+        String imgPath = (lastSlash > -1) ? fullPath.substring(0, lastSlash + 1) : "";
+        String imgRename = (lastSlash > -1) ? fullPath.substring(lastSlash + 1) : fullPath;
+
+        Map<String, Object> imgMap = new HashMap<>();
+        imgMap.put("boardNo", boardNo);
+        imgMap.put("imgPath", imgPath);    
+        imgMap.put("imgRename", imgRename); 
+        imgMap.put("imgOrder", 0);         // 대표 이미지는 항상 0번
+        
+        blogMapper.insertBoardImg(imgMap); 
+    }
+    
+    // 태그 처리 로직 분리
+    private void processTags(BlogDTO blogDTO) {
+        if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
+            for (String tagName : blogDTO.getTagList()) {
+                blogMapper.insertTag(tagName);
+                Long tagNo = blogMapper.selectTagNoByName(tagName);
+                
+                Map<String, Object> tagParams = new HashMap<>();
+                tagParams.put("boardNo", blogDTO.getBoardNo());
+                tagParams.put("tagNo", tagNo);
+                blogMapper.insertBlogTag(tagParams);
+            }
+        }
+    }
+    
+    
 }
