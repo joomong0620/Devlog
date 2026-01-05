@@ -110,7 +110,7 @@
 
         <tbody>
           <tr th:each="report : ${reportList}"
-              th:data-report-no="${report.reportNo}"
+              th:data-report-no="${report.reportId}"
               th:data-target-id="${report.targetId}"
               th:data-target-type="${report.targetType}"
               th:data-target-url="${report.targetUrl}"
@@ -122,7 +122,7 @@
               onclick="openModal(this)">
 
             <!-- 번호 -->
-            <td th:text="${report.reportNo}">1</td>
+            <td th:text="${report.reportId}">1</td>
             <td th:text="${report.reportType}">스팸/광고</td>
             <td th:text="${report.targetType}">BOARD</td>
             <td th:text="${report.reportReason}">내용</td>
@@ -141,10 +141,21 @@
             <td>
               <div class="status-wrapper" onclick="event.stopPropagation()">
                 <select class="status-select"
-                        th:value="${report.status}">
-                  <option th:value="PENDING">처리전</option>
-                  <option th:value="RESOLVED">처리완료</option>
-                  <option th:value="REJECTED">반려</option>
+                        th:disabled="${report.status.name() != 'PENDING'}">
+                  <option value="PENDING"
+                          th:selected="${report.status.name() == 'PENDING'}">
+                    처리전
+                  </option>
+
+                  <option value="RESOLVED"
+                          th:selected="${report.status.name() == 'RESOLVED'}">
+                    처리완료
+                  </option>
+
+                  <option value="REJECTED"
+                          th:selected="${report.status.name() == 'REJECTED'}">
+                    반려
+                  </option>
                 </select>
               </div>
             </td>

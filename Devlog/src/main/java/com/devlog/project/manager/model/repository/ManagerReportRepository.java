@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.devlog.project.manager.model.dto.ReportManagerDTO;
+import com.devlog.project.report.enums.ReportStatus;
+import com.devlog.project.report.enums.ReportTargetEnums;
 import com.devlog.project.report.model.entity.Report;
 
 public interface ManagerReportRepository extends JpaRepository<Report, Long> {
@@ -31,14 +34,15 @@ public interface ManagerReportRepository extends JpaRepository<Report, Long> {
     """)
     List<ReportManagerDTO> findAllForManager();
     
-
     @Query("""
-        select r
-        from Report r
-        where r.status = 'PENDING'
-          and r.targetType = 'BOARD'
+    	 select r
+    	 from Report r
+    	 where r.status = 'PENDING'
+    	 and r.targetType = 'BOARD'
     """)
-    List<Report> findByPending();
+    List<Report> findPendingBoardReports();
+    
+    
 }
 
 

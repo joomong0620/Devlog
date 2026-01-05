@@ -55,7 +55,10 @@ public class ManagerController {
         List<ReportManagerDTO> reportList =
             managerReportService.getReportList();
 
-        model.addAttribute("reportList", reportList);
+        model.addAttribute(
+            "reportList",
+            managerReportService.getReportList()
+        );
         return "manager/manager-report";
     }
 
@@ -65,10 +68,10 @@ public class ManagerController {
     @ResponseBody
     public void resolveReport(@RequestBody Map<String, Long> body) {
 
-        Long reportNo = body.get("reportNo");
+        Long reportId = body.get("reportId");
 
         managerReportService.updateReportStatus(
-            reportNo,
+            reportId,
             ReportStatus.RESOLVED
         );
     }
@@ -78,13 +81,14 @@ public class ManagerController {
     @ResponseBody
     public void rejectReport(@RequestBody Map<String, Long> body) {
 
-        Long reportNo = body.get("reportNo");
+        Long reportId = body.get("reportId");
 
         managerReportService.updateReportStatus(
-            reportNo,
+            reportId,
             ReportStatus.REJECTED
         );
     }
+    
     // 결제 관리
     @GetMapping("/dashboard/pay")
     public String adminPay(Model model,

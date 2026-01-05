@@ -106,8 +106,10 @@ public class Report {
 
 	@PrePersist
 	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-		this.status = ReportStatus.PENDING;
+	    this.createdAt = LocalDateTime.now();
+	    if (this.status == null) {
+	        this.status = ReportStatus.PENDING;
+	    }
 	}
 
 }

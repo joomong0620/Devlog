@@ -54,9 +54,9 @@ public class ManagerReportServiceImpl implements ManagerReportService {
 
     @Override
     @Transactional
-    public void updateReportStatus(Long reportNo, ReportStatus status) {
+    public void updateReportStatus(Long reportId, ReportStatus status) {
 
-        Report report = reportRepository.findById(reportNo)
+        Report report = reportRepository.findById(reportId)
             .orElseThrow(() -> new IllegalArgumentException("신고 내역 없음"));
 
         if (report.getStatus() != ReportStatus.PENDING) {
@@ -92,24 +92,29 @@ public class ManagerReportServiceImpl implements ManagerReportService {
         };
     }
 
-
-    @Override
+    
     @Transactional
     public void syncResolvedReports() {
 
-        List<Report> pendingReports = reportRepository.findByPending();
+        List<Report> reports = reportRepository.findPendingBoardReports();
+        System.out.println("[SYNC] pending board reports size = " + reports.size());
 
-        for (Report report : pendingReports) {
-
+        for (Report report : reports) {
             Long boardNo = report.getTargetId();
             int isDeleted = managerReportMapper.isBoardDeleted(boardNo);
+
+            System.out.println(
+                "[SYNC] reportId=" + report.getReportId()
+                + ", boardNo=" + boardNo
+                + ", isDeleted=" + isDeleted
+            );
 
             if (isDeleted == 1) {
                 report.setStatus(ReportStatus.RESOLVED);
                 report.setProcessedAt(LocalDateTime.now());
+                System.out.println("[SYNC] -> RESOLVED 처리됨");
             }
         }
-        reportRepository.flush();
     }
 }
 

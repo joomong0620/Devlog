@@ -16,7 +16,7 @@ public class ReportManagerDTO {
 
 	private String targetUrl; // 관리자가 이동할 게시글 주소
 	
-    private Long reportNo;
+    private Long reportId;
     private Long targetId;
     private String reportType;
     
@@ -32,7 +32,7 @@ public class ReportManagerDTO {
     private ReportStatus status;
 
     public ReportManagerDTO(
-    	    Long reportNo,
+    	    Long reportId,
     	    Long targetId,
     	    String reportType,
     	    ReportTargetEnums targetType,
@@ -43,7 +43,7 @@ public class ReportManagerDTO {
     	    LocalDateTime processDate,
     	    ReportStatus status
     	) {
-        this.reportNo = reportNo;
+        this.reportId = reportId;
         this.targetId = targetId;
         this.reportType = reportType;
         this.targetType = targetType;
