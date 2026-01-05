@@ -1367,25 +1367,24 @@ async function createPrivateWith(targetMemberNo){
 // 채팅방내 이미지 클릭 시 가운데에 띄우기
 function imagebigViewer() {
 
+
     const viewer = document.getElementById('imageViewer');
     const viewerImg = document.getElementById('imageViewerImg');
-    
-    document.querySelectorAll('.bubble.image img').forEach(img => {
-        img.addEventListener('click', e => {
-            e.stopPropagation();
-    
-            viewerImg.src = img.src;
-            viewer.classList.remove('display-none');
-        });
+
+    document.addEventListener('click', e => {
+        const img = e.target.closest('.bubble.image img');
+        if (!img) return;
+
+        e.stopPropagation();
+        viewerImg.src = img.src;
+        viewer.classList.remove('display-none');
     });
-    
-    
+
     viewer.addEventListener('click', () => {
         viewer.classList.add('display-none');
         viewerImg.src = '';
     });
-    
-    
+
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             viewer.classList.add('display-none');
