@@ -50,7 +50,7 @@
                     m.PROFILE_IMG AS thumbnailUrl,
                     bl.IS_PAID AS isPaid,
                     bl.PRICE AS price,
-                    (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO) AS commentCount,
+                    (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO AND c.COMMENT_DEL_FL = 'N') AS commentCount,
                     (SELECT COUNT(*) FROM "BOARD_LIKE" l WHERE l.BOARD_NO = b.BOARD_NO) AS likeCount
                 FROM "BOARD" b
                 JOIN "MEMBER" m ON b.MEMBER_NO = m.MEMBER_NO
@@ -87,7 +87,7 @@
                     
                     bl.IS_PAID AS isPaid, 
                     
-                    (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO) AS commentCount,
+                    (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO AND c.COMMENT_DEL_FL = 'N') AS commentCount,
                     (SELECT COUNT(*) FROM "BOARD_LIKE" l WHERE l.BOARD_NO = b.BOARD_NO) AS likeCount
                 FROM "BOARD" b
                 JOIN "MEMBER" m ON b.MEMBER_NO = m.MEMBER_NO
@@ -129,7 +129,7 @@
             m.PROFILE_IMG AS profileImg,
             bl.PRICE AS price,
             bl.IS_PAID AS isPaid,
-            (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO) AS commentCount,
+            (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO AND c.COMMENT_DEL_FL = 'N') AS commentCount,
             (SELECT COUNT(*) FROM "BOARD_LIKE" l WHERE l.BOARD_NO = b.BOARD_NO) AS likeCount
         FROM "BOARD" b
         JOIN "MEMBER" m ON b.MEMBER_NO = m.MEMBER_NO

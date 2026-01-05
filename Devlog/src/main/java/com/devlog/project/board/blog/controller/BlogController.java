@@ -86,7 +86,7 @@ public class BlogController {
 		return blogService.uploadImage(image);
 	}
 
-
+	
 	@GetMapping("/blog/{blogId:.+}") 
     public String blogMain(@PathVariable("blogId") String blogId, Model model) {
         

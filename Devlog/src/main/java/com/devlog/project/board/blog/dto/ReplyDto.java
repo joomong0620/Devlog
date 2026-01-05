@@ -2,7 +2,7 @@ package com.devlog.project.board.blog.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonProperty; // 추가
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,25 +13,41 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class ReplyDto {
-	
-	private Long commentNo;         // COMMENT_NO (PK)
-    private Long boardNo;           // BOARD_NO (FK)
-    private Long parentCommentNo;   // PARENTS_COMMENT_NO (부모 댓글 번호)
     
-    private Long memberNo;          // MEMBER_NO (작성자 FK)
-    private String memberNickname;  // 작성자 닉네임 (조인)
-    private String profileImg;      // 작성자 프사 (조인)
+    @JsonProperty("commentNo")
+    private Long commentNo;         
     
-    private String commentContent;  // COMMENT_CONTENT (내용)
-    private String cCreateDate;     // C_CREATE_DATE (작성일, String 변환)
-    private String commentDelFl;    // COMMENT_DEL_FL (삭제여부 N/Y)
-    private String secretYn;        // SECRET_YN (비밀글 여부)
+    @JsonProperty("boardNo")
+    private Long boardNo;           
     
-    private int likeCount;          // 좋아요 수 (서브쿼리)
+    @JsonProperty("parentCommentNo")
+    private Long parentCommentNo;   
     
-    // 내가 좋아요 눌렀는지 여부 
+    @JsonProperty("memberNo")
+    private Long memberNo;          
+    
+    @JsonProperty("memberNickname")
+    private String memberNickname;  
+    
+    @JsonProperty("profileImg")
+    private String profileImg;      
+    
+    @JsonProperty("commentContent")
+    private String commentContent;  
+    
+    @JsonProperty("cCreateDate")
+    private String cCreateDate;     
+    
+    @JsonProperty("commentDelFl")
+    private String commentDelFl;    
+    
+    @JsonProperty("secretYn")
+    private String secretYn;        
+    
+    @JsonProperty("likeCount")
+    private int likeCount;          
+    
     private boolean isLiked;
     
-    // 답글 리스트 (계층형 구조용)
     private List<ReplyDto> children = new ArrayList<>();
 }
