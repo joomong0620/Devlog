@@ -33,7 +33,15 @@ body {
 }
 
 /* 구분선 */
-.line {
+/* <!-- <hr class="fb-line"> --> 일때 */
+/* .fb-line {
+    border: none;
+    border-top: 4px solid #000;
+    margin: 20px 0;
+} */
+
+/* <div class="fb-line"></div>  일때 */
+.fb-line {
     border: none;
     border-top: 4px solid #000;
     margin: 20px 0;
