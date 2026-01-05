@@ -45,6 +45,8 @@ public class PayDTO {
 	private String tradeAt; // 거래 일시
 	private Long contentId; // 대상 ID(게시글번호, 회원번호, 챗봇번호)
 	
+	// 사용 타입
+	private String tradeType;
 	
 	// 환전     
 	@JsonProperty("exchangeNo")
