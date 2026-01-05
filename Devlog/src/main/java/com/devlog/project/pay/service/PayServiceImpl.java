@@ -123,6 +123,7 @@ public class PayServiceImpl implements PayService {
 	}
 
 
+	// 환전
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public int insertExchange(PayDTO pay) {
@@ -148,6 +149,8 @@ public class PayServiceImpl implements PayService {
 	    if (result > 0) {
 	        // 기존 필드인 price에 차감할 액수를 음수로 세팅
 	        pay.setPrice(-originAmount); 
+	        
+	        pay.setPayAmount(-originAmount);
 	        result = paymapper.updateMemberBeans(pay);
 	        if(result > 0) {
 	            paymapper.insertHistory(pay); 
