@@ -24,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
@@ -32,6 +33,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @ToString
 public class Report {
 
@@ -47,6 +49,9 @@ public class Report {
 	private Long reportId;
 
 
+	@Column(name = "BOARD_CODE")
+	private Integer boardCode;
+	
 	// 게시글 / 메시지
 	@Column(name = "TARGET_TYPE", length = 15, nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -101,8 +106,10 @@ public class Report {
 
 	@PrePersist
 	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-		this.status = ReportStatus.PENDING;
+	    this.createdAt = LocalDateTime.now();
+	    if (this.status == null) {
+	        this.status = ReportStatus.PENDING;
+	    }
 	}
 
 }

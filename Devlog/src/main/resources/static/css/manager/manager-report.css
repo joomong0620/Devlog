@@ -207,3 +207,30 @@
   font-size: 12px;
   color: #666;
 }
+
+.chat-preview {
+  margin-top: 14px;
+  padding: 0 16px;
+  background: #f4f6f8;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+
+  max-height: 0;
+  overflow: hidden;
+
+  transition:
+    max-height 0.35s ease,
+    padding 0.25s ease,
+    opacity 0.25s ease;
+
+  opacity: 0;
+}
+
+.chat-preview.open {
+  max-height: 200px;
+  padding: 14px 16px;
+  opacity: 1;
+}
