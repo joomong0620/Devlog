@@ -445,5 +445,3 @@ function savePost(isTemp) {
         alert('저장 실패: ' + error.message);
     });
 }
-
-document.querySelector('.btn-draft').addEventListener('click', () => savePost(true));

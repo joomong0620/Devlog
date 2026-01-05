@@ -1,9 +1,11 @@
 package com.devlog.project.myPage.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,7 @@ import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.MemberRepository;
 import com.devlog.project.myPage.dto.MemberUpdateDto;
+import com.devlog.project.myPage.dto.MyActivityDto;
 import com.devlog.project.myPage.service.MyPageService;
 
 import lombok.RequiredArgsConstructor;
@@ -125,6 +128,23 @@ public class MyPageController {
     	
     	return ResponseEntity.ok().build();
     	
+    }
+    
+    // [API] 내 활동 리스트 조회
+    @GetMapping("/api/myPage/activity-list")
+    @ResponseBody
+    public List<MyActivityDto> getActivityList(@RequestParam("type") String type) {
+        
+        // 현재 로그인한 사용자 찾기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        
+        // 회원 번호(memberNo) 구하기
+        Member member = memberRepository.findByMemberEmailAndMemberDelFl(email, CommonEnums.Status.N)
+                .orElseThrow(() -> new IllegalArgumentException("로그인 정보가 없습니다."));
+        
+        // 서비스 호출 및 결과 반환
+        return myPageService.getMyActivityList(member.getMemberNo(), type);
     }
     	
     

@@ -13,18 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnConfirm = document.getElementById('btn-confirm-delete');
     let targetDeleteId = null;
 
-    // 탭 클릭 이벤트
+    // 탭 클릭 이벤트 리스너 등록
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
+            // 모든 탭 비활성화 후 클릭한 탭 활성화
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
 
+            // data-tab 속성값 가져오기 (likes, history, drafts, purchases)
             const tabType = tab.dataset.tab;
+            
+            // 타이틀 변경 및 데이터 로드
             updateTitle(tabType);
             fetchData(tabType);
         });
     });
 
+    // 섹션 타이틀 변경 함수
     function updateTitle(type) {
         const titles = {
             'likes': '좋아요 한 게시물',
@@ -32,152 +37,163 @@ document.addEventListener('DOMContentLoaded', () => {
             'drafts': '임시 저장한 글',
             'purchases': '구매 내역'
         };
-        sectionTitle.textContent = titles[type];
+        if(sectionTitle) sectionTitle.textContent = titles[type] || '내 활동';
     }
 
+    // 서버에서 데이터 가져오기 (AJAX)
     function fetchData(type) {
+        // 목록 초기화 및 로딩중 표시
         listContainer.innerHTML = '';
-        listContainer.appendChild(loadingSpinner);
-        loadingSpinner.style.display = 'flex';
+        if(loadingSpinner) {
+            listContainer.appendChild(loadingSpinner);
+            loadingSpinner.style.display = 'flex';
+        }
 
-        setTimeout(() => {
-            const data = getMockData(type);
-            renderList(data, type);
-        }, 300);
+        // API 호출
+        fetch(`/api/myPage/activity-list?type=${type}`)
+            .then(res => {
+                if(!res.ok) throw new Error("데이터를 불러오는데 실패했습니다.");
+                return res.json();
+            })
+            .then(data => {
+                // 데이터 렌더링
+                renderList(data, type);
+            })
+            .catch(err => {
+                console.error(err);
+                listContainer.innerHTML = '<div style="padding:40px; text-align:center; color:#888;">데이터를 불러오지 못했습니다.</div>';
+            })
+            .finally(() => {
+                // 로딩중 숨기기
+                if(loadingSpinner) loadingSpinner.style.display = 'none';
+            });
     }
 
+    // 리스트 HTML 그리기
     function renderList(items, type) {
+        // 로딩중 제외하고 내용 비우기 (혹은 innerHTML=''로 덮어쓰기)
         listContainer.innerHTML = '';
 
-        if (items.length === 0) {
-            listContainer.innerHTML = '<p style="color:#999; padding:20px;">내역이 없습니다.</p>';
+        // 데이터가 없을 경우 처리
+        if (!items || items.length === 0) {
+            listContainer.innerHTML = '<div style="padding:60px 0; text-align:center; color:#999; font-size:15px;">내역이 없습니다.</div>';
             return;
         }
 
         const isDraft = (type === 'drafts');
+        const isPurchase = (type === 'purchases');
 
         items.forEach(item => {
             const itemEl = document.createElement('div');
             itemEl.className = 'post-item';
 
-            // 1. 링크 설정
-            // 임시저장이면 에디터로, 아니면 게시글 상세로 이동
-            const contentLink = isDraft ? `/write?id=${item.id}` : `/post/${item.id}`;
+            // DTO 변수명 매핑 (Backend MyActivityDto와 일치)
+            const bNo = item.board_no;            
+            const bTitle = item.board_title || '제목 없음';      
+            const bContent = item.board_content || '';
+            const bThumb = item.thumbnail_url || '/images/logo.png'; // 썸네일 없으면 기본 로고
+            const bDate = item.activity_date || '';
+            const bAuthor = item.member_nickname || '익명';
+            const bCount = item.board_Count || 0;
+            const isPaidVal = item.is_paid || 'N';
 
-            // 2. 제목 앞 아이콘 (구매내역인 경우만)
-            const titlePrefix = (type === 'purchases') ? '<i class="fa-solid fa-crown crown-icon"></i> ' : '';
+            // 링크 설정 (임시저장은 수정 페이지, 나머지는 상세 페이지)
+            const link = isDraft ? `/blog/write?no=${bNo}` : `/blog/detail/${bNo}`;
 
-            // 3. 게시판/작성자 정보 (임시저장은 안보임)
-            let metaInfoHtml = '';
-            if (!isDraft) {
-                // 블로그 글이면 작성자 닉네임, 아니면 게시판 이름
-                const sourceName = (item.category === 'BLOG') ? item.author : item.boardName;
-                const sourceLink = (item.category === 'BLOG') ? `/blog/${item.authorId}` : `/board/${item.boardId}`;
-                metaInfoHtml = `<a href="${sourceLink}" class="source-link">${sourceName}</a>`;
-            }
-
-            // 4. 태그 (임시저장이 아니고, 카테고리가 블로그일 때만 표시)
-            let tagsHtml = '';
-            if (!isDraft && item.category === 'BLOG' && item.tags && item.tags.length > 0) {
-                const tags = item.tags.map(tag => `<span class="tag">#${tag}</span>`).join('');
-                tagsHtml = `<div class="post-tags">${tags}</div>`;
-            }
-
-            // 5. 삭제 버튼 (임시저장인 경우만)
-            const deleteHtml = isDraft
-                ? `<div class="delete-btn-wrapper" onclick="openDeleteModal(${item.id})"><i class="fa-regular fa-trash-can"></i></div>`
+            // 유료 아이콘 (구매내역이거나 유료글일 때)
+            const crownHtml = (isPurchase || isPaidVal === 'Y') 
+                ? '<i class="fa-solid fa-crown" style="color:#ffd700; margin-right:6px; font-size:14px;"></i>' 
                 : '';
+            
+            // 삭제 버튼 (임시저장 탭에서만 보임)
+            const deleteBtn = isDraft 
+                ? `<div class="delete-btn-wrapper" title="삭제" onclick="openDeleteModal(${bNo})">
+                    <i class="fa-regular fa-trash-can"></i>
+                    </div>` 
+                : '';
+
+            // 메타 정보 (작성자, 날짜, 조회수) - 임시저장은 안 보여줌
+            let metaInfo = '';
+            if(!isDraft) {
+                metaInfo = `
+                    <div style="font-size:13px; color:#666; margin-top:8px; display:flex; align-items:center;">
+                        <span style="font-weight:600; color:#333;">${bAuthor}</span>
+                        <span style="margin:0 8px; color:#ddd;">|</span>
+                        <span>${bDate}</span>
+                        <span style="margin:0 8px; color:#ddd;">|</span>
+                        <span><i class="fa-regular fa-eye"></i> ${bCount}</span>
+                    </div>
+                `;
+            }
+
+            // 본문 요약 (HTML 태그 제거 후 60자 제한)
+            // 정규식: <[^>]*>? -> HTML 태그 제거
+            let summary = bContent.replace(/<[^>]*>?/g, '').replace(/\s+/g, ' ').trim();
+            if(summary.length > 60) summary = summary.substring(0, 60) + '...';
 
             // HTML 조립
             itemEl.innerHTML = `
-                <a href="${contentLink}" class="thumb-link">
-                    <img src="${item.img}" alt="썸네일" class="post-thumb">
+                <a href="${link}" class="thumb-link">
+                    <img src="${bThumb}" alt="썸네일" class="post-thumb" onerror="this.src='/images/logo.png'">
                 </a>
                 <div class="post-info">
                     <div class="post-header">
-                        <a href="${contentLink}" class="title-link">
-                            <span>${titlePrefix}${item.title}</span>
+                        <a href="${link}" class="title-link">
+                            <span style="display:flex; align-items:center;">${crownHtml}${bTitle}</span>
                         </a>
-                        ${deleteHtml}
+                        ${deleteBtn}
                     </div>
-                    ${metaInfoHtml}
-                    ${tagsHtml}
+                    <p style="font-size:14px; color:#888; margin:6px 0; line-height:1.4;">${summary}</p>
+                    ${metaInfo}
                 </div>
             `;
             listContainer.appendChild(itemEl);
         });
     }
 
-    // 모달 로직
+    // 4. 모달 열기 (전역 함수로 연결)
     window.openDeleteModal = (id) => {
         targetDeleteId = id;
-        modal.classList.remove('hidden');
+        if(modal) modal.classList.remove('hidden');
     };
-    btnCancel.addEventListener('click', () => {
-        modal.classList.add('hidden');
-        targetDeleteId = null;
-    });
-    btnConfirm.addEventListener('click', () => {
-        alert(`ID: ${targetDeleteId} 삭제 완료 (UI 갱신 필요)`);
-        modal.classList.add('hidden');
-        fetchData('drafts'); // 목록 갱신 시뮬레이션
-    });
 
-    // 초기 실행
+    // 모달 닫기 (취소)
+    if(btnCancel) {
+        btnCancel.addEventListener('click', () => {
+            if(modal) modal.classList.add('hidden');
+            targetDeleteId = null;
+        });
+    }
+
+    // 모달 확인 (삭제 실행)
+    if(btnConfirm) {
+        btnConfirm.addEventListener('click', () => {
+            if(!targetDeleteId) return;
+
+            // 실제 삭제 API 호출
+            fetch(`/api/blog/delete/${targetDeleteId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => {
+                if(res.ok) {
+                    alert("삭제되었습니다.");
+                    fetchData('drafts'); // 목록 새로고침
+                } else {
+                    return res.text().then(text => alert("삭제 실패: " + text));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("오류가 발생했습니다.");
+            })
+            .finally(() => {
+                if(modal) modal.classList.add('hidden');
+                targetDeleteId = null;
+            });
+        });
+    }
+
+    // 5. 초기 실행: 페이지 로드 시 '좋아요' 탭 데이터 불러오기
     fetchData('likes');
 });
-
-// Mock Data (수정된 요구사항 반영)
-function getMockData(type) {
-    const thumb = 'https://via.placeholder.com/150';
-
-    // 카테고리: 'BLOG', 'NEWS', 'JOB'
-
-    if (type === 'likes' || type === 'history') {
-        return [
-            {
-                id: 1, img: thumb, category: 'JOB',
-                title: '2025년 12월 신입/경력 채용',
-                boardName: 'IT 채용정보', boardId: 'job',
-                tags: [] // 채용정보는 태그 안나옴
-            },
-            {
-                id: 2, img: thumb, category: 'NEWS',
-                title: '게임 축제 "AGF 2025", 뜨거운 열기',
-                boardName: 'IT 지식뉴스', boardId: 'news',
-                tags: [] // 뉴스는 태그 안나옴
-            },
-            {
-                id: 3, img: thumb, category: 'BLOG',
-                title: '개발자 첫 출근 시 기강 잡는 OOTD',
-                author: 'Fit_the_size', authorId: 'user100',
-                tags: ['OOTD', '출근', 'Java'] // 블로그만 태그 나옴
-            },
-            {
-                id: 4, img: thumb, category: 'BLOG',
-                title: '사수님에게 잘 보이는 법 (질문 잘하는 법)',
-                author: 'Dev_master123', authorId: 'user200',
-                tags: ['사수', '인사', '꿀팁']
-            }
-        ];
-    }
-    else if (type === 'drafts') {
-        // 임시저장: 제목, 썸네일만 있음
-        return [
-            { id: 101, img: thumb, title: 'Spring Boot JPA 정복기 (작성중)' },
-            { id: 102, img: thumb, title: '리액트 훅 완벽 가이드 (초안)' }
-        ];
-    }
-    else if (type === 'purchases') {
-        // 구매내역: 유료 글
-        return [
-            {
-                id: 3, img: thumb, category: 'BLOG',
-                title: '개발자 첫 출근 시 기강 잡는 OOTD (Premium)',
-                author: 'Fit_the_size', authorId: 'user100',
-                tags: ['OOTD', '출근']
-            }
-        ];
-    }
-    return [];
-}

@@ -1,6 +1,7 @@
 package com.devlog.project.myPage.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import com.devlog.project.member.enums.CommonEnums;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.MemberRepository;
 import com.devlog.project.myPage.dto.MemberUpdateDto;
+import com.devlog.project.myPage.dto.MyActivityDto;
 import com.devlog.project.myPage.mapper.MyPageMapper; // [필수] 우리가 만든 Mapper import
 
 import lombok.RequiredArgsConstructor;
@@ -79,8 +81,29 @@ public class MyPageServiceImpl implements MyPageService {
 		
 		
 		
-		
-		
-		
 	}
+	
+	// 내 활동 리스트 조회
+	@Override
+    @Transactional(readOnly = true) // 조회 전용이라 readOnly 권장
+    public List<MyActivityDto> getMyActivityList(Long memberNo, String type) {
+        
+        // type: likes, history, drafts, purchases
+        switch (type) {
+            case "likes":
+                return myPageMapper.selectLikedPosts(memberNo);
+            case "history":
+                // VIEW_LOG 테이블이 없으면 에러 날 수 있으니 주의 (생성했으니 안심!)
+                return myPageMapper.selectViewHistory(memberNo);
+            case "drafts":
+                return myPageMapper.selectDrafts(memberNo);
+            case "purchases":
+                return myPageMapper.selectPurchasedPosts(memberNo);
+            default:
+                // 이상한 type이 오면 빈 리스트 반환
+                return List.of(); 
+        }
+    }
+	
+	
 }

@@ -45,7 +45,7 @@
                             <button class="btn-text"
                                 th:onclick="|location.href='@{/blog/edit/{no}(no=${post.boardNo})}'|">수정</button>
                             <span class="divider">|</span>
-                            <button class="btn-text delete" onclick="deletePost()">삭제</button>
+                            <button class="btn-text delete" th:onclick="|deletePost(${post.boardNo})|">삭제</button>
                         </div>
 
                         <div class="stats">

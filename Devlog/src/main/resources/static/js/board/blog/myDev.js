@@ -17,7 +17,7 @@ function stripHtml(html) {
     tmp.innerHTML = html;
     let text = tmp.textContent || tmp.innerText || "";
     if (text.length > 30) {
-        text = text.substring(0, 30) + "...";
+        text = text.substring(0, 60) + "...";
     }
     return text;
 }

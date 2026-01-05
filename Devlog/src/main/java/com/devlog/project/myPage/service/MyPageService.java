@@ -1,7 +1,9 @@
 package com.devlog.project.myPage.service;
 
+import java.util.List;
 import java.util.Map;
 import com.devlog.project.myPage.dto.MemberUpdateDto;
+import com.devlog.project.myPage.dto.MyActivityDto;
 
 public interface MyPageService {
     
@@ -14,4 +16,7 @@ public interface MyPageService {
     
     // 구독료 설정
 	void setSubscribePrice(Map<String, Object> paramMap);
+	
+	// 내 활동 리스트 조회
+    List<MyActivityDto> getMyActivityList(Long memberNo, String type);
 }

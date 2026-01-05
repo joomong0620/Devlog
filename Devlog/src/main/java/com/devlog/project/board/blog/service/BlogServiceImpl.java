@@ -25,6 +25,7 @@ import com.devlog.project.member.model.entity.Level;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.LevelRepository;
 import com.devlog.project.member.model.repository.MemberRepository;
+import com.devlog.project.myPage.mapper.MyPageMapper;
 import com.devlog.project.notification.NotiEnums;
 import com.devlog.project.notification.dto.NotifiactionDTO;
 import com.devlog.project.notification.service.NotificationService;
@@ -38,6 +39,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogMapper blogMapper;
     private final MemberRepository memberRepository;
     private final LevelRepository levelRepository;
+    private final MyPageMapper myPageMapper;
 
     private final NotificationService notiService;
     
@@ -494,6 +496,21 @@ public class BlogServiceImpl implements BlogService {
             }
         }
     }
+    
+    // 최근 본 게시물 로직
+	@Override
+	public void insertViewLog(Long memberNo, Long boardNo) {
+		if (memberNo == null || boardNo == null) return;
+
+        try {
+            // Mapper 호출해서 DB에 저장
+            myPageMapper.insertViewLog(memberNo, boardNo);
+        } catch (Exception e) {
+            // 로그 저장하다가 에러 나도(예: DB연결 끊김 등), 
+            // 사용자가 글 보는 데는 지장 없도록 에러를 무시(로그만 찍음)합니다.
+            System.out.println("조회 로그 저장 실패 (무시됨): " + e.getMessage());
+        }
+	}
     
     
 }

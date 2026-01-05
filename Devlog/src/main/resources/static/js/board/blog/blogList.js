@@ -10,55 +10,26 @@ let currentSort = 'id';
 let isLoading = false;
 let isLastPage = false;
 
-
-// HTML 태그 + 마크다운 문법 제거 및 길이 제한 함수
-function cleanContent(htmlContent) {
-    if (!htmlContent) return '';
-
-    // 1. DOMParser를 이용해 HTML 태그를 해석해서 텍스트만 추출
-    // (<div>, <p>, <br> 등이 여기서 사라짐)
-    const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
-    let text = doc.body.textContent || "";
-
-    // 2. 마크다운 특수문자 제거 (정규식)
-    // # (헤더), * (볼드), _ (이탤릭), ~ (취소선), ` (코드), [ ] (링크/이미지 괄호) 제거
-    text = text.replace(/[#*`_~\[\]]/g, '');
-
-    // 3. 이미지 마크다운 문법 제거 (![...](...)) 및 링크 문법 제거
-    text = text.replace(/!\[.*?\]\(.*?\)/g, ''); // 이미지 태그 제거
-    text = text.replace(/\(.*?\)/g, ''); // 괄호 안에 있는 링크 주소 등 제거
-
-    // 4. 공백 정리 (연속된 공백, 줄바꿈을 공백 한 칸으로)
-    text = text.replace(/\s+/g, ' ').trim();
-
-    // 5. 카드 내 내용 길이 제한 (100자)
-    if (text.length > 30) {
-        text = text.substring(0, 30) + "...";
-    }
-    return text;
-}
+// [삭제됨] cleanContent 함수는 이제 필요 없습니다! (백엔드 DTO가 summary를 줌)
 
 // 1. 카드 생성 함수
 function createCard(post) {
     const card = document.createElement('div');
     card.className = 'blog-card';
 
-    // [핵심 로직] DB에 있는 썸네일 주소만 봅니다. 없으면 무조건 기본 이미지.
-    let displayImg = '/images/logo.png'; // 기본 이미지 경로
-
-    // DB에서 가져온 thumbnail_url이 있으면 그걸 사용
+    // 썸네일 처리
+    let displayImg = '/images/logo.png';
     if (post.thumbnail_url && post.thumbnail_url.trim() !== '') {
         displayImg = post.thumbnail_url;
     }
 
     const detailUrl = `/blog/detail/${post.boardNo || post.board_no}`;
     const paidIcon = (post.isPaid === 'Y' || post.is_paid === 'Y') ? '<i class="fa-solid fa-crown" style="color:#ffd700; margin-right:5px;"></i>' : '';
-    
-    // [수정됨] cleanContent 함수를 사용하여 마크다운/HTML 모두 제거된 깔끔한 텍스트 가져오기
-    const rawContent = post.boardContent || post.board_content;
-    const cleanText = cleanContent(rawContent);
 
-    // 날짜 포맷팅
+    // [핵심 변경] JS가 청소하는 게 아니라, 백엔드가 준 'summary'를 그대로 씁니다.
+    // DTO의 getSummary() 덕분에 JSON에 'summary' 필드가 자동으로 생깁니다.
+    const cleanText = post.summary || "";
+
     const dateStr = post.bCreateDate || post.bcreate_date;
 
     card.innerHTML = `
@@ -102,7 +73,6 @@ function fetchPosts(isReset = false) {
     if (isLastPage) return;
     isLoading = true;
 
-    // 백엔드 API 호출
     const url = `/api/blog/list?page=${currentPage}&size=12&sort=${currentSort},desc`;
 
     fetch(url)
@@ -111,8 +81,8 @@ function fetchPosts(isReset = false) {
             return res.json();
         })
         .then(data => {
-            const posts = data.content; 
-            
+            const posts = data.content;
+
             if (!posts || posts.length === 0) {
                 isLastPage = true;
                 loader.style.display = 'none';
@@ -163,7 +133,7 @@ filterButtons.forEach(btn => {
 });
 
 // TOP 버튼
-if(scrollTopBtn) {
+if (scrollTopBtn) {
     window.addEventListener('scroll', () => {
         scrollTopBtn.style.display = (window.scrollY > 500) ? 'flex' : 'none';
     });
@@ -171,3 +141,6 @@ if(scrollTopBtn) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
+
+// [중요] 맨 아래에 있던 DOMContentLoaded 코드는 이제 완전히 삭제했습니다!
+// (서버가 처음부터 깨끗한 HTML을 주기 때문에 필요 없음)

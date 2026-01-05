@@ -56,6 +56,9 @@ public interface BlogService {
 	// 게시글 스크랩 여부
 	boolean isScraped(Long boardNo, Long memberNo);
 	
+	// 최근 본 게시물 로그 저장
+	void insertViewLog(Long memberNo, Long boardNo);
+	
 	
 	
 }
