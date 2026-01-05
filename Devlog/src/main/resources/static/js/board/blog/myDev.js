@@ -153,6 +153,14 @@ function renderUserList(users) {
         // 소개글 없으면 빈칸
         const bio = user.bio ? user.bio : '';
 
+        let btnHtml = '';
+
+        if (user.isFollowed) {
+            btnHtml = `<button class="modal-follow-btn active" onclick="toggleModalFollow(this, '${user.id}')" style="margin-left:auto;">팔로잉</button>`;
+        } else {
+            btnHtml = `<button class="modal-follow-btn" onclick="toggleModalFollow(this, '${user.id}')" style="margin-left:auto;">팔로우</button>`;
+        }
+
         // 유저 아이템 HTML (클릭 시 해당 유저 블로그로 이동 기능 추가 가능)
         const li = document.createElement('li');
         li.className = 'user-item';
@@ -164,9 +172,54 @@ function renderUserList(users) {
                 </span>
                 <span class="u-bio">${bio}</span>
             </div>
-            `;
+            ${btnHtml}  
+        `;
         modalUserList.appendChild(li);
     });
+}
+
+// 모달 내부 팔로우 버튼 동작
+function toggleModalFollow(btn, targetId) {
+    fetch(`/api/blog/follow/${targetId}`, { method: 'POST' })
+        .then(res => {
+            if (res.status === 401) {
+                alert("로그인이 필요합니다.");
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+
+            if (data.success) {
+                // 1. 모달 버튼 디자인 토글 (modal-follow-btn active 클래스 활용)
+                if (data.isFollowed) {
+                    btn.innerText = "팔로잉";
+                    btn.classList.add('active');
+                } else {
+                    btn.innerText = "팔로우";
+                    btn.classList.remove('active');
+                }
+
+                // 2. [핵심] 메인 화면의 '팔로잉 숫자' 즉시 업데이트
+                // 방금 HTML에 추가한 id="followingCnt"를 찾습니다.
+                const followingCntEl = document.getElementById('followingCnt');
+
+                if (followingCntEl) {
+                    // 현재 숫자를 가져와서 정수로 변환 (콤마가 있을 수 있으니 제거 후 변환 추천)
+                    let currentVal = parseInt(followingCntEl.innerText.replace(/,/g, '')) || 0;
+
+                    if (data.isFollowed) {
+                        // 팔로우 성공 -> 숫자 +1
+                        followingCntEl.innerText = currentVal + 1;
+                    } else {
+                        // 언팔로우 성공 -> 숫자 -1 (0보다 작아지진 않게 방어)
+                        followingCntEl.innerText = Math.max(0, currentVal - 1);
+                    }
+                }
+            }
+        })
+        .catch(console.error);
 }
 
 // 4. 모달 닫기 함수
@@ -354,6 +407,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     listWrap.insertAdjacentHTML('beforeend', html);
                 });
+
+                // [추가] 데이터가 로드됐는데 스크롤이 안 생길 정도로 적으면, 자동으로 다음 페이지 로드 시도
+                const observerEl = document.getElementById('infinite-sentinel');
+                if (observerEl && !isLastPage && document.body.scrollHeight <= window.innerHeight) {
+                    // 약간의 딜레이 후 재호출
+                    setTimeout(() => {
+                        page++; // 페이지 수동 증가 후 호출
+                        renderPosts();
+                    }, 500);
+                }
             }
 
             if (data.last) {

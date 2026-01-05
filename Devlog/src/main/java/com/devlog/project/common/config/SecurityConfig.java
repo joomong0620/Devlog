@@ -72,6 +72,7 @@ public class SecurityConfig {
 					"/ws-chat/**",
 	                "/topic/**",
 	                "/queue/**",
+	                "/report/**", // ??
 	                
 	                //// KJY ////
 	                "/jobposting",

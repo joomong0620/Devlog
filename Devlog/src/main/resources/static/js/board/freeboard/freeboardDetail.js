@@ -155,3 +155,34 @@ goToListBtn.addEventListener("click", ()=>{
     location.href = url + location.search;
 
 })
+
+function openReportModal(targetMemberNo, targetNo) {  //<--------------------------- 함수 호출 시 타겟 회원 번호 넣어서 호출
+    console.log("openReportModal함수 실행...")
+    
+    console.log("before Number() conversion: ")
+    console.log(targetMemberNo, typeof targetMemberNo)
+    console.log(targetNo, typeof targetNo)  
+    
+    targetMemberNo = Number(targetMemberNo);
+    targetNo = Number(targetNo);
+    console.log("after Number() conversion: ")
+    console.log(targetMemberNo, typeof targetMemberNo)
+    console.log(targetNo, typeof targetNo)
+
+    fetch(`/report/modal?memberNo=${targetMemberNo}`) //<------------------------------------------- 타켓 대상 회원 번호 넣어주셔야 합니다.
+        .then((res) => res.text())
+        .then((html) => {
+            console.log("받아온 html: ")
+            console.log(html); // 뭘 받아오나 보자
+
+            const root = document.getElementById("modal-root"); // freeboardDetail.html에 <div id="modal-root"></div> 태그 필요
+            root.innerHTML = html;
+            const modal = root.querySelector("#reportModal");
+            modal.classList.remove("display-none");
+
+            modal.dataset.targetType = "BOARD"; //<-------------------------- 이 부분은 게시판이신 분들은 BOARD로 바꿔주세요
+            modal.dataset.targetNo = targetNo; //<-------------------------- 게시글 번호도 이런 식으로 넘겨주세요
+            bindReportModalEvents();
+        });
+}
+

@@ -30,10 +30,22 @@ public class ReplyApiController {
 	private final MemberRepository memberRepository;
 	
 	// 댓글 조회
-    @GetMapping("/api/posts/{postId}/comments")
-    public List<ReplyDto> getComments(@PathVariable Long postId) {
-        return replyService.getComments(postId);
-    }
+	@GetMapping("/api/posts/{postId}/comments")
+	public List<ReplyDto> getComments(@PathVariable Long postId) {
+	    Member me = getMe();
+	    Long memberNo = (me != null) ? me.getMemberNo() : null;
+	    return replyService.getComments(postId, memberNo); // memberNo 전달
+	}
+	
+	// 댓글 좋아요 토글
+	@PostMapping("/api/comments/{commentId}/like")
+	public ResponseEntity<?> toggleLike(@PathVariable Long commentId) {
+	    Member m = getMe();
+	    if (m == null) return ResponseEntity.status(401).body("로그인 필요");
+	    
+	    boolean liked = replyService.toggleCommentLike(commentId, m.getMemberNo());
+	    return ResponseEntity.ok(Map.of("success", true, "liked", liked));
+	}
     
     // 댓글 작성
     @PostMapping("/api/comments")
@@ -42,7 +54,15 @@ public class ReplyApiController {
         // 로그인 안 한 상태면 401(권한 없음)에러 보내기
         if (m == null) return ResponseEntity.status(401).body("로그인 필요");
         
+        System.out.println("수신된 댓글 데이터 : " + reply.toString());
+        
         reply.setMemberNo(m.getMemberNo());
+        
+        // 서비스 호출 전 boardNo가 있는지 한 번 더 체크
+        if(reply.getBoardNo() == null) {
+            return ResponseEntity.badRequest().body("게시글 번호가 누락되었습니다.");
+        }
+        
         replyService.writeComment(reply);
         return ResponseEntity.ok(Map.of("message", "등록 성공"));
     }
@@ -56,12 +76,18 @@ public class ReplyApiController {
     
     // 댓글 수정
     @PutMapping("/api/comments/{commentId}")
-    public ResponseEntity<?> updateComment(@PathVariable Long commentId, @RequestBody Map<String, String> body) {
-        ReplyDto dto = new ReplyDto();
+    public ResponseEntity<?> updateComment(@PathVariable Long commentId, @RequestBody ReplyDto dto) {
+        // 1. URL의 commentId를 DTO에 담기
         dto.setCommentNo(commentId);
-        dto.setCommentContent(body.get("content"));
-        replyService.updateComment(dto);
-        return ResponseEntity.ok("수정 성공");
+        
+        // 2. 서비스 호출 (DTO에 commentContent가 담겨 들어옴)
+        int result = replyService.updateComment(dto);
+        
+        if(result > 0) {
+            return ResponseEntity.ok("수정 성공");
+        } else {
+            return ResponseEntity.status(500).body("수정 실패");
+        }
     }
     
     // 결제 요청

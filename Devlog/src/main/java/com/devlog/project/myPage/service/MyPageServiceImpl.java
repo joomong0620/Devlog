@@ -59,4 +59,28 @@ public class MyPageServiceImpl implements MyPageService {
         // [변경] MyPageMapper 사용
         myPageMapper.updateProfileImage(email, imageUrl);
     }
+    
+    
+    // 구독 설정
+	@Override
+	@Transactional
+	public void setSubscribePrice(Map<String, Object> paramMap) {
+		
+		Long memberNo = ((Number)paramMap.get("memberNo")).longValue();
+		
+		
+		Integer price = Integer.parseInt(paramMap.get("price").toString());
+
+		
+		Member member = memberRepository.findById(memberNo).orElseThrow(); 
+		
+		
+		member.setSubscriptionPrice(price);
+		
+		
+		
+		
+		
+		
+	}
 }

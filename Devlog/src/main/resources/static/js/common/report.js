@@ -80,28 +80,28 @@ function closeReportModal() {
 //      다들 새해 복 많이 받으시고 화이팅
 //
 
-function openReportModal(targetMemberNo, targetNo) {
-  //<--------------------------- 함수 호출 시 타겟 회원 번호 넣어서 호출
+// function openReportModal(targetMemberNo, targetNo) {
+//   //<--------------------------- 함수 호출 시 타겟 회원 번호 넣어서 호출
 
-  fetch(`/report/modal?memberNo=${targetMemberNo}`) //<------------------------------------------- 타켓 대상 회원 번호 넣어주셔야 합니다.
-    .then((res) => res.text())
-    .then((html) => {
-      const root = document.getElementById("modal-root");
-      root.innerHTML = html;
-      const modal = root.querySelector("#reportModal");
-      modal.classList.remove("display-none");
+//   fetch(`/report/modal?memberNo=${targetMemberNo}`) //<------------------------------------------- 타켓 대상 회원 번호 넣어주셔야 합니다.
+//     .then((res) => res.text())
+//     .then((html) => {
+//       const root = document.getElementById("modal-root");
+//       root.innerHTML = html;
+//       const modal = root.querySelector("#reportModal");
+//       modal.classList.remove("display-none");
 
-      modal.dataset.targetType = "BOARD"; //<-------------------------- 이 부분은 게시판이신 분들은 BOARD로 바꿔주세요
-      modal.dataset.targetNo = targetNo; //<-------------------------- 게시글 번호도 이런 식으로 넘겨주세요
-      bindReportModalEvents();
-    });
-}
+//       modal.dataset.targetType = "BOARD"; //<-------------------------- 이 부분은 게시판이신 분들은 BOARD로 바꿔주세요
+//       modal.dataset.targetNo = targetNo; //<-------------------------- 게시글 번호도 이런 식으로 넘겨주세요
+//       bindReportModalEvents();
+//     });
+// }
 
-const reOverlay = document.getElementById("reportModal");
+// const reOverlay = document.getElementById("reportModal");
 
-reOverlay?.addEventListener("click", (e) => {
-  //<------------------------------모달 닫기용 입니다 .
-  if (e.target.id === "reportModal") {
-    closeReportModal();
-  }
-});
+// reOverlay?.addEventListener("click", (e) => {
+//   //<------------------------------모달 닫기용 입니다 .
+//   if (e.target.id === "reportModal") {
+//     closeReportModal();
+//   }
+// });

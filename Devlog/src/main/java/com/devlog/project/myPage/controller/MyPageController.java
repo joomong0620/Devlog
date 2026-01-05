@@ -1,6 +1,9 @@
 package com.devlog.project.myPage.controller;
 
 import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -10,10 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devlog.project.board.blog.service.BlogService;
 import com.devlog.project.member.enums.CommonEnums;
+import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.MemberRepository;
 import com.devlog.project.myPage.dto.MemberUpdateDto;
@@ -101,4 +106,28 @@ public class MyPageController {
         
         return imageUrl;
     }
+    
+    
+    @PostMapping("/api/myPage/subscribe")
+    @ResponseBody
+    public ResponseEntity<Void>  setSubscribePrice(
+    		@RequestBody Map<String, Object> paramMap,
+    		@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
+    		) {
+    	
+    	System.out.println(paramMap.get("price") + "구독 금액 넘어 오는지 확인");
+    	
+    	Long memberNo = loginMember.getMemberNo();
+    	
+    	paramMap.put("memberNo", memberNo);
+    	
+    	myPageService.setSubscribePrice(paramMap);
+    	
+    	return ResponseEntity.ok().build();
+    	
+    }
+    	
+    
+    
+    
 }

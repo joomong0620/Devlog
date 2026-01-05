@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "MEMBER")
 @Getter
+@Setter
 @ToString(exclude = {"memberLevel"})  // Level 필드 제외,  연관관계 모두 제외
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor // 시제 객체생성에 필요

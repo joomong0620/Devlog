@@ -10,6 +10,7 @@
     <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
     <link rel="stylesheet" th:href="@{/css/board/freeboard/freeboardDetail.css}">
     <link rel="stylesheet" th:href="@{/css/board/freeboard/comments.css}">
+    <link rel="stylesheet" th:href="@{/css/common/report.css}">
 </head>
 <body>
     <!-- <p th:text="${freeboard}" th:if="${freeboard != null}"></p>     -->
@@ -68,7 +69,8 @@
             
                     <!-- 신고 버튼 -->
                     <div class="report-box">
-                        <div  class="report-btn" id="reportBtn">
+                        <div  class="report-btn" id="reportBtn"
+                                th:onclick="|openReportModal(${freeboard.memberNo}, ${freeboard.boardNo})|">
                             <div>게시글신고</div>
                             <img th:src="@{/images/board/freeboard/report_icon.png}" class="report-img" alt="#">
                         </div>
@@ -144,6 +146,11 @@
     <!-- freeboardDetail.js 추가 -->
     <script th:src="@{/js/board/freeboard/freeboardDetail.js}"></script>    
     <!-- freeboardComment.js 추가 -->
-    <script th:src="@{/js/board/freeboard/freeboardComment.js}"></script>        
+    <script th:src="@{/js/board/freeboard/freeboardComment.js}"></script>     
+    
+
+    <!-- 모달 for 게시글 신고: 2026/01/05 -->
+    <div id="modal-root"></div>
+    <script th:src="@{/js/common/report.js}"></script> 
 </body>
 </html>

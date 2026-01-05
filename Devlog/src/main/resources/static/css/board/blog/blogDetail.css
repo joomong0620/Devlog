@@ -596,6 +596,70 @@ body {
     background: #fff;
 }
 
+/* 수정 모드 & 답글 모드 공통 버튼 그룹 */
+.comment-edit-actions, .reply-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* 저장/등록 버튼 (보라색 스타일) */
+.btn-save-edit, .btn-reply-submit {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-save-edit:hover, .btn-reply-submit:hover {
+    background: var(--primary-hover);
+}
+
+/* 취소 버튼 (회색 스타일) */
+.btn-cancel-edit, .btn-reply-cancel {
+    background: #e0e0e0;
+    color: #666;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.btn-cancel-edit:hover, .btn-reply-cancel:hover {
+    background: #d0d0d0;
+}
+
+/* 답글 작성 컨테이너 디자인 보강 */
+.reply-form-container {
+    background: #fdfdfd;
+    border: 1px dashed #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.reply-form-container textarea {
+    width: 100%;
+    height: 70px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 10px;
+    resize: none;
+    font-family: inherit;
+    margin-bottom: 5px;
+}
+
+.reply-form-container textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
 /* === 모달 스타일 === */
 .modal-overlay {
     position: fixed;

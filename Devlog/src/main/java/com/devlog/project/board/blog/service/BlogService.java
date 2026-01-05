@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devlog.project.board.blog.dto.BlogDTO;
 import com.devlog.project.board.blog.dto.MyBlogResponseDto;
 import com.devlog.project.board.blog.dto.UserProfileDto;
+import com.devlog.project.member.model.entity.Member;
 
 public interface BlogService {
 
@@ -31,12 +32,23 @@ public interface BlogService {
 	// 상세 게시글 조회
 	BlogDTO getBoardDetail(Long boardNo);
 	
+	// 조회수 증가
+    void increaseViewCount(Long boardNo);
+    
+    // 게시글 삭제
+    void deletePost(Long boardNo);
+	
 	boolean toggleFollow(Long followerId, Long targetId);
     boolean isFollowing(Long followerId, Long targetId);
     void increaseVisitCount(Long blogOwnerNo);
     
+    boolean toggleBoardLike(Long boardNo, Long memberNo);
+    
     // 팔로워, 팔로잉 목록 조회
-    List<UserProfileDto> getFollowList(String blogId, String type);
+	List<UserProfileDto> getFollowList(String blogId, String string, Member me);
+
+	// 게시글 수정
+	void updateBlog(BlogDTO blogDTO);
 	
 	
 	
