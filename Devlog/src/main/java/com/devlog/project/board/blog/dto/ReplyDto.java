@@ -29,6 +29,9 @@ public class ReplyDto {
     
     private int likeCount;          // 좋아요 수 (서브쿼리)
     
+    // 내가 좋아요 눌렀는지 여부 
+    private boolean isLiked;
+    
     // 답글 리스트 (계층형 구조용)
     private List<ReplyDto> children = new ArrayList<>();
 }

@@ -1,6 +1,7 @@
 package com.devlog.project.board.blog.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -11,7 +12,7 @@ import com.devlog.project.board.blog.dto.ReplyDto;
 public interface ReplyMapper {
 	
 	// 댓글 기능
-    List<ReplyDto> selectReplyList(Long boardNo);
+	List<ReplyDto> selectReplyList(Map<String, Object> params);
     int insertReply(ReplyDto reply);
     int deleteReply(Long commentNo);
     int updateReply(ReplyDto reply);
@@ -25,4 +26,9 @@ public interface ReplyMapper {
     
     // 글 작성자 번호 찾기 (판매자에게 돈 주기 위해)
     Long selectBoardWriter(Long boardNo);
+    
+    // 댓글 좋아요
+    int checkCommentLike(@Param("commentNo") Long commentNo, @Param("memberNo") Long memberNo);
+    int insertCommentLike(@Param("commentNo") Long commentNo, @Param("memberNo") Long memberNo);
+    int deleteCommentLike(@Param("commentNo") Long commentNo, @Param("memberNo") Long memberNo);
 }

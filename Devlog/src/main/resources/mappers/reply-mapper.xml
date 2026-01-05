@@ -2,26 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devlog.project.board.blog.mapper.ReplyMapper">
 
-    <select id="selectReplyList" resultType="com.devlog.project.board.blog.dto.ReplyDto">
-    	SELECT 
-            C.COMMENT_NO,
-            C.BOARD_NO,
-            C.PARENTS_COMMENT_NO AS parentCommentNo,
-            C.COMMENT_CONTENT,
-            TO_CHAR(C.C_CREATE_DATE, 'YYYY-MM-DD HH24:MI') AS cCreateDate,
-            C.SECRET_YN,
-            C.COMMENT_DEL_FL,
-            M.MEMBER_NO,
-            M.MEMBER_NICKNAME,
-            M.PROFILE_IMG,
-            (SELECT COUNT(*) FROM "COMMENT_LIKE" L WHERE L.COMMENT_NO = C.COMMENT_NO) AS likeCount
-        FROM "COMMENT" C
-        JOIN "MEMBER" M ON C.MEMBER_NO = M.MEMBER_NO
-        WHERE C.BOARD_NO = #{boardNo}
-          AND C.COMMENT_DEL_FL = 'N'
-        ORDER BY COALESCE(C.PARENTS_COMMENT_NO, C.COMMENT_NO), C.COMMENT_NO
-    </select>
-    
     <insert id="insertReply" parameterType="com.devlog.project.board.blog.dto.ReplyDto">
         INSERT INTO "COMMENT" (
             COMMENT_NO, BOARD_NO, MEMBER_NO, COMMENT_CONTENT, PARENTS_COMMENT_NO, 
@@ -88,5 +68,50 @@
     <select id="selectBoardWriter" resultType="long">
         SELECT MEMBER_NO FROM "BOARD" WHERE BOARD_NO = #{boardNo}
     </select>
+    
+    <select id="selectReplyList" parameterType="map" resultType="com.devlog.project.board.blog.dto.ReplyDto">
+    SELECT 
+        C.COMMENT_NO,
+        C.BOARD_NO,
+        C.PARENTS_COMMENT_NO AS parentCommentNo,
+        C.COMMENT_CONTENT,
+        TO_CHAR(C.C_CREATE_DATE, 'YYYY-MM-DD HH24:MI') AS cCreateDate,
+        C.SECRET_YN,
+        C.COMMENT_DEL_FL,
+        M.MEMBER_NO,
+        M.MEMBER_NICKNAME,
+        M.PROFILE_IMG,
+        (SELECT COUNT(*) FROM "COMMENT_LIKE" L WHERE L.COMMENT_NO = C.COMMENT_NO) AS likeCount,
+        <choose>
+            <when test="memberNo != null">
+                (SELECT COUNT(*) FROM "COMMENT_LIKE" CL 
+                 WHERE CL.COMMENT_NO = C.COMMENT_NO AND CL.MEMBER_NO = #{memberNo}) AS isLiked
+            </when>
+            <otherwise>
+                0 AS isLiked
+            </otherwise>
+        </choose>
+    FROM "COMMENT" C
+    JOIN "MEMBER" M ON C.MEMBER_NO = M.MEMBER_NO
+    WHERE C.BOARD_NO = #{boardNo}
+      AND C.COMMENT_DEL_FL = 'N'
+    ORDER BY COALESCE(C.PARENTS_COMMENT_NO, C.COMMENT_NO), C.COMMENT_NO
+	</select>
+
+	<select id="checkCommentLike" resultType="_int">
+    	SELECT COUNT(*) 
+    	FROM "COMMENT_LIKE" 
+    	WHERE COMMENT_NO = #{commentNo} AND MEMBER_NO = #{memberNo}
+	</select>
+
+	<insert id="insertCommentLike">
+	    INSERT INTO "COMMENT_LIKE" (COMMENT_NO, MEMBER_NO)
+	    VALUES (#{commentNo}, #{memberNo})
+	</insert>
+
+	<delete id="deleteCommentLike">
+	    DELETE FROM "COMMENT_LIKE" 
+	    WHERE COMMENT_NO = #{commentNo} AND MEMBER_NO = #{memberNo}
+	</delete>
 
 </mapper>

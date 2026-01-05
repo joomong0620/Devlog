@@ -154,13 +154,25 @@ public class BlogServiceImpl implements BlogService {
     // 6. 상세 조회
     @Override
     public BlogDTO getBoardDetail(Long boardNo) {
-        blogMapper.updateViewCount(boardNo);
+    	// blogMapper.updateViewCount(boardNo);
         BlogDTO dto = blogMapper.selectBlogDetail(boardNo);
         if (dto != null) {
             List<String> tags = blogMapper.selectBoardTags(boardNo);
             dto.setTagList(tags);
         }
         return dto;
+    }
+    
+    // 조회수 증가 전용 메서드
+    @Override
+    public void increaseViewCount(Long boardNo) {
+        blogMapper.updateViewCount(boardNo);
+    }
+    
+    // [추가] 게시글 삭제
+    @Override
+    public void deletePost(Long boardNo) {
+        blogMapper.deleteBoard(boardNo);
     }
 
     // 7. 팔로우 여부 확인
@@ -251,14 +263,83 @@ public class BlogServiceImpl implements BlogService {
     
     // 팔로워/팔로잉 목록 가져오기
     @Override
-    public List<UserProfileDto> getFollowList(String blogId, String type) {
+    public List<UserProfileDto> getFollowList(String blogId, String type, Member me) {
         Member owner = memberRepository.findByMemberEmailAndMemberDelFl(blogId, CommonEnums.Status.N)
                 .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
         
+        Map<String, Object> params = new HashMap<>();
+        params.put("memberNo", owner.getMemberNo());
+        
+        // 로그인 했다면 내 번호 넣기, 안했으면 null
+        if (me != null) {
+            params.put("myMemberNo", me.getMemberNo());
+        }
+
         if ("follower".equals(type)) {
-            return blogMapper.selectFollowerList(owner.getMemberNo());
+            return blogMapper.selectFollowerList(params);
         } else {
-            return blogMapper.selectFollowingList(owner.getMemberNo());
+            return blogMapper.selectFollowingList(params);
+        }
+    }
+    
+    // 게시글 좋아요
+    @Override
+    @Transactional
+    public boolean toggleBoardLike(Long boardNo, Long memberNo) {
+        Map<String, Object> params = Map.of("boardNo", boardNo, "memberNo", memberNo);
+        // Mapper 메서드 필요 (checkBoardLike, deleteBoardLike, insertBoardLike)
+        // *주의: Mapper 인터페이스에 해당 메서드들을 Map 파라미터로 정의해주세요.
+        
+        if (blogMapper.checkBoardLike(params) > 0) {
+            blogMapper.deleteBoardLike(params);
+            return false; // 취소됨
+        } else {
+            blogMapper.insertBoardLike(params);
+            return true; // 등록됨
+        }
+    }
+    
+    // 게시글 수정
+    @Override
+    @Transactional
+    public void updateBlog(BlogDTO blogDTO) {
+        // 1. 기존 글 조회 (존재 여부 및 본인 확인용)
+        BlogDTO existPost = blogMapper.selectBlogDetail(blogDTO.getBoardNo());
+        if (existPost == null) {
+            throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+        }
+
+        // 2. 본인 확인 (요청자 이메일 vs 작성자 이메일)
+        // blogDTO.getMemberEmail()은 컨트롤러에서 넣어줌
+        if (!existPost.getMemberEmail().equals(blogDTO.getMemberEmail())) {
+            throw new AccessDeniedException("본인의 글만 수정할 수 있습니다.");
+        }
+
+        // 3. 내용 수정 (BOARD 테이블)
+        blogMapper.updateBoard(blogDTO);
+
+        // 4. 옵션 수정 (BLOG 테이블 - 유료여부, 가격 등)
+        blogMapper.updateBlog(blogDTO);
+
+        // 5. 태그 수정 (기존 태그 삭제 -> 새 태그 등록)
+        // 5-1. 기존 태그 연결 끊기
+        blogMapper.deleteBlogTags(blogDTO.getBoardNo());
+
+        // 5-2. 새 태그 등록 (Write 로직과 동일)
+        if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
+            for (String tagName : blogDTO.getTagList()) {
+                // 태그가 없으면 생성 (MERGE INTO)
+                blogMapper.insertTag(tagName);
+                
+                // 태그 번호 조회
+                Long tagNo = blogMapper.selectTagNoByName(tagName);
+
+                // 연결 테이블(BLOG_TAG)에 등록
+                Map<String, Object> tagParams = new HashMap<>();
+                tagParams.put("boardNo", blogDTO.getBoardNo());
+                tagParams.put("tagNo", tagNo);
+                blogMapper.insertBlogTag(tagParams);
+            }
         }
     }
 }

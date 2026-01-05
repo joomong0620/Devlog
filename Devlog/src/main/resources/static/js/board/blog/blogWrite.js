@@ -4,12 +4,14 @@ console.log('blogWrite.js loaded');
 const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
     height: '600px',
-    initialEditType: 'markdown',
+    // [수정 1] 마크다운 대신 '위지윅' 모드로 시작 (수정 시 보기 편함)
+    initialEditType: 'wysiwyg', 
     previewStyle: 'vertical',
     placeholder: '내용을 입력하세요.',
+    // 수정 모드일 때 기존 내용 불러오기
+    initialValue: document.getElementById('initialContent').value || '',
     hooks: {
         addImageBlobHook: (blob, callback) => {
-            // 이미지 업로드 로직 
             const formData = new FormData();
             formData.append('image', blob);
 
@@ -17,23 +19,14 @@ const editor = new toastui.Editor({
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.text())
-                .then(url => {
-                    // URL 대신 HTML 태그를 만들어서 콜백에 넘김
-                    const imgTag = `<img src="${url}" alt="이미지" style="max-width:100%;">`;
-                    // 에디터에 HTML을 삽입합니다. (마크다운 모드에서도 태그 그대로 들어감)
-                    editor.insertText(imgTag);
-                    
-                })
-                .catch(error => console.error('이미지 업로드 실패:', error));
+            .then(response => response.text())
+            .then(url => {
+                const imgTag = `<img src="${url}" alt="이미지" style="max-width:100%;">`;
+                editor.insertText(imgTag);
+            })
+            .catch(error => console.error('이미지 업로드 실패:', error));
         }
     }
-});
-
-
-
-document.querySelector('.btn-publish').addEventListener('click', () => {
-    savePost(false);
 });
 
 // ---------------------- 오탈자 검출 - 소연!!!!!! ------------------------
@@ -239,6 +232,16 @@ const tagInput = document.getElementById('tagInput');
 const tagList = document.getElementById('tagList');
 let tags = new Set();
 
+// 초기 태그 로딩
+const initialTagsVal = document.getElementById('initialTags').value;
+if (initialTagsVal) {
+    const loadedTags = initialTagsVal.split(',');
+    loadedTags.forEach(tag => {
+        if(tag.trim()) tags.add(tag.trim());
+    });
+    renderTags(); // 화면에 그리기
+}
+
 function addTag(text) {
     const cleanText = text.trim().replace(/,/g, '');
     if (cleanText.length > 0 && !tags.has(cleanText)) {
@@ -282,6 +285,12 @@ const radioButtons = document.querySelectorAll('input[name="content-type"]');
 const priceWrapper = document.getElementById('priceWrapper');
 const priceInput = document.getElementById('priceInput');
 
+// [추가] 페이지 로드 시 유료 체크 상태라면 가격창 활성화 (수정 모드 대비)
+if(document.querySelector('input[name="content-type"]:checked').value === 'paid') {
+    priceWrapper.classList.add('active');
+    priceInput.disabled = false;
+}
+
 radioButtons.forEach(radio => {
     radio.addEventListener('change', (e) => {
         if (e.target.value === 'paid') {
@@ -316,14 +325,22 @@ if (btnOpenModal) {
     });
 }
 
+// 5. 저장 버튼 이벤트 연결 (중복 방지를 위해 하나만 남김)
+const btnSave = document.getElementById('btnSave');
+if(btnSave) {
+    btnSave.addEventListener('click', () => savePost(false));
+}
+
+document.querySelector('.btn-draft').addEventListener('click', () => savePost(true));
 document.querySelector('.btn-exit').addEventListener('click', () => {
     if (confirm('작성중인 글이 사라집니다. 정말 나가시겠습니까?')) history.back();
 });
 
 // ============================================================
-// [핵심] 게시글 저장 함수 (DTO 필드명 매핑 수정)
+// [핵심] 게시글 저장 함수 (데이터 이름 수정)
 // ============================================================
 function savePost(isTemp) {
+    const boardNo = document.getElementById('boardNo').value; 
     const title = document.querySelector('.input-title').value.trim();
     const content = editor.getHTML().trim();
     const isPaidChecked = document.querySelector('input[name="content-type"]:checked').value === 'paid';
@@ -340,38 +357,47 @@ function savePost(isTemp) {
         return priceInput.focus();
     }
 
-    // 백엔드 BlogDTO 필드명과 일치
+    // [수정 3] 백엔드가 스네이크 케이스(board_no)를 원할 경우를 대비해
+    // 데이터를 보낼 때 변수명을 DB 컬럼 스타일로 맞춰줍니다.
     const postData = {
-        "board_title": title,          // boardTitle  -> board_title
-        "board_content": content,      // boardContent -> board_content
-        "tag_list": Array.from(tags),  // tagList     -> tag_list
-
+        // 수정일 때는 board_no 값 넣기, 아닐 때는 null
+        "board_no": boardNo ? parseInt(boardNo) : null,
+        "board_title": title,
+        "board_content": content,
+        "tag_list": Array.from(tags),
         "is_paid": isPaidChecked ? "Y" : "N",
-
         "price": isPaidChecked ? parseInt(priceInput.value) : 0,
-
         "temp_fl": isTemp ? "Y" : "N"
     };
 
-    console.log('전송 데이터:', postData);
+    console.log('전송 데이터(수정됨):', postData);
 
-    fetch('/api/blog/write', {
-        method: 'POST',
+    let url = '/api/blog/write';
+    let method = 'POST';
+    
+    // 수정 모드일 때
+    if (boardNo) {
+        url = '/api/blog/update'; 
+    }
+
+    fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postData),
     })
-        .then(response => {
-            if (response.ok) {
-                alert(isTemp ? '임시저장 되었습니다.' : '발행되었습니다!');
-                location.href = "/blog/list";
-            } else {
-                alert('저장 실패');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("통신 오류 발생");
-        });
+    .then(response => {
+        if (response.ok) {
+            alert(boardNo ? '수정되었습니다.' : (isTemp ? '임시저장 되었습니다.' : '발행되었습니다!'));
+            location.href = boardNo ? `/blog/detail/${boardNo}` : "/blog/list";
+        } else {
+            // 서버 에러 메시지를 확인하기 위해 text()로 읽음
+            return response.text().then(text => { throw new Error(text) });
+        }
+    })
+    .catch(error => {
+        console.error('Save Error:', error);
+        alert('저장 실패: ' + error.message);
+    });
 }
 
 document.querySelector('.btn-draft').addEventListener('click', () => savePost(true));

@@ -30,10 +30,22 @@ public class ReplyApiController {
 	private final MemberRepository memberRepository;
 	
 	// 댓글 조회
-    @GetMapping("/api/posts/{postId}/comments")
-    public List<ReplyDto> getComments(@PathVariable Long postId) {
-        return replyService.getComments(postId);
-    }
+	@GetMapping("/api/posts/{postId}/comments")
+	public List<ReplyDto> getComments(@PathVariable Long postId) {
+	    Member me = getMe();
+	    Long memberNo = (me != null) ? me.getMemberNo() : null;
+	    return replyService.getComments(postId, memberNo); // memberNo 전달
+	}
+	
+	// 댓글 좋아요 토글
+	@PostMapping("/api/comments/{commentId}/like")
+	public ResponseEntity<?> toggleLike(@PathVariable Long commentId) {
+	    Member m = getMe();
+	    if (m == null) return ResponseEntity.status(401).body("로그인 필요");
+	    
+	    boolean liked = replyService.toggleCommentLike(commentId, m.getMemberNo());
+	    return ResponseEntity.ok(Map.of("success", true, "liked", liked));
+	}
     
     // 댓글 작성
     @PostMapping("/api/comments")

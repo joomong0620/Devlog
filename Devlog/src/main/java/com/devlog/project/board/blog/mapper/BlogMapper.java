@@ -11,10 +11,13 @@ import com.devlog.project.board.blog.dto.UserProfileDto;
 @Mapper
 public interface BlogMapper {
 
-    // 게시글 등록 (BOARD -> BLOG 순서)
+    // 게시글 등록 
     int insertBoard(BlogDTO blogDTO);
     int insertBlog(BlogDTO blogDTO);
-
+    
+    // 게시글 삭제
+    int deleteBoard(Long boardNo);
+    
     // 태그 등록 및 연결
     int insertTag(String tagName);
     Long selectTagNoByName(String tagName);
@@ -59,7 +62,17 @@ public interface BlogMapper {
     int updateVisitCount(Long memberNo);
     
     // 팔로워, 팔로잉 목록 조회
-    List<UserProfileDto> selectFollowerList(Long memberNo);
-    List<UserProfileDto> selectFollowingList(Long memberNo);
+	List<UserProfileDto> selectFollowerList(Map<String, Object> params);
+	List<UserProfileDto> selectFollowingList(Map<String, Object> params);
+	
+	// 게시글 좋아요
+	int checkBoardLike(Map<String, Object> params);
+	void deleteBoardLike(Map<String, Object> params);
+	void insertBoardLike(Map<String, Object> params);
+	
+	// 게시글 수정 관련
+    int updateBoard(BlogDTO blogDTO);
+    int updateBlog(BlogDTO blogDTO);
+    int deleteBlogTags(Long boardNo);
     
 }

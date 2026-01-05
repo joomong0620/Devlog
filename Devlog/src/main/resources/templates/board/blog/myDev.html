@@ -64,7 +64,7 @@
                     </div>
 
                     <div class="stat-btn" onclick="openUserModal('following')">
-                        팔로잉 <strong th:text="${followingCount}">0</strong>
+                        팔로잉 <strong id="followingCnt" th:text="${followingCount}">0</strong>
                     </div>
 
                     <div class="stat-btn" th:if="${isOwner}" onclick="openUserModal('subscriber')">
@@ -75,7 +75,7 @@
                 <div class="action-row">
                     <th:block th:unless="${isOwner}">
                         <button class="btn-purple" id="btnFollow" onclick="toggleFollow()"
-                            th:classappend="${isFollowed} ? 'active'" th:text="${isFollowed} ? '팔로잉 v' : '팔로우'">
+                            th:classappend="${isFollowed} ? 'active'" th:text="${isFollowed} ? '팔로잉' : '팔로우'">
                             팔로우
                         </button>
 

@@ -241,29 +241,84 @@
         WHERE MEMBER_NO = #{memberNo}
     </update>
     
-    <select id="selectFollowerList" parameterType="long" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
-        SELECT 
-            m.MEMBER_EMAIL AS id,
-            m.MEMBER_NICKNAME AS nickname,
-            m.PROFILE_IMG AS profileImgUrl,
-            m.MY_INFO_INTRO AS bio
-        FROM "FOLLOW" f
-        JOIN "MEMBER" m ON f.FOLLOW_ID = m.MEMBER_NO
-        WHERE f.FOLLOWED_ID = #{memberNo}
-    </select>
+    <select id="selectFollowerList" parameterType="map" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
+    SELECT 
+        m.MEMBER_EMAIL AS id,
+        m.MEMBER_NICKNAME AS nickname,
+        m.PROFILE_IMG AS profileImgUrl,
+        m.MY_INFO_INTRO AS bio,
+        <choose>
+            <when test="myMemberNo != null">
+                (SELECT COUNT(*) FROM "FOLLOW" sub 
+                 WHERE sub.FOLLOW_ID = #{myMemberNo} AND sub.FOLLOWED_ID = m.MEMBER_NO) AS isFollowed
+            </when>
+            <otherwise>
+                0 AS isFollowed
+            </otherwise>
+        </choose>
+    FROM "FOLLOW" f
+    JOIN "MEMBER" m ON f.FOLLOW_ID = m.MEMBER_NO
+    WHERE f.FOLLOWED_ID = #{memberNo}
+	</select>
 
-    <select id="selectFollowingList" parameterType="long" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
-        SELECT 
-            m.MEMBER_EMAIL AS id,
-            m.MEMBER_NICKNAME AS nickname,
-            m.PROFILE_IMG AS profileImgUrl,
-            m.MY_INFO_INTRO AS bio
-        FROM "FOLLOW" f
-        JOIN "MEMBER" m ON f.FOLLOWED_ID = m.MEMBER_NO
-        WHERE f.FOLLOW_ID = #{memberNo}
-    </select>
+	<select id="selectFollowingList" parameterType="map" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
+    SELECT 
+        m.MEMBER_EMAIL AS id,
+        m.MEMBER_NICKNAME AS nickname,
+        m.PROFILE_IMG AS profileImgUrl,
+        m.MY_INFO_INTRO AS bio,
+        <choose>
+            <when test="myMemberNo != null">
+                (SELECT COUNT(*) FROM "FOLLOW" sub 
+                 WHERE sub.FOLLOW_ID = #{myMemberNo} AND sub.FOLLOWED_ID = m.MEMBER_NO) AS isFollowed
+            </when>
+            <otherwise>
+                0 AS isFollowed
+            </otherwise>
+        </choose>
+    FROM "FOLLOW" f
+    JOIN "MEMBER" m ON f.FOLLOWED_ID = m.MEMBER_NO
+    WHERE f.FOLLOW_ID = #{memberNo}
+	</select>
+	
+	<update id="deleteBoard" parameterType="long">
+    UPDATE "BOARD" SET BOARD_DEL_FL = 'Y' WHERE BOARD_NO = #{boardNo}
+	</update>
+	
+	<select id="checkBoardLike" resultType="_int">
+	    SELECT COUNT(*) FROM "BOARD_LIKE" WHERE BOARD_NO = #{boardNo} AND MEMBER_NO = #{memberNo}
+	</select>
+	
+	<insert id="insertBoardLike">
+	    INSERT INTO "BOARD_LIKE" (BOARD_NO, MEMBER_NO) VALUES (#{boardNo}, #{memberNo})
+	</insert>
+	
+	<delete id="deleteBoardLike">
+	    DELETE FROM "BOARD_LIKE" WHERE BOARD_NO = #{boardNo} AND MEMBER_NO = #{memberNo}
+	</delete>
 	
 	
+	
+	<update id="updateBoard" parameterType="com.devlog.project.board.blog.dto.BlogDTO">
+        UPDATE "BOARD"
+        SET 
+            BOARD_TITLE = #{boardTitle},
+            BOARD_CONTENT = #{boardContent}
+            WHERE BOARD_NO = #{boardNo}
+    </update>
+
+    <update id="updateBlog" parameterType="com.devlog.project.board.blog.dto.BlogDTO">
+        UPDATE "BLOG"
+        SET 
+            IS_PAID = #{isPaid},
+            PRICE = #{price},
+            TEMP_FL = #{tempFl}
+        WHERE BOARD_NO = #{boardNo}
+    </update>
+
+    <delete id="deleteBlogTags" parameterType="long">
+        DELETE FROM "BLOG_TAG" WHERE BOARD_NO = #{boardNo}
+    </delete>
 	
 	
 	

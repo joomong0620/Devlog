@@ -24,8 +24,17 @@ public class ReplyServiceImpl implements ReplyService{
 	
 	// 댓글 로직
 	@Override
-    public List<ReplyDto> getComments(Long boardNo) {
-        List<ReplyDto> all = replyMapper.selectReplyList(boardNo);
+    public List<ReplyDto> getComments(Long boardNo, Long memberNo) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("boardNo", boardNo);
+        
+        // 로그인 안 했으면 null 들어감 (MyBatis XML에서 <if>로 처리)
+        params.put("memberNo", memberNo); 
+        
+        // Mapper 호출 (Mapper 인터페이스 파라미터도 Map으로 바꿨는지 확인 필수!)
+        List<ReplyDto> all = replyMapper.selectReplyList(params);
+        
+        // --- 아래는 기존 계층형 변환 로직 유지 ---
         List<ReplyDto> result = new ArrayList<>();
         Map<Long, ReplyDto> map = new HashMap<>();
 
@@ -46,6 +55,7 @@ public class ReplyServiceImpl implements ReplyService{
         return result;
     }
 	
+	// 댓글 작성
 	@Override
     public int writeComment(ReplyDto reply) { 
 		return replyMapper.insertReply(reply); 
@@ -59,6 +69,24 @@ public class ReplyServiceImpl implements ReplyService{
     @Override
     public int updateComment(ReplyDto reply) {
     	return replyMapper.updateReply(reply); 
+    }
+    
+    // 댓글 좋아요 토글
+    @Override
+    @Transactional
+    public boolean toggleCommentLike(Long commentNo, Long memberNo) {
+        // 1. 이미 좋아요 했는지 확인
+        int count = replyMapper.checkCommentLike(commentNo, memberNo);
+        
+        if (count > 0) {
+            // 이미 했으면 -> 취소 (삭제)
+            replyMapper.deleteCommentLike(commentNo, memberNo);
+            return false; // 결과: 좋아요 안 함
+        } else {
+            // 안 했으면 -> 등록 (추가)
+            replyMapper.insertCommentLike(commentNo, memberNo);
+            return true; // 결과: 좋아요 함
+        }
     }
     
     // 결제 로직 

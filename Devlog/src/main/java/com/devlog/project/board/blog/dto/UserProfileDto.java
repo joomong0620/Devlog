@@ -18,4 +18,6 @@ public class UserProfileDto {
     private String blogUrl;
     private int exp;              // 경험치
 	
+    // 내가 이 사람을 팔로우 중인지 여부 (1: true, 0: false)
+    private boolean isFollowed;
 }

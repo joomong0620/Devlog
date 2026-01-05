@@ -28,25 +28,45 @@ function init() {
 function togglePostLike() {
     if (!loginUserId) return alert("로그인이 필요합니다.");
 
-    // 좋아요 API는 아직 구현 안 했으므로 패스하거나 추가 필요
-    // 일단 UI만 동작하게 둠 (나중에 구현 시 fetch 추가)
-    const isLiked = btnPostLike.classList.contains('active');
-    if (isLiked) {
-        btnPostLike.classList.remove('active');
-        postHeartIcon.classList.replace('fa-solid', 'fa-regular');
-    } else {
-        btnPostLike.classList.add('active');
-        postHeartIcon.classList.replace('fa-regular', 'fa-solid');
-    }
+    fetch(`/api/blog/like/${postId}`, { method: 'POST' })
+        .then(res => {
+            if(res.status === 401) { alert("로그인 필요"); return null; }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.success) {
+                // 서버에서 받은 최신 상태로 업데이트
+                if (data.isLiked) {
+                    btnPostLike.classList.add('active');
+                    postHeartIcon.classList.replace('fa-regular', 'fa-solid');
+                } else {
+                    btnPostLike.classList.remove('active');
+                    postHeartIcon.classList.replace('fa-solid', 'fa-regular');
+                }
+                // 숫자 업데이트
+                document.getElementById('postLikeCount').innerText = data.count;
+            }
+        })
+        .catch(err => console.error("게시글 좋아요 에러 : ", err));
 }
 
 // 게시글 삭제
 function deletePost() {
     if (!confirm('정말 삭제하시겠습니까?')) return;
     
-    // 블로그 게시글 삭제 API (BlogController에 추가 필요, 일단 경로 예시)
-    // 현재 BlogController에는 delete가 없으므로 추후 구현 필요
-    alert("게시글 삭제 기능은 아직 구현되지 않았습니다.");
+    // API 호출
+    fetch(`/api/blog/delete/${postId}`, { 
+        method: 'DELETE' 
+    })
+    .then(res => {
+        if(res.ok) {
+            alert("삭제되었습니다.");
+            location.href = '/blog/list'; // 목록으로 이동
+        } else {
+            alert("삭제 실패");
+        }
+    });
 }
 
 // 팔로우 토글
@@ -102,13 +122,14 @@ function renderComments(comments) {
 function createCommentElement(data, isReply = false) {
     const el = document.createElement('div');
     el.className = `comment-item ${isReply ? 'reply' : ''}`;
-    el.id = `comment-${data.commentNo}`; // id -> commentNo
+    el.id = `comment-${data.commentNo}`;
 
-    // 로그인한 유저와 댓글 작성자가 같은지 확인 (memberNo 비교)
     const isMine = loginUserId && (String(data.memberNo) === String(loginUserId));
-    
-    // 프로필 이미지 처리
     const profileSrc = data.profileImg || '/images/default_profile.png';
+    
+    // 좋아요 상태 클래스
+    const likeClass = data.isLiked ? 'active' : '';
+    const heartIcon = data.isLiked ? 'fa-solid' : 'fa-regular';
 
     el.innerHTML = `
         <a href="#" class="profile-link">
@@ -125,6 +146,11 @@ function createCommentElement(data, isReply = false) {
             <div class="comment-text" id="text-${data.commentNo}">${data.commentContent}</div>
             
             <div class="comment-actions">
+                <button class="action-btn like-comment-btn ${likeClass}" onclick="toggleCommentLike(${data.commentNo}, this)">
+                    <i class="${heartIcon} fa-heart"></i>
+                    <span class="like-count">${data.likeCount}</span>
+                </button>
+
                 ${!isReply ? `<button class="action-btn" onclick="openReplyForm(${data.commentNo})">답글</button>` : ''}
                 
                 ${isMine ? `
@@ -138,17 +164,52 @@ function createCommentElement(data, isReply = false) {
     return el;
 }
 
-// 3. 메인 댓글 작성
-function addMainComment() {
+// [추가] 댓글 좋아요 토글 함수
+function toggleCommentLike(commentId, btn) {
     if (!loginUserId) return alert("로그인이 필요합니다.");
-    const content = mainCommentInput.value.trim();
-    if (!content) return alert("내용을 입력해주세요.");
 
-    // [수정] DTO 필드명에 맞춤
+    fetch(`/api/comments/${commentId}/like`, { method: 'POST' })
+    .then(res => {
+        if(res.status === 401) return alert("로그인이 필요합니다.");
+        return res.json();
+    })
+    .then(data => {
+        if(data.success) {
+            const icon = btn.querySelector('i');
+            const countSpan = btn.querySelector('.like-count');
+            let count = parseInt(countSpan.innerText);
+
+            if (data.liked) {
+                // 좋아요 됨
+                btn.classList.add('active');
+                icon.classList.replace('fa-regular', 'fa-solid');
+                countSpan.innerText = count + 1;
+            } else {
+                // 취소 됨
+                btn.classList.remove('active');
+                icon.classList.replace('fa-solid', 'fa-regular');
+                countSpan.innerText = Math.max(0, count - 1);
+            }
+        }
+    })
+    .catch(console.error);
+}
+
+// 3. 메인 댓글 작성
+// 3. 메인 댓글 작성 (수정됨)
+function addMainComment() {
+    // 1. 값 다시 확실하게 가져오기
+    const currentPostId = document.getElementById('postId').value;
+    const content = mainCommentInput.value.trim();
+    
+    if (!loginUserId) return alert("로그인이 필요합니다.");
+    if (!content) return alert("내용을 입력해주세요.");
+    if (!currentPostId) return alert("게시글 정보를 불러오지 못했습니다."); // 방어 코드
+
     const payload = {
-        boardNo: postId,            // postId -> boardNo
-        commentContent: content,    // content -> commentContent
-        parentCommentNo: null       // parentId -> parentCommentNo
+        boardNo: parseInt(currentPostId), // 숫자로 변환해서 전송
+        commentContent: content,
+        parentCommentNo: null
     };
 
     fetch('/api/comments', {
@@ -156,14 +217,16 @@ function addMainComment() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-        .then(res => {
-            if (res.ok) {
-                mainCommentInput.value = '';
-                loadComments(); 
-            } else {
-                alert('댓글 등록 실패');
-            }
-        });
+    .then(res => {
+        if (res.ok) {
+            mainCommentInput.value = '';
+            loadComments(); 
+        } else {
+            // 에러 메시지 확인
+            res.text().then(text => alert('댓글 등록 실패: ' + text));
+        }
+    })
+    .catch(err => console.error(err));
 }
 
 // 3. 메인 댓글 작성
