@@ -384,3 +384,11 @@ h2 {
     gap: 8px;
     font-size: 14px;
 }
+
+
+.form-msg {
+    font-size: 12px;
+    margin-top: 4px;
+}
+.success { color: #4CAF50; }
+.error { color: #FF5252; }

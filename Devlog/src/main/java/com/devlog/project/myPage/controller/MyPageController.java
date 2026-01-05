@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,7 @@ import com.devlog.project.myPage.dto.MemberUpdateDto;
 import com.devlog.project.myPage.dto.MyActivityDto;
 import com.devlog.project.myPage.service.MyPageService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -118,7 +120,6 @@ public class MyPageController {
     		@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
     		) {
     	
-    	System.out.println(paramMap.get("price") + "구독 금액 넘어 오는지 확인");
     	
     	Long memberNo = loginMember.getMemberNo();
     	
@@ -145,6 +146,37 @@ public class MyPageController {
         
         // 서비스 호출 및 결과 반환
         return myPageService.getMyActivityList(member.getMemberNo(), type);
+    
+    @PostMapping("/api/changePw")
+    @ResponseBody
+    public ResponseEntity<Integer> changePw(
+    		@RequestBody Map<String, Object> paramMap,
+    		@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
+    		) {
+    	
+    	paramMap.put("memberNo", loginMember.getMemberNo());
+    	
+    	Integer result = myPageService.changePw(paramMap);
+    	
+    	return ResponseEntity.ok(result);
+    }
+    
+    
+    @DeleteMapping("/api/withdraw")
+    @ResponseBody
+    public ResponseEntity<Integer> withdraw(
+    		@RequestBody Map<String, String> paramMap,
+            @SessionAttribute("loginMember") MemberLoginResponseDTO loginMember,
+            HttpSession session
+    		){
+    	
+    	int result = myPageService.withdraw(loginMember.getMemberNo(), paramMap.get("checkPw"));
+
+        if (result == 1) {  // 성공
+            session.invalidate();
+        }
+    	
+    	return ResponseEntity.ok(result);
     }
     	
     

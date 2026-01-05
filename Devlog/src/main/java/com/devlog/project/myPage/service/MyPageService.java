@@ -19,4 +19,11 @@ public interface MyPageService {
 	
 	// 내 활동 리스트 조회
     List<MyActivityDto> getMyActivityList(Long memberNo, String type);
+    
+	// 비밀번호 변경
+	Integer changePw(Map<String, Object> paramMap);
+	
+	
+	// 탈퇴
+	int withdraw(Long memberNo, String string);
 }

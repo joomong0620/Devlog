@@ -20,4 +20,7 @@ public class UserProfileDto {
 	
     // 내가 이 사람을 팔로우 중인지 여부 (1: true, 0: false)
     private boolean isFollowed;
+    
+    
+    private Long memberNo; // 구독하려고 가져올게요
 }

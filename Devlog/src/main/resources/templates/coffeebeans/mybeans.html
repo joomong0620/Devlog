@@ -91,23 +91,24 @@
               <th>일시</th>
             </tr>
           </thead>
-         <tbody id="history-tbody">
-            <tr th:each="history : ${historyList}" 
-                th:data-type="${(history.contentType == 'POST' or history.contentType == 'SUBSCRIBE' or history.contentType == 'CHATBOT') ? 'use' : 
+          <tbody id="history-tbody">
+            <tr th:each="history : ${historyList}" th:data-type="${(history.contentType == 'POST' or history.contentType == 'SUBSCRIBE' or history.contentType == 'CHATBOT') ? 'use' : 
                               (history.contentType == '충전' ? 'charge' : 
                               (history.contentType == '환전' ? 'exchange' : 
-                              (history.contentType == '취소' ? 'cancel' : 'all')))}"
-                th:data-id="${history.paymentId}"
-                th:data-no="${history.beansPayNo}" 
-                th:data-used="${history.usedAmount}"
-                th:data-price="${history.displayPrice}">
+                              (history.contentType == '취소' ? 'cancel' : 'all')))}" th:data-id="${history.paymentId}"
+              th:data-no="${history.beansPayNo}" th:data-used="${history.usedAmount}"
+              th:data-price="${history.displayPrice}">
 
               <td>
-                <span th:if="${history.contentType == 'POST' or history.contentType == 'SUBSCRIBE' or history.contentType == 'CHATBOT'}" th:text="'사용'"></span>
+                <span
+                  th:if="${history.contentType == 'POST' or history.contentType == 'SUBSCRIBE' or history.contentType == 'CHATBOT'}"
+                  th:text="'사용'"></span>
                 <span th:if="${history.contentType == '충전'}" th:text="'충전'"></span>
                 <span th:if="${history.contentType == '환전'}" th:text="'환전'"></span>
                 <span th:if="${history.contentType == '취소'}" th:text="'취소'"></span>
-                <span th:unless="${history.contentType == 'POST' or history.contentType == 'SUBSCRIBE' or history.contentType == 'CHATBOT' or history.contentType == '충전' or history.contentType == '환전' or history.contentType == '취소'}" th:text="${history.contentType}"></span>
+                <span
+                  th:unless="${history.contentType == 'POST' or history.contentType == 'SUBSCRIBE' or history.contentType == 'CHATBOT' or history.contentType == '충전' or history.contentType == '환전' or history.contentType == '취소'}"
+                  th:text="${history.contentType}"></span>
               </td>
 
               <td>
@@ -122,8 +123,9 @@
                 </th:block>
               </td>
 
-              <td th:class="${history.contentType == '충전' ? 'plus' : 'minus'}"
-                  th:text="${history.contentType == '충전' ? '+' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA') : '-' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA')}">
+              <td th:class="${history.payAmount > 0 ? 'plus' : 'minus'}" th:text="${history.payAmount > 0 ? 
+                            '+' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA') : 
+                            '-' + #numbers.formatInteger(history.displayPrice, 0, 'COMMA')}">
               </td>
 
               <td th:text="${history.payDate}">일시</td>
