@@ -138,6 +138,7 @@ public class BlogController {
             model.addAttribute("memberLevel", myBlogData.getMemberLevel());
             model.addAttribute("currentExp", myBlogData.getCurrentExp());
             model.addAttribute("nextExp", myBlogData.getNextExp());
+            model.addAttribute("levelTitle", myBlogData.getLevelTitle());
             
          // 4. 내가 팔로우 중인지 여부 확인
             boolean isFollowing = false;

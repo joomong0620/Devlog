@@ -43,7 +43,7 @@
                         </div>
                     </div>
                     <div class="lv-row">
-                        <span class="user-name" th:text="${userProfile.username}">실명</span>
+                        <span class="user-name" th:text="${levelTitle}">칭호</span>
                         <div class="exp-container"  th:if="${isOwner}" role="progressbar"
                             aria-valuemin="0"
                             th:attr="aria-valuemax=${nextExp}, aria-valuenow=${currentExp}">

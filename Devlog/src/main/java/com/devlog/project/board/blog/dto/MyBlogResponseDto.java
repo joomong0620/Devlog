@@ -38,4 +38,6 @@ public class MyBlogResponseDto {
     private Integer currentExp;
     
     private Integer nextExp;
+    
+    private String levelTitle;
 }

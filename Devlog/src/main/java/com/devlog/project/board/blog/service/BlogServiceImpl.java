@@ -314,6 +314,8 @@ public class BlogServiceImpl implements BlogService {
         
         response.setNextExp(level.getRequiredTotalExp());
         
+        response.setLevelTitle(level.getTitle());
+        
 
         return response;
     }

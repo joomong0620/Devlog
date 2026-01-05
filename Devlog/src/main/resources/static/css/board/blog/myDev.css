@@ -134,6 +134,20 @@ body[data-user-type="owner"] .visitor-only {
     box-shadow: 0 6px 18px rgba(0,0,0,0.12);
 }
 
+.user-name {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    color: #6d28d9;
+    box-shadow: 0 4px 10px rgba(139, 92, 246, 0.25);
+    user-select: none;
+}
+
 .lv-row:hover .exp-info {
     opacity: 1;
     top: 120%;
