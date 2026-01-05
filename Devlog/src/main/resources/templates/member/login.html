@@ -7,6 +7,9 @@
 
     <link rel="stylesheet" th:href="@{/css/member/login.css}">
     <link rel="stylesheet" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" th:href="@{/css/common/common.css}" />
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+
 </head>
 
 <body>
@@ -14,11 +17,13 @@
 
     <main>
         <!-- 헤더 -->
-        <header class="main-header">header</header>
+        <!-- <header class="main-header">header</header> -->
         <!-- header.html (fragment) 추가 -->
         <!-- <th:block th:replace="~{/common/header}">header.html</th:block> -->
         <!-- 또는 -->
-        <!-- <div th:replace="common/header :: header"></div> -->
+        <div th:replace="common/header :: header"></div>
+        <script th:src="@{/js/common/header.js}"></script>
+
 
         <!-- 네비게이션 -->
         <nav class="main-nav"></nav>
@@ -77,11 +82,11 @@
 
 
         <!--  ###################################################### -->
-        <footer class="main-footer">footer</footer>
+        <!-- <footer class="main-footer">footer</footer> -->
         <!-- footer.html 추가 -->
         <!-- <th:block th:replace="~{common/footer}">footer.html</th:block> -->
         <!-- 또는 -->
-        <!-- <div th:replace="common/footer :: footer"></div> -->
+        <div th:replace="common/footer :: footer"></div>
 
     </main>
 

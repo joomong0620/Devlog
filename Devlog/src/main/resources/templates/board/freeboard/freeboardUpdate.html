@@ -5,6 +5,9 @@
     <title>게시글 수정</title>
     <link rel="stylesheet" th:href="@{/css/board/freeboard/freeboardUpdate.css}">
     <link rel="stylesheet" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" th:href="@{/css/common/common.css}" />
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}" />
+        
 </head>
 
 <body>
@@ -12,16 +15,18 @@
     <main>
 
         <!-- 헤더 -->
-        <header class="main-header">header</header>
+        <!-- <header class="main-header">header</header> -->
         <!-- header.html (fragment) 추가 -->
         <!-- <th:block th:replace="~{/common/header}">header.html</th:block> -->
         <!-- 또는 -->
-        <!-- <div th:replace="common/header :: header"></div> -->
+        <div th:replace="common/header :: header"></div>
+        <script th:src="@{/js/common/header.js}"></script>
 
         <!-- 네비게이션 -->
         <nav class="main-nav"></nav>
         <!--  ###################################################### -->  
         
+        <div class="top-space-bw-header"> </div>
         <!-- 상단 타이틀 바 -->
         <h2 class="title-main fw-800">자유게시판</h2>
         <div class="container">
@@ -110,11 +115,11 @@
         </div>
 
         <!--  ###################################################### -->
-        <footer class="main-footer">footer</footer>
+        <!-- <footer class="main-footer">footer</footer> -->
         <!-- footer.html 추가 -->
         <!-- <th:block th:replace="~{common/footer}">footer.html</th:block> -->
         <!-- 또는 -->
-        <!-- <div th:replace="common/footer :: footer"></div> -->
+        <div th:replace="common/footer :: footer"></div>
 
     </main>
 
