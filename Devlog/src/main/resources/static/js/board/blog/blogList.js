@@ -17,6 +17,24 @@ function createCard(post) {
     const card = document.createElement('div');
     card.className = 'blog-card';
 
+    const dateStr = post.bCreateDate || post.bcreate_date;
+
+    // 태그 HTML 생성 로직
+    let tagsHtml = '';
+    const tagList = post.tagList || post.tag_list;
+
+    if (tagList && tagList.length > 0) {
+        tagsHtml = '<div class="card-tags" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px;">';
+        // 최대 3개까지만 표시
+        tagList.slice(0, 3).forEach(tag => {
+            tagsHtml += `<span class="tag-pill" style="font-size:12px; background:#f1f3f5; color:#495057; padding:3px 8px; border-radius:12px;">#${tag}</span>`;
+        });
+        if (tagList.length > 3) {
+            tagsHtml += `<span style="font-size:11px; color:#888; align-self:center;">+${tagList.length - 3}</span>`;
+        }
+        tagsHtml += '</div>';
+    }
+
     // 썸네일 처리
     let displayImg = '/images/logo.png';
     if (post.thumbnail_url && post.thumbnail_url.trim() !== '') {
@@ -30,7 +48,6 @@ function createCard(post) {
     // DTO의 getSummary() 덕분에 JSON에 'summary' 필드가 자동으로 생깁니다.
     const cleanText = post.summary || "";
 
-    const dateStr = post.bCreateDate || post.bcreate_date;
 
     card.innerHTML = `
         <a href="${detailUrl}" class="card-link">
@@ -141,6 +158,3 @@ if (scrollTopBtn) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
-
-// [중요] 맨 아래에 있던 DOMContentLoaded 코드는 이제 완전히 삭제했습니다!
-// (서버가 처음부터 깨끗한 HTML을 주기 때문에 필요 없음)

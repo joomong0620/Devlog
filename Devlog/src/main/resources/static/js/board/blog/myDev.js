@@ -12,32 +12,32 @@ let isLastPage = false;
 
 // HTML 태그 제거 및 길이 제한 함수
 function stripHtml(html) {
-    if (!html) return '';
-    const tmp = document.createElement("DIV");
-    tmp.innerHTML = html;
-    let text = tmp.textContent || tmp.innerText || "";
-    if (text.length > 30) {
-        text = text.substring(0, 60) + "...";
-    }
-    return text;
-}
-
-// 본문에서 첫 번째 이미지 URL 추출 (없으면 로고 반환)
-function extractFirstImage(html) {
-  // 내용이 없으면 로고 반환
-  if (!html) return "/images/logo.png";
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const img = doc.querySelector("img");
-
-  // 이미지가 있으면 그 주소, 없으면 로고 반환
-  if (img) {
-    return img.src;
-  } else {
-    return "/images/logo.png";
+  if (!html) return '';
+  const tmp = document.createElement("DIV");
+  tmp.innerHTML = html;
+  let text = tmp.textContent || tmp.innerText || "";
+  if (text.length > 30) {
+    text = text.substring(0, 60) + "...";
   }
+  return text;
 }
+
+// // 본문에서 첫 번째 이미지 URL 추출 (없으면 로고 반환)
+// function extractFirstImage(html) {
+//   // 내용이 없으면 로고 반환
+//   if (!html) return "/images/logo.png";
+
+//   const parser = new DOMParser();
+//   const doc = parser.parseFromString(html, "text/html");
+//   const img = doc.querySelector("img");
+
+//   // 이미지가 있으면 그 주소, 없으면 로고 반환
+//   if (img) {
+//     return img.src;
+//   } else {
+//     return "/images/logo.png";
+//   }
+// }
 
 // 팔로우 기능
 function toggleFollow() {
@@ -394,9 +394,13 @@ document.addEventListener("DOMContentLoaded", () => {
           const cCount = post.commentCount ?? post.comment_count ?? 0;
           const vCount = post.boardCount ?? post.board_count ?? 0;
           const isPaidStatus = post.isPaid || post.is_paid || "N";
-
-          const thumb = extractFirstImage(bContent);
+          let thumb = post.thumbnailUrl || post.thumbnail_url;
           const desc = stripHtml(bContent);
+
+          // 썸네일이 없으면 기본 로고 이미지 사용
+          if (!thumb || thumb.trim() === "") {
+            thumb = "/images/logo.png";
+          }
 
           // 유료글 "Premium" 텍스트를 "왕관 아이콘"으로 변경
           const paidIcon =
