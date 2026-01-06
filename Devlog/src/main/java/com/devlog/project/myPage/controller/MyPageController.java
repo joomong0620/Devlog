@@ -146,6 +146,7 @@ public class MyPageController {
         
         // 서비스 호출 및 결과 반환
         return myPageService.getMyActivityList(member.getMemberNo(), type);
+    }
     
     @PostMapping("/api/changePw")
     @ResponseBody
