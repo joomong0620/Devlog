@@ -296,6 +296,7 @@ public class BlogServiceImpl implements BlogService {
         if (ownerNo != 0L) {
             response.setFollowerCount(blogMapper.countFollower(ownerNo));
             response.setFollowingCount(blogMapper.countFollowing(ownerNo));
+            response.setSubscriberCount(blogMapper.countSubscriber(ownerNo));
 
             // 방문자 수
             Map<String, Object> visitMap = blogMapper.selectVisitCount(ownerNo);
@@ -335,6 +336,28 @@ public class BlogServiceImpl implements BlogService {
         
 
         return response;
+    }
+    
+    // 구독 여부 확인 메서드 (Controller에서 호출)
+    public boolean isSubscribed(Long me, Long target) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("me", me);
+        params.put("target", target);
+        return blogMapper.checkSubscribeStatus(params) > 0;
+    }
+    
+    // 구독자 목록 조회 (API용)
+    public List<UserProfileDto> getSubscriberList(String blogId, Member me) {
+        Member owner = memberRepository.findByMemberEmailAndMemberDelFl(blogId, CommonEnums.Status.N)
+                .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("memberNo", owner.getMemberNo());
+        if (me != null) {
+            params.put("myMemberNo", me.getMemberNo());
+        }
+        
+        return blogMapper.selectSubscriberList(params);
     }
     
     // 팔로워/팔로잉 목록 가져오기
