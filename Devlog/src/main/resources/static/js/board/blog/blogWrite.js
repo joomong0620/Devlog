@@ -381,7 +381,13 @@ document.querySelector('.btn-exit').addEventListener('click', () => {
 // ============================================================
 // [핵심] 게시글 저장 함수 (데이터 이름 수정)
 // ============================================================
+let isSaving = false;
+
 function savePost(isTemp) {
+    if(isSaving){
+        return;
+    }
+    
     const boardNo = document.getElementById('boardNo').value; 
     const title = document.querySelector('.input-title').value.trim();
     const content = editor.getHTML().trim();
@@ -401,6 +407,8 @@ function savePost(isTemp) {
         alert('유료 콘텐츠의 가격을 설정해주세요.');
         return priceInput.focus();
     }
+
+    isSaving = true;
 
     // [수정 3] 백엔드가 스네이크 케이스(board_no)를 원할 경우를 대비해
     // 데이터를 보낼 때 변수명을 DB 컬럼 스타일로 맞춰줍니다.
@@ -443,5 +451,9 @@ function savePost(isTemp) {
     .catch(error => {
         console.error('Save Error:', error);
         alert('저장 실패: ' + error.message);
+    })
+    .finally(() => {
+        // 3. [저장 끝] 성공하든 실패하든 깃발 뽑기 (잠금 해제)
+        isSaving = false;
     });
 }

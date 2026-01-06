@@ -85,19 +85,18 @@ public class BlogServiceImpl implements BlogService {
         blogDTO.setMemberNo(member.getMemberNo());
 
         blogMapper.insertBoard(blogDTO);
+        
         blogMapper.insertBlog(blogDTO);
-
-        if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
-            for (String tagName : blogDTO.getTagList()) {
-                blogMapper.insertTag(tagName);
-                Long tagNo = blogMapper.selectTagNoByName(tagName);
-
-                Map<String, Object> tagParams = new HashMap<>();
-                tagParams.put("boardNo", blogDTO.getBoardNo());
-                tagParams.put("tagNo", tagNo);
-                blogMapper.insertBlogTag(tagParams);
-            }
+        
+        // 썸네일 처리
+        if (blogDTO.getThumbnailUrl() != null && !blogDTO.getThumbnailUrl().isEmpty()) {
+            insertThumbnail(blogDTO.getBoardNo(), blogDTO.getThumbnailUrl());
         }
+        
+        
+        // 태그 처리
+        processTags(blogDTO);
+        
         return blogDTO.getBoardNo();
     }
 
