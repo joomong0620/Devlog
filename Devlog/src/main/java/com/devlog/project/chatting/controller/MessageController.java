@@ -54,7 +54,6 @@ public class MessageController {
 	private final MemberRepository memberRepository;
 	
 	
-	
 	// 현재 채팅방에 참여중인 회원 목록을 담을 Map
 	// key = roomNo, value = 해당 채팅방에 접속한 memberNo 집합
 	// ConcurrentHashMap + newKeySet() → 멀티스레드 환경에서도 안전하게 관리
@@ -72,10 +71,11 @@ public class MessageController {
 	    // computeIfAbsent(K key, Function) : key 가 없을 경우 값을 생성
 	    
 	    
-	    
 	    Long lastReadMessageNo = chatService.selectLastReadNo(req.getRoomNo(), req.getMemberNo());
 	    Integer roomLastMessageNo = service.selectLastMessageNo(req.getRoomNo());
 		
+	    chatService.updateLastRead(req.getRoomNo(), req.getMemberNo());
+	    
 		// List<Long> messageNos = service.searchMessageList(null)
 		
 		System.out.println("업데이트 전 마지막 읽은 메세지 : " + lastReadMessageNo);
@@ -343,6 +343,8 @@ public class MessageController {
 	            break;
 	        }
 	    }
+	    
+	    templete.convertAndSend(memberNo);
 
 	}
 

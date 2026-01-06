@@ -286,9 +286,15 @@ public class ChattingServiceImpl implements ChattingService {
 		}else {
 			ChattingUser opponent = chattingUserRepository.findOpponent(roomNo, memberNo);
 			
-			Member opponentMember = opponent.getMember();
-			roomInfo.setRoomName(opponentMember.getMemberNickname());
-			roomInfo.setRoomProfile(opponentMember.getProfileImg());
+			if(opponent != null) {
+				
+				Member opponentMember = opponent.getMember();
+				roomInfo.setRoomName(opponentMember.getMemberNickname());
+				roomInfo.setRoomProfile(opponentMember.getProfileImg());
+			} else {
+				roomInfo.setRoomName("알수없음");
+				roomInfo.setRoomProfile("/images/logo.png");
+			}
 		}
 		
 		
@@ -302,7 +308,7 @@ public class ChattingServiceImpl implements ChattingService {
 		List<MessageDTO> message = messageRepository.findByMessageList(roomNo, memberNo);
 		
 		
-		
+			
 		// 3-1 메세지에 달린 이모지 조회
 		// 메세지 번호들 꺼내오기
 		List<Long> messageNos = message.stream()
