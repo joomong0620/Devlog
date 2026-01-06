@@ -64,6 +64,9 @@ public interface BlogService {
 
 	// 구독자 목록 조회
 	List<UserProfileDto> getSubscriberList(String blogId, Member me);
+
+	// 게시글 좋아요 확인
+	boolean isBoardLiked(Long boardNo, Long memberNo);
 	
 	
 	

@@ -102,7 +102,8 @@ public class BlogController {
 	}
 
 	@GetMapping("/blog/{blogId:.+}")
-	public String blogMain(@PathVariable("blogId") String blogId, Model model) {
+	public String blogMain(@PathVariable("blogId") String blogId, Model model,
+			HttpServletRequest request, HttpServletResponse response) {
 
 		// 1. 현재 로그인한 사용자 ID 가져오기
 		String currentLoginId = null;
@@ -112,15 +113,46 @@ public class BlogController {
 		}
 
 		try {
-
-			// 1. 방문자 수 증가 (본인 블로그가 아닐 때만 증가시키는 로직을 넣어도 됨)
 			// 블로그 주인 찾기
 			Member owner = memberRepository.findByMemberEmailAndMemberDelFl(blogId, CommonEnums.Status.N).orElse(null);
 
 			if (owner != null) {
-				// 로그인 안 했거나, 로그인 했어도 내 블로그가 아니면 방문수 증가
+				
+				// 내 블로그가 아닐 때만 카운트 증가 시도
 				if (currentLoginId == null || !currentLoginId.equals(blogId)) {
-					blogService.increaseVisitCount(owner.getMemberNo());
+					
+					Cookie oldCookie = null;
+					Cookie[] cookies = request.getCookies();
+					
+					if (cookies != null) {
+						for (Cookie cookie : cookies) {
+							// "blogVisit"라는 이름의 쿠키가 있는지 확인
+							if (cookie.getName().equals("blogVisit")) {
+								oldCookie = cookie;
+							}
+						}
+					}
+
+					// 쿠키가 있고, 해당 블로그 방문 기록이 없으면 -> 카운트 증가 & 쿠키 업데이트
+					if (oldCookie != null) {
+						if (!oldCookie.getValue().contains("[" + owner.getMemberNo() + "]")) {
+							blogService.increaseVisitCount(owner.getMemberNo());
+							
+							oldCookie.setValue(oldCookie.getValue() + "_[" + owner.getMemberNo() + "]");
+							oldCookie.setPath("/");
+							oldCookie.setMaxAge(60 * 60 * 24); // 24시간 유지
+							response.addCookie(oldCookie);
+						}
+					} 
+					// 쿠키가 아예 없으면 -> 카운트 증가 & 새 쿠키 생성
+					else {
+						blogService.increaseVisitCount(owner.getMemberNo());
+						
+						Cookie newCookie = new Cookie("blogVisit", "[" + owner.getMemberNo() + "]");
+						newCookie.setPath("/");
+						newCookie.setMaxAge(60 * 60 * 24); // 24시간 유지
+						response.addCookie(newCookie);
+					}
 				}
 			}
 
@@ -168,7 +200,7 @@ public class BlogController {
                     }
 				}
 			}
-			model.addAttribute("isFollowing", isFollowing);
+			model.addAttribute("isFollowed", isFollowing);
 			model.addAttribute("isSubscribed", isSubscribed);
 
 		} catch (Exception e) {
@@ -256,10 +288,28 @@ public class BlogController {
 
 		// 3. 게시글 데이터 가져오기
 		BlogDTO post = blogService.getBoardDetail(boardNo);
-
+		
+		// 팔로우 여부 확인(상세 게시글 옆에 팔로우버튼)
+        boolean isFollowed = false;
+        if (loginUser != null) {
+            Member me = loginUser.getMember();
+            // 게시글 작성자(post.getMemberNo())를 내가 팔로우했는지 확인
+            isFollowed = blogService.isFollowing(me.getMemberNo(), post.getMemberNo());
+        }
+        model.addAttribute("isFollowed", isFollowed); // HTML로 전달
+		
 		if (post == null) {
 			return "redirect:/blog/list";
 		}
+		
+		// [추가] 게시글 좋아요 여부 확인 (로그인 한 경우만)
+        boolean isLiked = false;
+        if (loginUser != null) {
+            Member me = loginUser.getMember(); // 혹은 repository에서 조회한 me 객체 사용
+            // BlogService에 이 메서드가 없으면 아래 2단계 참고해서 추가하세요
+            isLiked = blogService.isBoardLiked(boardNo, me.getMemberNo());
+        }
+        model.addAttribute("isLiked", isLiked); // HTML로 전달
 
 		// 4. 유료 글 잠금 체크 - 기존 코드 유지
 		boolean isLocked = false;
@@ -275,7 +325,7 @@ public class BlogController {
 			if (!isPurchased)
 				isLocked = true;
 		}
-
+		// 스크랩 체크
 		boolean isScraped = false;
 		if (loginEmail != null) {
 			Member me = memberRepository.findByMemberEmailAndMemberDelFl(loginEmail, CommonEnums.Status.N).orElse(null);
@@ -307,18 +357,16 @@ public class BlogController {
 	}
 
 	// 팔로워 / 팔로잉 목록 API (모달 연동용)
-
 	// 9. 팔로워 목록 조회
 	@GetMapping("/api/blog/{blogId}/followers")
-	@ResponseBody
-	public ResponseEntity<List<UserProfileDto>> getFollowers(@PathVariable String blogId) {
-		// 1. 내 정보 찾기
-		Member me = getMyMember(); // *하단 헬퍼 메소드 참고
-
-		// 2. 서비스 호출 (내 정보 전달)
-		List<UserProfileDto> list = blogService.getFollowList(blogId, "follower", me);
-		return ResponseEntity.ok(list);
-	}
+    @ResponseBody
+    public ResponseEntity<List<UserProfileDto>> getFollowers(@PathVariable String blogId) {
+        // 1. 내 정보 찾기
+        Member me = getMyMember(); // *하단 헬퍼 메소드 참고 
+        // 2. 서비스 호출 (내 정보 전달)
+        List<UserProfileDto> list = blogService.getFollowList(blogId, "follower", me);
+        return ResponseEntity.ok(list);
+    }
 
 	// 10. 팔로잉 목록 조회
 	@GetMapping("/api/blog/{blogId}/followings")
@@ -334,12 +382,16 @@ public class BlogController {
 	@GetMapping("/api/blog/{blogId}/subscribers")
 	@ResponseBody
 	public ResponseEntity<List<UserProfileDto>> getSubscribers(@PathVariable String blogId) {
-		// TODO: 추후 구독(Payment) 로직 구현 시 Mapper/Service 추가 필요
-		// 현재는 빈 리스트 반환
-		return ResponseEntity.ok(List.of());
+	    // 1. 현재 로그인한 내 정보 가져오기 (구독자 목록에 있는 사람을 내가 팔로우했는지 체크하기 위함)
+	    Member me = getMyMember();
+	    
+	    // 2. 서비스 호출하여 실제 구독자 목록 가져오기
+	    List<UserProfileDto> list = blogService.getSubscriberList(blogId, me);
+	    
+	    return ResponseEntity.ok(list);
 	}
 
-	// 게시글 스크랩
+	// 게시글 스크랩 API
 	// BlogController.java 내 추가
 	@PostMapping("/api/blog/scrap/{boardNo}")
 	@ResponseBody
@@ -355,7 +407,7 @@ public class BlogController {
 		return ResponseEntity.ok(Map.of("success", true, "isScraped", isScraped));
 	}
 
-	// 게시글 좋아요
+	// 게시글 좋아요 API
 	@PostMapping("/api/blog/like/{boardNo}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> toggleBoardLike(@PathVariable Long boardNo) {

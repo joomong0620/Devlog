@@ -325,7 +325,7 @@
 
     <select id="selectFollowerList" parameterType="map" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
         SELECT
-            m.MEMBER_EMAIL AS id,
+            m.MEMBER_NO AS memberNo,   m.MEMBER_EMAIL AS id,
             m.MEMBER_NICKNAME AS nickname,
             m.PROFILE_IMG AS profileImgUrl,
             m.MY_INFO_INTRO AS bio,
@@ -342,7 +342,7 @@
 
     <select id="selectFollowingList" parameterType="map" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
         SELECT
-            m.MEMBER_EMAIL AS id,
+            m.MEMBER_NO AS memberNo,   m.MEMBER_EMAIL AS id,
             m.MEMBER_NICKNAME AS nickname,
             m.PROFILE_IMG AS profileImgUrl,
             m.MY_INFO_INTRO AS bio,
@@ -453,7 +453,7 @@
 
     <select id="selectSubscriberList" parameterType="map" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
         SELECT
-            m.MEMBER_EMAIL AS id,
+            m.MEMBER_NO AS memberNo,   m.MEMBER_EMAIL AS id,
             m.MEMBER_NICKNAME AS nickname,
             m.PROFILE_IMG AS profileImgUrl,
             m.MY_INFO_INTRO AS bio,

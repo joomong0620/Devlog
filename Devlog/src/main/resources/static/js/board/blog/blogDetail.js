@@ -203,7 +203,10 @@ function renderComments(comments) {
 function createCommentElement(data, isReply = false) {
     const el = document.createElement('div');
     el.className = `comment-item ${isReply ? 'reply' : ''}`;
-    el.id = `comment-${data.commentNo}`;
+    
+    // [중요] 전체 덩어리 ID: 'comment-item-숫자'
+    el.id = `comment-item-${data.commentNo}`;
+
     const isMine = loginUserId && (String(data.memberNo) === String(loginUserId));
     const profileSrc = data.profileImg || '/images/user.png';
     const likeClass = data.isLiked ? 'active' : '';
@@ -218,13 +221,16 @@ function createCommentElement(data, isReply = false) {
                     <span class="comment-date">${data.cCreateDate || '방금 전'}</span>
                 </div>
             </div>
-            <div class="comment-text" id="comment-${data.commentNo}">${data.commentContent}</div>
+            
+            <div class="comment-text" id="comment-content-${data.commentNo}">${data.commentContent}</div>
+            
             <div class="comment-actions">
                 <button class="action-btn like-comment-btn ${likeClass}" onclick="toggleCommentLike(${data.commentNo}, this)">
                     <i class="${heartIcon} fa-heart"></i>
                     <span class="like-count">${data.likeCount}</span>
                 </button>
                 ${!isReply ? `<button class="action-btn" onclick="openReplyForm(${data.commentNo})">답글</button>` : ''}
+                
                 ${isMine ? `
                     <button class="action-btn" onclick="enableEditMode(${data.commentNo})">수정</button>
                     <button class="action-btn delete-btn" onclick="deleteComment(${data.commentNo})">삭제</button>
@@ -344,25 +350,37 @@ function scrollToHashIfExists() {
 
 // 게시글 수정
 function enableEditMode(id) {
-    const textEl = document.getElementById(`text-${id}`);
-    const currentText = textEl.innerText;
+    const textEl = document.getElementById(`comment-content-${id}`);
 
-    // 수정 중에는 액션 버튼들(수정, 삭제, 답글)을 잠시 숨기면 더 깔끔합니다.
-    const actionArea = textEl.parentElement.querySelector('.comment-actions');
-    if (actionArea) actionArea.style.display = 'none';
+    if (!textEl) {
+        console.error(`수정할 요소를 찾을 수 없습니다. ID: comment-content-${id}`);
+        return;
+    }
 
+    const currentText = textEl.innerText; // 현재 텍스트 가져오기
+
+    // 버튼 숨기기 (선택 사항: UI 깔끔하게 하기 위해)
+    const wrapper = document.getElementById(`comment-item-${id}`);
+    if (wrapper) {
+        const actionArea = wrapper.querySelector('.comment-actions');
+        if (actionArea) actionArea.style.display = 'none';
+    }
+
+    // 텍스트 영역을 입력창(textarea)으로 교체
     textEl.innerHTML = `
-        <div class="edit-form-wrapper">
-            <textarea id="editInput-${id}" class="edit-textarea">${currentText}</textarea>
-            <div class="comment-edit-actions">
-                <button class="btn-cancel-edit" onclick="loadComments()">취소</button>
-                <button class="btn-save-edit" onclick="saveEdit(${id})">저장</button>
+        <div class="edit-form-wrapper" style="margin-top: 10px;">
+            <textarea id="editInput-${id}" class="edit-textarea" style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; resize: none;">${currentText}</textarea>
+            <div class="comment-edit-actions" style="margin-top: 8px; text-align: right;">
+                <button class="btn-cancel-edit" onclick="loadComments()" style="margin-right: 5px; padding: 5px 10px; cursor:pointer;">취소</button>
+                <button class="btn-save-edit" onclick="saveEdit(${id})" style="background-color: #9b59b6; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor:pointer;">저장</button>
             </div>
         </div>`;
 
-    // 포커스 자동 이동
-    document.getElementById(`editInput-${id}`).focus();
+    // 입력창에 포커스
+    const input = document.getElementById(`editInput-${id}`);
+    if (input) input.focus();
 }
+
 // 게시글 수정 저장 api
 function saveEdit(id) {
     const newContent = document.getElementById(`editInput-${id}`).value;

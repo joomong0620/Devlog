@@ -344,7 +344,6 @@ public class MessageController {
 	        }
 	    }
 	    
-	    templete.convertAndSend(memberNo);
 
 	}
 

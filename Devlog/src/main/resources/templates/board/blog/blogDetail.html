@@ -36,7 +36,10 @@
                         </a>
                         <button class="btn-follow"
                             th:if="${loginUser != null and loginUser.memberEmail != post.memberEmail}"
-                            onclick="toggleFollow(this)">+ 팔로우</button>
+                            th:classappend="${isFollowed} ? 'active'" th:text="${isFollowed} ? '팔로잉' : '+ 팔로우'"
+                            onclick="toggleFollow(this)">
+                            + 팔로우
+                        </button>
                     </div>
 
                     <div class="meta-right-group">
@@ -56,10 +59,14 @@
                                 <span>스크랩</span>
                             </span>
 
-                            <span class="like-btn" id="btnPostLike" onclick="togglePostLike()">
-                                <i class="fa-regular fa-heart" id="postHeartIcon"></i>
+                            <span class="like-btn" id="btnPostLike" onclick="togglePostLike()"
+                                th:classappend="${isLiked} ? 'active'"> <i
+                                    th:class="${isLiked} ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"
+                                    id="postHeartIcon"></i>
+
                                 <span id="postLikeCount" th:text="${post.likeCount}">0</span>
                             </span>
+
                             <span><i class="fa-regular fa-comment-dots"></i> <span id="commentCount"
                                     th:text="${post.commentCount}">0</span></span>
                             <span><i class="fa-regular fa-eye"></i> <span th:text="${post.boardCount}">0</span></span>

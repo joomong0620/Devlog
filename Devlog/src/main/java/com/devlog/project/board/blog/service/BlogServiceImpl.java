@@ -311,7 +311,6 @@ public class BlogServiceImpl implements BlogService {
         }
 
         response.setPostCount(blogMapper.countTotalPosts(blogId));
-        response.setSubscriberCount(0);
         
         response.setSubPrice(blogOwner.getSubscriptionPrice());
         
@@ -412,7 +411,7 @@ public class BlogServiceImpl implements BlogService {
         return blogMapper.checkScrapStatus(params) > 0;
     }
     
-    // 게시글 좋아요
+    // 게시글 좋아요 토글
     @Override
     @Transactional
     public boolean toggleBoardLike(Long boardNo, Long memberNo) {
@@ -450,6 +449,15 @@ public class BlogServiceImpl implements BlogService {
             
             return true; // 등록됨
         }
+    }
+    
+    // 게시글 좋아요
+    @Override
+    public boolean isBoardLiked(Long boardNo, Long memberNo) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("boardNo", boardNo);
+        params.put("memberNo", memberNo);
+        return blogMapper.checkBoardLike(params) > 0;
     }
     
     // 게시글 수정

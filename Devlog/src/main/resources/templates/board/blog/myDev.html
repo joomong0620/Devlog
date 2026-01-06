@@ -257,7 +257,7 @@
             userProfile 안에 있는 id(이메일)를 가져옵니다.
         */
         const blogOwnerId = [[${ userProfile.id }]];
-        const loginMemberNo = [[${ session.loginMember?.memberNo }]];
+        const loginMemberNo = [[${session.loginMember != null ? session.loginMember.memberNo : 0}]];
         const blogOwnerNo = [[${ userProfile.memberNo }]];
 
         const subPrice = /*[[${subPrice}]]*/ 0;

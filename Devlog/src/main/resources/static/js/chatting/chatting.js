@@ -1133,6 +1133,7 @@ function bindTeamNameEditEvent() {
         const input = document.createElement('input');
         input.type = 'text';
         input.classList.add('team-name-input');
+        input.name = 'teamNameInput'
         input.value = currentName;
 
         /*
@@ -1143,7 +1144,7 @@ function bindTeamNameEditEvent() {
         input.focus();
 
         /* 편집 완료 처리 함수 */
-        const finishEdit = () => {
+        const finishEdit = async () => {
 
             const newName = input.value.trim();
 
@@ -1151,10 +1152,21 @@ function bindTeamNameEditEvent() {
                 teamNameSpan.innerText = newName;
             }
 
-            /* 
-                TODO: 
-                팀 이름 변경 비동기 요청 (서버 업데이트)
-            */
+            const resp = await fetch("/devtalk/roomName", {
+                method : "POST",
+                headers : {"Content-Type" : "application/json"},
+                body : JSON.stringify({
+                    newName : newName,
+                    roomNo : currentRoomNo
+                })
+            });
+
+            if(!resp.ok) {
+                console.error("에러 발생");
+                alert("서버 에러 발생");
+                return;
+            }
+            
 
             input.remove();
             teamNameSpan.classList.remove('display-none');
@@ -1191,6 +1203,34 @@ function bindTeamNameEditEvent() {
 //     pinnedBtn.classList.toggle('display-none')
 //     unpinnedBtn.classList.toggle('display-none')
 // }
+
+
+document.addEventListener("click", async e=> {
+
+    const pin = e.target.closest('#unpinned-btn');
+    if (!pin) return;
+
+    const data = {
+        memberNo : myNo,
+        roomNo : currentRoomNo
+    };
+
+    const resp = await fetch('/devtalk/pinUpdate', {
+        method : "POST",
+        headers : { 'Content-Type' : 'application/json' },
+        body : JSON.stringify(data)
+    });
+
+    if (resp.ok) {
+        await selectChatList();
+
+        const listItem = document.querySelector(
+            `[data-room-no="${currentRoomNo}"]`
+        );
+
+        listItem?.classList.add('is-selected');
+    }
+})
 
 
 // 메세지 삭제 이벤트
@@ -2145,9 +2185,9 @@ const searchChat = document.getElementById("chatting-search-area");
 searchChat.addEventListener("keydown", e => {
 
     if (e.key === 'Enter') {
-        const keyword = searchChat.value.trim();
+        const keyword = searchChat.value;
 
-        if (!keyword) return;   // 비어있으면 종료
+       // if (!keyword) return;   // 비어있으면 종료
 
         console.log("검색어:", keyword);
         selectChatList(keyword);
