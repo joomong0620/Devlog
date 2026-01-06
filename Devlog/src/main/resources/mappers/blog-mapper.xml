@@ -382,5 +382,17 @@
     <select id="selectBoardTitle" resultType="string">
         SELECT BOARD_TITLE FROM BOARD WHERE BOARD_NO = ${boardNo}
     </select>
+    
+    <select id="selectBoardImg" resultType="_int">
+    	SELECT COUNT(*) FROM BOARD_IMG
+    	WHERE BOARD_NO = ${boardNo}
+    </select>
+    
+    <update id="updateBoardImg">
+    	UPDATE BOARD_IMG SET IMG_RENAME = #{imgRename}
+    	WHERE BOARD_NO = ${boardNo}
+    
+    </update>
+    
 
 </mapper>
