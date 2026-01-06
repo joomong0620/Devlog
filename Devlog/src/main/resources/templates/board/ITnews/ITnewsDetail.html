@@ -23,7 +23,10 @@
   <main>
 
     <div class="news-header">
-      <img th:src="${news.imgPath != null ? news.imgPath : '/images/common/devlog.svg'}" alt="뉴스 헤더 이미지">
+      <img th:src="${news.imgPath.startsWith('http') ? 
+                news.imgPath : 
+                (news.imgRename != null ? news.imgPath + news.imgRename : '/images/common/devlog.svg')}"
+        alt="뉴스 헤더 이미지">
     </div>
 
     <button id="goToListBtn" type="button" onclick="location.href='/ITnews'">
@@ -79,22 +82,26 @@
       </div>
       <div class="news-content">
         <div class="news-content-image">
-          <img th:src="${news.imgPath}" alt="뉴스 컨텐츠 이미지">
-        </div>
-        <div class="news-content-text" th:text="${news.boardContent}">
-          본문 내용
+          <img th:src="${news.imgPath.startsWith('http') ? 
+                news.imgPath : 
+                (news.imgRename != null ? news.imgPath + news.imgRename : '/images/common/devlog.svg')}"
+            alt="뉴스 컨텐츠 이미지">
         </div>
       </div>
-
-
-      <div class="button-area" th:if="${session.loginMember != null and session.loginMember.memberAdmin.name()=='Y'}">
-        <button type="button" class="delete-btn" id="delete-btn">삭제</button>
-        <button type="button" class="update-btn" id="update-btn">수정하기</button>
+      <div class="news-content-text" th:text="${news.boardContent}">
+        본문 내용
       </div>
+    </div>
+
+
+    <div class="button-area" th:if="${session.loginMember != null and session.loginMember.memberAdmin.name()=='Y'}">
+      <button type="button" class="delete-btn" id="delete-btn">삭제</button>
+      <button type="button" class="update-btn" id="update-btn">수정하기</button>
+    </div>
 
 
 
-      <div id="commentContainer" th:replace="~{board/ITnews/ITnewsComment}"></div>
+    <div id="commentContainer" th:replace="~{board/ITnews/ITnewsComment}"></div>
 
 
 

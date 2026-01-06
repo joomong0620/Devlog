@@ -141,6 +141,8 @@ public class ITnewsServiceImpl implements ITnewsService {
 		return ITnewsmapper.boardDelete(boardNo);
 	}
 
+	
+	// 수정
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public int boardUpdate(ITnewsDTO itnews, MultipartFile imageFile) throws IllegalStateException, IOException {

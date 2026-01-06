@@ -48,6 +48,8 @@ p {
   margin: 0 auto;
   margin-top: 20px;
   padding: 0 20px;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
 }
 
 #goToListBtn {
@@ -72,6 +74,7 @@ p {
   justify-content: flex-end;
   gap: 15px;
   margin-top: 40px;
+  margin-right: 250px;
 }
 
 
