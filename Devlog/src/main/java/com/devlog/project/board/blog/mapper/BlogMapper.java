@@ -79,6 +79,7 @@ public interface BlogMapper {
 	Long selectReceiverNo(Long boardNo);
 	String selectBoardTitle(Long boardNo);
 	String selectMemberNickname(Long receiver);
+	
     // 게시글 스크랩 관련
     int checkScrapStatus(Map<String, Object> params);
     int insertScrap(Map<String, Object> params);

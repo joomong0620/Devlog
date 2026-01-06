@@ -42,6 +42,8 @@ public class BlogDTO {
     
     private List<String> tagList;   // 태그 리스트 (저장/조회용)
     
+    private String tagsStr;
+    
     // 화면 깜빡임 방지용 요약 메서드 ${blog.summary}로 사용하면 자동 호출됨
     public String getSummary() {
         if (this.boardContent == null) return "";

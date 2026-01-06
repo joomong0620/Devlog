@@ -58,6 +58,14 @@ public class BlogServiceImpl implements BlogService {
         params.put("sort", sort);
 
         List<BlogDTO> list = blogMapper.selectBlogList(params);
+        
+        // 문자열 태그를 리스트로 변환함 (목록에 태그 보여줄라고)
+        for (BlogDTO dto : list) {
+            if (dto.getTagsStr() != null) {
+                dto.setTagList(java.util.Arrays.asList(dto.getTagsStr().split(",")));
+            }
+        }
+        
         int totalCount = blogMapper.countBlogList(params);
 
         Map<String, Object> result = new HashMap<>();
@@ -122,6 +130,13 @@ public class BlogServiceImpl implements BlogService {
         }
         
         List<BlogDTO> list = blogMapper.selectMyBlogList(params);
+        
+        for (BlogDTO dto : list) {
+            if (dto.getTagsStr() != null) {
+                dto.setTagList(java.util.Arrays.asList(dto.getTagsStr().split(",")));
+            }
+        }
+        
         int totalCount = blogMapper.countMyBlogList(params);
 
         System.out.println(">>> [디버깅] 탭타입: " + type + ", 조회된 글 수: " + list.size() + ", 전체 수: " + totalCount);

@@ -104,7 +104,10 @@
                 <button class="btn-exit" onclick="history.back()">← 나가기</button>
                 <div class="right-buttons">
                     <button class="btn-draft">임시저장</button>
-                    <button class="btn-publish" id="btnSave" th:text="${post != null ? '수정하기' : '발행하기'}">발행하기</button>
+                    <button class="btn-publish" id="btnSave" 
+                            th:text="${post != null and post.tempFl == 'N' ? '수정하기' : '발행하기'}">
+                            발행하기
+                    </button>
                 </div>
             </div>
         </section>
