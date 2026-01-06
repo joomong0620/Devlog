@@ -314,17 +314,22 @@ public class BlogController {
 		// 4. 유료 글 잠금 체크 - 기존 코드 유지
 		boolean isLocked = false;
 		if (post.getPrice() > 0 && (loginEmail == null || !post.getMemberEmail().equals(loginEmail))) {
-			boolean isPurchased = false;
-			if (loginEmail != null) {
-				Member me = memberRepository.findByMemberEmailAndMemberDelFl(loginEmail, CommonEnums.Status.N)
-						.orElse(null);
-				if (me != null) {
-					isPurchased = replyService.isPurchased(boardNo, me.getMemberNo());
-				}
-			}
-			if (!isPurchased)
-				isLocked = true;
+			isLocked = true; // 일단 유료글이고 남의 글이면 잠가버림!
+
+		    if (loginEmail != null) {
+		        Member me = memberRepository.findByMemberEmailAndMemberDelFl(loginEmail, CommonEnums.Status.N).orElse(null);
+		        if (me != null) {
+		            boolean isPurchased = replyService.isPurchased(boardNo, me.getMemberNo());
+		            boolean isSubscribed = blogService.isSubscribed(me.getMemberNo(), post.getMemberNo());
+
+		            // 둘 중 하나라도 해당되면 잠금을 해제(false) 함
+		            if (isPurchased || isSubscribed) {
+		                isLocked = false; 
+		            }
+		        }
+		    }
 		}
+		    
 		// 스크랩 체크
 		boolean isScraped = false;
 		if (loginEmail != null) {
