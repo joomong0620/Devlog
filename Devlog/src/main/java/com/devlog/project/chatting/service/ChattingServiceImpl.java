@@ -362,20 +362,15 @@ public class ChattingServiceImpl implements ChattingService {
 	// 마지막으로 읽은 메세지 업데이트
 	@Override
 	@Transactional
-	public Long updateLastRead(Long roomNo, Long memberNo) {
+	public void updateLastRead(Long roomNo, Long memberNo) {
 		
 		
 		log.info("roomNo : {}", roomNo);
 		log.info("memberNo : {}", memberNo);
 		
-		Long lastReadNo = chattingUserRepository.selectLastReadMessagNo(roomNo, memberNo);
-		
-		
-		
 		
 		chattingUserRepository.updateLastReadMessageNo(roomNo, memberNo);
 		
-		return lastReadNo;
 	}
 
 
@@ -583,6 +578,15 @@ public class ChattingServiceImpl implements ChattingService {
 		}
 		
 		return result;
+	}
+
+	
+	// 채팅방 입장 전 마지막 읽은 메세지 조회
+	@Override
+	public Long selectLastReadNo(Long roomNo, Long memberNo) {
+		
+		
+		return chattingUserRepository.selectLastReadMessagNo(roomNo, memberNo);
 	}
 
 

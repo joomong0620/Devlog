@@ -1,6 +1,7 @@
 package com.devlog.project.chatting.controller;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -8,10 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import com.devlog.project.common.utility.Util;
 import com.devlog.project.chatting.dto.MessageDTO;
@@ -30,6 +34,8 @@ import com.devlog.project.chatting.dto.QueryMessageResponseDTO;
 import com.devlog.project.chatting.service.ChattingService;
 import com.devlog.project.chatting.service.MessageService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
+import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +51,8 @@ public class MessageController {
 	
 	private final ChattingService chatService;
 	
+	private final MemberRepository memberRepository;
+	
 	
 	
 	// 현재 채팅방에 참여중인 회원 목록을 담을 Map
@@ -56,11 +64,35 @@ public class MessageController {
 	@MessageMapping("/chat.enter")
 	public void enter(@Payload MessageDTO.messageReadRequest req
 	                  ) {
+		
 
 	    roomViewers
 	        .computeIfAbsent(req.getRoomNo(), k -> ConcurrentHashMap.newKeySet())
 	        .add(req.getMemberNo());
 	    // computeIfAbsent(K key, Function) : key 가 없을 경우 값을 생성
+	    
+	    
+	    
+	    Long lastReadMessageNo = chatService.selectLastReadNo(req.getRoomNo(), req.getMemberNo());
+	    Integer roomLastMessageNo = service.selectLastMessageNo(req.getRoomNo());
+		
+		// List<Long> messageNos = service.searchMessageList(null)
+		
+		System.out.println("업데이트 전 마지막 읽은 메세지 : " + lastReadMessageNo);
+		System.out.println("현재 채팅방 마지막 메세지 : " + roomLastMessageNo);
+		
+		Map<String, Object> result = new HashMap<>();
+		
+		
+		
+		 result.put("type", "READ"); 
+		 result.put("LastReadNo", lastReadMessageNo);
+		 result.put("roomLastReadNo", roomLastMessageNo);
+		 result.put("memberNo", req.getMemberNo());
+		 
+		 
+		 templete.convertAndSend( "/topic/room/" + req.getRoomNo(), result );
+		 
 	}
 	
 	
@@ -130,19 +162,13 @@ public class MessageController {
 		
 		// System.out.println("req = " + req);
 		
-		Long lastReadMessageNo = chatService.updateLastRead(req.getRoomNo(), req.getMemberNo());
+		chatService.updateLastRead(req.getRoomNo(), req.getMemberNo());
 		
 		
-		System.out.println("업데이트 전 마지막 읽은 메세지 : " + lastReadMessageNo);
 		
-		Map<String, Object> result = new HashMap<>();
 		
-		/*
-		 * result.put("type", "READ"); result.put("LastReadNo", lastReadMessageNo);
-		 * 
-		 * 
-		 * templete.convertAndSend( "/topic/room/" + req.getRoomNo(), result );
-		 */
+		
+	
 		
 	}
 	
@@ -283,6 +309,43 @@ public class MessageController {
 				);
 		
 	}
+	
+	
+	
+	@EventListener
+	public void onDisconnect(SessionDisconnectEvent event) {
+
+	    StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+
+	    Principal principal = accessor.getUser();
+
+	    if (principal == null) {
+	        System.out.println("[DISCONNECT] principal is null");
+	        return;
+	    }
+	    String memberEmail = principal.getName();
+	    Member member = memberRepository.findMemberNoByMemberEmail(memberEmail);
+	    
+	    Long memberNo = member.getMemberNo();
+
+	    for (Map.Entry<Long, Set<Long>> entry : roomViewers.entrySet()) {
+
+	        Long roomNo = entry.getKey();
+	        Set<Long> users = entry.getValue();
+
+
+	        if (users.remove(memberNo)) {
+
+	            if (users.isEmpty()) {
+	                roomViewers.remove(roomNo);
+	            }
+
+	            break;
+	        }
+	    }
+
+	}
+
 	
 
 }

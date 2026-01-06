@@ -25,6 +25,10 @@ public interface MemberRepository extends JpaRepository<Member, Long>  {
     // for 관리자 회원정보 조회기능 (findById는 jpa 기본제공)
     Optional<Member> findByMemberEmail(String memberEmail); // memberDelFl=N, Y 모든 회원 조회 by 관리자
     Optional<Member> findByMemberNickname(String memberNickname); // memberDelFl=N, Y 모든 회원 조회 by 관리자	
+    
+    
+    // 회원 번호 조회
+    Member findMemberNoByMemberEmail(String memberEmail);
 	
 }
 

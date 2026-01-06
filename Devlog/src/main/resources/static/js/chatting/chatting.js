@@ -45,10 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // stomp 구독
         // 읽음 처리
 
-        // 해당 메세지로 스크롤
-        if (targetMsg) {
-            waitAndScrollToMessage(targetMsg);
-        }
 
     }, 50);
 });
@@ -503,7 +499,7 @@ function enterChatRoom(roomNo) {
 
     target.classList.add('is-selected');
 
-    const unreadCountEl = document.querySelector('.unread-count');
+    const unreadCountEl = target.querySelector('.unread-count');
     if(unreadCountEl) unreadCountEl.remove();
 
     // 2. 채팅 UI 생성
@@ -512,10 +508,11 @@ function enterChatRoom(roomNo) {
     // 3. 채팅 정보 로딩
     loadChatRoom(roomNo);
 
-    // 5. 채팅방 입장 시 마지막 읽은 메세지 업데이트
-    sendReadSignal(roomNo);
     // 4. STOMP 구독
     subscribeRoom(roomNo);
+    
+    // 5. 채팅방 입장 시 마지막 읽은 메세지 업데이트
+    sendReadSignal(roomNo);
 
 
 }
@@ -1559,9 +1556,11 @@ function subscribeRoom(roomNo) {
 
     enterRoomCount(roomNo);
 
-
-
     currentRoomNo = roomNo;
+
+
+
+
     
 
     console.log('subscribed to room:', roomNo);
@@ -1571,7 +1570,7 @@ function subscribeRoom(roomNo) {
 
 function enterRoomCount(roomNo) {
 
-    
+    console.log('roomNo : ', roomNo);
 
     const data = {
         room_no : roomNo,
@@ -1586,45 +1585,19 @@ function enterRoomCount(roomNo) {
 
 
 // 채팅방 리스트 정보 최신화
-function onChatListUpdate(payload) {
+async function onChatListUpdate(payload) {
     
     const updateInfo = JSON.parse(payload.body);
     console.log("채팅방 리스트 업데이트용 : " + payload.body);
 
-        
-    const listItem = document.querySelector(`[data-room-no="${updateInfo.room_no}"]`)
+    await selectChatList();
 
 
 
-    if(!listItem) return;
-    
-    // 마지막 보낸 메세지, 시간 업데이트
-    listItem.querySelector('.last-message').innerText = updateInfo.last_message;
-    listItem.querySelector('.chat-time').innerText = formatTime(updateInfo.sendtime);
-
-    moveTop(updateInfo.room_info);
-
-    // 현재 보고 있는 방과 같으면 함수 종료
-    if(currentRoomNo === updateInfo.room_no) return;
-
-    // 안 읽은 메세지 개수 
-    const countPin = listItem.querySelector('.count-pin')
-    const unreadCount = listItem.querySelector('.unread-count');
-
-    if(unreadCount) {
-        unreadCount.innerText = updateInfo.unread_count;
-    } else {
-
-        const span = document.createElement('span');
-        span.className = 'unread-count fw-600 fs-14';
-        span.innerText = updateInfo.unread_count;
-
-        countPin.append(span);
-        
-    }
+    const listItem = document.querySelector(`[data-room-no="${currentRoomNo}"]`)
 
 
-
+    listItem?.classList.add('is-selected')
 
 
 }
@@ -1702,9 +1675,13 @@ function onMessageReceived(payload) {
     console.log(msg);
 
 
-        console.log("그럼 여기는 ?");
-        updateUnreadChange(msg);
+    if(msg.type == 'READ') {
+        console.log('LastReadNo raw:', msg.LastReadNo);
+        console.log('LastReadNo num:', Number(msg.LastReadNo));
 
+        updateUnreadChange(msg);
+        return;
+    }
 
     if(msg.status == 'MOD' || msg.status == 'DEL'){
 
@@ -1725,6 +1702,10 @@ function onMessageReceived(payload) {
 
             return;
         }
+
+
+        
+        
 
         if(msg.type == 'Emoji'){
             updateEmojiUI(msg);
@@ -2063,38 +2044,41 @@ function createOtherMessage(msg) {
 function updateUnreadChange(msg) {
     console.log("여기 오긴 하니 ? ? ");
 
-    const targets = getMessagesAfter(msg.last_read_no);
+    if((msg.LastReadNo == msg.roomLastReadNo) ||(msg.memberNo == myNo) ) return;
 
-//     for (let target of targets) {
-// 
-//         const unread =  target.querySelector('.unread-people');
-//         if(!unread) continue;
-// 
-//         const previousCount = Number(unread.innerText);
-// 
-//         const currentCount = previousCount - 1;
-// 
-//         if(currentCount == 0 ) {
-//             unread.innerText = '';
-//         }else {
-//             unread.innerText = currentCount;
-//         }
+
+    const interval = setInterval(() => {
+        
+        console.log("이건 실행 되니 ?");
+
+        const targets = getMessagesAfter(Number(msg.LastReadNo));
+        // roomNo를 가진 요소가 생겼는지 확인
+
+        console.log("여기는?  ? 2051")
+        console.log(targets.length);
+        // 생성되지 않았으ㅕㄴ 대기
+        if (targets.length === 0) return;
+
+        // 요소가 생성되었음 중단
+        clearInterval(interval);
+
+        console.log('타겟들 확인 : ', targets);
+
 
         for (const target of targets) {
             const unread = target.querySelector('.unread-people');
             if (!unread) continue;
-
+    
             const prev = Number(unread.innerText) || 0;
             const next = Math.max(prev - 1, 0);
-
+    
             unread.innerText = next === 0 ? '' : next;
         }
-        
 
-        
-    
-
+    }, 100);
+   
 }
+
 
 function getMessagesAfter(baseNo) {
     return [...document.querySelectorAll('.message-item')]
@@ -2423,3 +2407,11 @@ function sendTyping(state) {
         typing: state
     }));
 }
+
+
+window.addEventListener('beforeunload', () => {
+        stompClient.send("/devtalk/chat.leave", {}, JSON.stringify({
+        room_no : currentRoomNo ,
+        member_no : myNo}));
+
+});

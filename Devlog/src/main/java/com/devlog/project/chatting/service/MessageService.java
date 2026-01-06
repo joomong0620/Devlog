@@ -38,5 +38,8 @@ public interface MessageService {
 	
 	// 메세지 리스트 조회
 	List<QueryMessageResponseDTO> searchMessageList(Map<String, Object> paramMap);
+	
+	// 채팅방 마지막 메세지 조회
+	Integer selectLastMessageNo(Long roomNo);
 
 }

@@ -316,4 +316,13 @@ public class MessageServiceImpl implements MessageService {
 		return msgRepository.searchMessage(roomNo, query);
 	}
 
+	
+	
+	// 채팅방 마지막 메세지 조회
+	@Override
+	public Integer selectLastMessageNo(Long roomNo) {
+		
+		return msgRepository.selectLastMessage(roomNo);
+	}
+
 }
