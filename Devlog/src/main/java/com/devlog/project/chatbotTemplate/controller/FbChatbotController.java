@@ -2,6 +2,7 @@ package com.devlog.project.chatbotTemplate.controller;
 
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.devlog.project.chatbotTemplate.service.ChatbotService;
@@ -22,15 +23,23 @@ public class FbChatbotController {
     }    
     
     @GetMapping("popupBasicChatbot") // chatbot pop-up window (무료버전)
-    public String fbChatbotPopupBasicCB() {
+    public String fbChatbotPopupBasicCB(Model model) {
     	// BasicChatbot id 넘겨주기
-    	return "board/freeboard/fbChatbotBasic";
+        model.addAttribute("chatbotId", "BASIC");
+        model.addAttribute("chatbotType", "free");
+        model.addAttribute("cbtProfileImg", "/images/board/freeboard/chatbot1.png");
+        
+    	//return "board/freeboard/fbChatbotBasic";
+    	return "board/freeboard/fbChatbotRevBasic";
     }
     
     @GetMapping("popupKongChatbot") // chatbot pop-up window (유료버전)
-    public String fbChatbotPopupKongCB() {
+    public String fbChatbotPopupKongCB(Model model) {
     	// KongChatbot id 넘겨주기
-    	return "board/freeboard/fbChatbotKong";
+        model.addAttribute("chatbotId", "KONG");
+        model.addAttribute("chatbotType", "beanCharge");
+        model.addAttribute("cbtProfileImg", "/images/board/freeboard/chatbot3.png");    	
+    	return "board/freeboard/fbChatbotRevKong";
     }    
     
     @PostMapping("/{sessionId}")
