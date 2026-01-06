@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devlog.project.myPage.mapper.MyPageMapper">
-
+	
+	<!-- 내 정보 변경 -->
     <update id="updateMemberInfo">
         UPDATE "MEMBER"
         SET 
@@ -13,7 +14,8 @@
             MY_INFO_HOMEPAGE = #{dto.myInfoHomepage}
         WHERE MEMBER_EMAIL = #{email}
     </update>
-
+    
+	<!-- 프로필 사진 변경 -->
     <update id="updateProfileImage">
         UPDATE "MEMBER"
         SET PROFILE_IMG = #{imageUrl}
@@ -37,7 +39,7 @@
         <result property="activityDate" column="ACTIVITY_DATE"/>
         <result property="categoryName" column="CATEGORY"/>
     </resultMap>
-
+	<!-- 좋아요 한 게시물 조회 -->
     <select id="selectLikedPosts" resultMap="ActivityMap">
         SELECT 
             B.BOARD_NO,
@@ -59,7 +61,8 @@
           AND B.BOARD_DEL_FL = 'N'
         ORDER BY B.BOARD_NO DESC
     </select>
-
+    
+	<!-- 최근 본 게시물 조회 -->
     <select id="selectViewHistory" resultMap="ActivityMap">
         SELECT * FROM (
             SELECT 
@@ -84,7 +87,8 @@
         ) WHERE rn = 1
         ORDER BY ACTIVITY_DATE DESC
     </select>
-
+    
+	<!-- 임시 저장한 글 조회 -->
     <select id="selectDrafts" resultMap="ActivityMap">
         SELECT 
             B.BOARD_NO,
@@ -106,7 +110,8 @@
           AND B.BOARD_DEL_FL = 'N'
         ORDER BY B.B_CREATE_DATE DESC
     </select>
-
+    
+	<!-- 구매 내역 조회 -->
     <select id="selectPurchasedPosts" resultMap="ActivityMap">
         SELECT 
             B.BOARD_NO,
@@ -127,10 +132,17 @@
           AND H.PAY_AMOUNT &lt; 0 
         ORDER BY H.REG_DATE DESC
     </select>
-
+	
+	<!-- 최근 본 게시물 로그 db저장 -->
     <insert id="insertViewLog">
         INSERT INTO VIEW_LOG (LOG_NO, MEMBER_NO, BOARD_NO, VIEW_DATE)
         VALUES (SEQ_VIEW_LOG_NO.NEXTVAL, #{memberNo}, #{boardNo}, SYSDATE)
     </insert>
+    
+    
+    
+    
+    
+    
 
 </mapper>

@@ -65,18 +65,17 @@ public class MyPageServiceImpl implements MyPageService {
     }
     
     
-    // 구독 설정
+    // 구독 금액 설정
 	@Override
 	@Transactional
 	public void setSubscribePrice(Map<String, Object> paramMap) {
 		
 		Long memberNo = ((Number)paramMap.get("memberNo")).longValue();
-		
-		
 		Integer price = Integer.parseInt(paramMap.get("price").toString());
 
 		
-		Member member = memberRepository.findById(memberNo).orElseThrow(); 
+		Member member = memberRepository.findById(memberNo)
+				.orElseThrow(() -> new IllegalArgumentException("회원 정보가 없습니다.")); 
 		
 		
 		member.setSubscriptionPrice(price);
@@ -154,13 +153,15 @@ public class MyPageServiceImpl implements MyPageService {
 	
 	// 회원 탈퇴 처리
 	@Override
+	@Transactional
 	public int withdraw(Long memberNo, String checkPw) {
 		
 		try {
 			Member member = memberRepository.findById(memberNo).orElseThrow();
 			
+			// 비밀번호 불일치 체크
 	        if (!passwordEncoder.matches(checkPw, member.getMemberPw())) {
-	            return 0;
+	            return 0; // 비번 틀림
 	        }
 	        
 	        member.setMemberDelFl(CommonEnums.Status.Y);
@@ -169,8 +170,8 @@ public class MyPageServiceImpl implements MyPageService {
 			
 			
 		} catch (Exception e) {
-			
-			return -1;
+			e.printStackTrace();
+			return -1; // 에러
 		}
 		
 	}
