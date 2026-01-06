@@ -30,5 +30,6 @@ public interface MyPageMapper {
 
     // 최근 본 게시물 기록 저장 (로그 쌓기)
     void insertViewLog(@Param("memberNo") Long memberNo, @Param("boardNo") Long boardNo);
+    
 
 }
