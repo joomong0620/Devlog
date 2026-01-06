@@ -168,11 +168,9 @@ function connectOnlineStatus() {
 }
 
 // 로그아웃
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") {
-    if (stompClient && stompClient.connected) {
-      stompClient.disconnect();
-    }
+window.addEventListener("beforeunload", () => {
+  if (stompClient && stompClient.connected) {
+    stompClient.disconnect();
   }
 });
 

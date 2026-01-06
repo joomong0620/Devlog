@@ -10,4 +10,6 @@ import com.devlog.project.member.model.dto.FollowDTO;
 public interface OnlineMapper {
 
 	List<FollowDTO> selectFollow(Long memberNo);
+
+	List<FollowDTO> selectFollowers(Long targetMemberNo);
 }

@@ -13,4 +13,20 @@
 	    WHERE F.FOLLOW_ID = #{memberNo}
   </select>
 
+
+
+
+	<select id="selectFollowers" resultType="com.devlog.project.member.model.dto.FollowDTO">
+	    SELECT
+	        M.MEMBER_NO, 
+	        M.MEMBER_NICKNAME, 
+	        M.PROFILE_IMG AS profile,
+	        M.MEMBER_EMAIL
+	    FROM FOLLOW F
+	    JOIN "MEMBER" M ON F.FOLLOW_ID = M.MEMBER_NO
+	    WHERE F.FOLLOWED_ID = #{memberNo}
+	</select>
+	
+	
+
 </mapper>

@@ -20,6 +20,10 @@ public class OnlineService {
 		return mapper.selectFollow(memberNo);
 	}
 
+	public List<FollowDTO> selectFollows(Long targetMemberNo) {
+		return mapper.selectFollowers(targetMemberNo);
+	}
+
 	
 	
 	
