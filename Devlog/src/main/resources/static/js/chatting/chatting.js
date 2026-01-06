@@ -1701,14 +1701,10 @@ function onMessageReceived(payload) {
     
     console.log(msg);
 
-/*     if(msg.type == "READ") {
 
         console.log("그럼 여기는 ?");
         updateUnreadChange(msg);
-        // lastReadMsgCache = msg;
 
-        return ;
-    } */
 
     if(msg.status == 'MOD' || msg.status == 'DEL'){
 
@@ -1741,22 +1737,28 @@ function onMessageReceived(payload) {
     }
 }
 
+const typingMembers = new Map(); 
+
 function handleTyping(msg) {
+    if (msg.memberNo === myNo) return;
+
     const typingBox = document.querySelector(".typing-box");
     if (!typingBox) return;
 
-        if(msg.memberNo != myNo) {
+    if (msg.typing) {
+        typingMembers.set(msg.memberNo, msg.memberNickname);
+    } else {
+        typingMembers.delete(msg.memberNo);
+    }
 
-            if(msg.typing){
-                typingBox.innerText = `${msg.memberNickname} 입력중...`;
-                typingBox.classList.remove("display-none");
+    if (typingMembers.size === 0) {
+        typingBox.classList.add("display-none");
+        return;
+    }
 
-            }else {
-
-                typingBox.classList.add("display-none");
-            }
-        }
-
+    const names = [...typingMembers.values()];
+    typingBox.innerText = names.join(", ") + " 입력중...";
+    typingBox.classList.remove("display-none");
 }
 
 
