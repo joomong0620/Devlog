@@ -68,15 +68,34 @@ public class OnlineUserEventListener {
 				if (follow.getMemberNo().equals(onlineMemberNo)) {
 					resp.add(follow);
 				}
-
 			}
-
 		}
-
 		System.out.println("온라인 유저 목록" + resp);
-
 		messagingTemplate.convertAndSend("/topic/online/" + memberNo, resp);
 
 	}
+	
+	
+	@EventListener
+	public void handleWebSocketDisconnectListenr(SessionDisconnectEvent event) {
+		StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+		Principal principal = headerAccessor.getUser();
+		if (principal == null) return;
+		
+		
+		String memberEmail = principal.getName();
+		Member member = memberRepository.findMemberNoByMemberEmail(memberEmail);
+		if (member == null) return;
+		
+		Long memberNo = member.getMemberNo();
+		Set<Long> onlineSet = onlineUsers.get("online"); // 현재 온라인 상태로 관리 중인 유저 ID 집합(Set)을 꺼내는 코드
+		if (onlineSet != null) {
+			onlineSet.remove(memberNo);
+		}
+	    System.out.println("로그아웃/연결 종료: " + memberNo);
+	    System.out.println("현재 온라인 유저들: " + onlineUsers.get("online"));
 
+		
+	}
+	
 }
