@@ -170,8 +170,8 @@
 	            H.BEANS_HISTORY,
 	            H.PAY_AMOUNT AS payAmount,
 	            CASE 
-	                WHEN E.EXCHANGE_NO IS NOT NULL THEN E.REQUEST_AMOUNT 
-	                ELSE ABS(H.PAY_AMOUNT) 
+	                WHEN E.EXCHANGE_NO IS NOT NULL THEN (E.REQUEST_AMOUNT * -1) 
+	                ELSE H.PAY_AMOUNT 
 	            END AS displayPrice,
 	            TO_CHAR(H.REG_DATE, 'YYYY-MM-DD HH24:MI') AS payDate,
 	            M.MEMBER_NICKNAME,
@@ -181,6 +181,7 @@
 	            E.EXCHANGE_HOLDER,
 	            TO_CHAR(E.EXCHANGE_OK_DATE, 'YYYY-MM-DD HH24:MI') AS exchangeOkDate,
 	            CASE 
+	                WHEN T.TRADE_NO IS NOT NULL THEN T.CONTENT_TYPE
 	                WHEN E.EXCHANGE_NO IS NOT NULL THEN '환전'
 	                WHEN H.PAY_AMOUNT <![CDATA[ < ]]> 0 AND H.TRADE_NO IS NULL THEN '취소'
 	                WHEN H.PAY_AMOUNT > 0 AND H.TRADE_NO IS NULL THEN '충전'
@@ -192,6 +193,7 @@
 	            END AS status
 	        FROM COFFEE_BEANS_HISTORY H
 	        JOIN "MEMBER" M ON (H.MEMBER_NO = M.MEMBER_NO)
+	        LEFT JOIN COFFEE_BEANS_TRADE T ON (H.TRADE_NO = T.TRADE_NO)
 	        LEFT JOIN COFFEE_BEANS_EXCHANGE E ON (
 	            H.MEMBER_NO = E.MEMBER_NO
 	            AND TO_CHAR(H.REG_DATE, 'YYYYMMDDHH24MI') = TO_CHAR(E.EXCHANGE_REQ_DATE, 'YYYYMMDDHH24MI')
@@ -209,12 +211,18 @@
 	        </if>
 	        
 	        <if test="type != null and type != ''">
-	            AND contentType = #{type}
+	            <choose>
+	                <when test="type == '사용'">
+	                    AND contentType IN ('POST', 'SUBSCRIBE', 'CHATBOT', '사용')
+	                </when>
+	                <otherwise>
+	                    AND contentType = #{type}
+	                </otherwise>
+	            </choose>
 	        </if>
 	    </where>
 	    ORDER BY BEANS_HISTORY DESC
 	</select>
-	
 	
 	
 	<insert id="insertBeansTrade" parameterType="PayDTO">

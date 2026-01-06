@@ -2,7 +2,7 @@
 .main {
   padding: 40px 60px;
   background-color: #fff;
-  max-height: 600px;
+  max-height: 800px;
   overflow: auto;
 }
 
@@ -53,7 +53,7 @@
 }
 
 .status-done {
-  color: #52c41a;
+  color: #28a745;
   /* 완료 - 초록색 */
   font-weight: bold;
 }
@@ -228,4 +228,17 @@
   color: white;
   border-color: #6c5ce7;
   font-weight: bold;
+}
+
+ /* 초록색: 충전(+) */
+.plus {
+    color: #28a745 !important;
+    font-weight: 700;
+}
+
+
+/* 빨간색: 사용/환전/취소(-) */
+.minus {
+    color: #dc3545 !important; 
+    font-weight: 700;
 }

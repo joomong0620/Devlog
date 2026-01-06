@@ -59,9 +59,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // historyRows를 돌면서 클릭 이벤트 설정
   historyRows.forEach((row) => {
-    const amountCell = row.querySelector(".plus"); // 충전(+) 내역만 클릭 가능하게
+    const rowType = row.getAttribute("data-type"); // 충전(+) 내역만 클릭 가능하게
 
-    amountCell?.addEventListener("click", () => {
+    if (rowType === 'charge'){
+      row.style.cursor = "pointer";
+      // 마우스 올렸을 때: 언더라인 추가
+      row.addEventListener("mouseenter", () => {
+        row.style.textDecoration = "underline";
+      });
+
+      //  마우스 뗐을 때: 언더라인 제거
+      row.addEventListener("mouseleave", () => {
+        row.style.textDecoration = "none";
+      });
+      row?.addEventListener("click", () => {
       // 행에 심어진 데이터 가져오기
       const pId = row.getAttribute("data-id");
       const pNo = row.getAttribute("data-no");
@@ -87,7 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       cancelModal.style.display = "flex";
     });
-  });
+  }
+});
 
   // 환전 및 취소 완료 처리
   submitExchangeBtn?.addEventListener("click", () => {
@@ -263,6 +275,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // 필요한 파라미터 준비 (취소 모달을 열 때 미리 저장해둔 값)
     const paymentId = selectedPaymentData.id; // 예: pay-a08199f6
     const beansPayNo = selectedPaymentData.no; // DB PK
+
+    const currentBeansVal = parseInt(document.querySelector(".mybeans-val").innerText.replace(/[^0-9]/g, ""));
+    const cancelAmount = parseInt(document.querySelector("#cancel-modal .val").innerText.replace(/[^0-9]/g, ""));
+    if (currentBeansVal < cancelAmount) {
+      alert("보유하신 커피콩이 취소하려는 금액보다 적습니다. 충전 후 이미 사용하신 경우 결제 취소가 불가능합니다.");
+      return;
+    }
 
     if (!paymentId || !beansPayNo) {
       alert("취소할 결제 정보를 찾을 수 없습니다.");

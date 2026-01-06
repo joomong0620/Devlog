@@ -599,9 +599,3 @@
   line-height: 1.5;
   word-break: keep-all;
 }
-
-
-.history-table td.plus {
-  cursor: pointer;
-  text-decoration: underline;
-}
