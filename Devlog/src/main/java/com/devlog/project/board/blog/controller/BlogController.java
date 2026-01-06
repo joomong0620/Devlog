@@ -113,7 +113,7 @@ public class BlogController {
 
 		try {
 
-			// 1. [NEW] 방문자 수 증가 (본인 블로그가 아닐 때만 증가시키는 로직을 넣어도 됨)
+			// 1. 방문자 수 증가 (본인 블로그가 아닐 때만 증가시키는 로직을 넣어도 됨)
 			// 블로그 주인 찾기
 			Member owner = memberRepository.findByMemberEmailAndMemberDelFl(blogId, CommonEnums.Status.N).orElse(null);
 
@@ -144,6 +144,7 @@ public class BlogController {
 			model.addAttribute("todayVisit", myBlogData.getTodayVisit());
 
 			model.addAttribute("subPrice", myBlogData.getSubPrice());
+			model.addAttribute("subscriberCount", myBlogData.getSubscriberCount());
 
 			model.addAttribute("memberLevel", myBlogData.getMemberLevel());
 			model.addAttribute("currentExp", myBlogData.getCurrentExp());
@@ -152,14 +153,23 @@ public class BlogController {
 
 			// 4. 내가 팔로우 중인지 여부 확인
 			boolean isFollowing = false;
+			
+			boolean isSubscribed = false; // 구독 여부 변수
+			
 			if (currentLoginId != null && owner != null) {
 				Member me = memberRepository.findByMemberEmailAndMemberDelFl(currentLoginId, CommonEnums.Status.N)
 						.orElse(null);
 				if (me != null) {
 					isFollowing = blogService.isFollowing(me.getMemberNo(), owner.getMemberNo());
+					
+					if (!me.getMemberNo().equals(owner.getMemberNo())) {
+                        // 형변환해서 ServiceImpl의 메서드 호출
+                        isSubscribed = blogService.isSubscribed(me.getMemberNo(), owner.getMemberNo());
+                    }
 				}
 			}
 			model.addAttribute("isFollowing", isFollowing);
+			model.addAttribute("isSubscribed", isSubscribed);
 
 		} catch (Exception e) {
 			e.printStackTrace();

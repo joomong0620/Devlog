@@ -252,6 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const blogOptionBtn = document.getElementById("blogOptionBtn");
   const dropdownMenu = document.getElementById("dropdownMenu");
 
+
   // [기능 1] TOP 버튼
   window.addEventListener("scroll", () => {
     if (window.scrollY > 400) {
@@ -468,17 +469,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const subModal = document.getElementById("subModal");
-  const btnSubscribe = document.querySelector(".btn-purple[data-sub-price]"); // 구독 버튼
+  const btnSubscribe = document.getElementById("btnSubscribe") || document.querySelector(".btn-purple[data-sub-price]"); // 구독 버튼
 
   if (btnSubscribe) {
     btnSubscribe.addEventListener("click", () => {
+
+      // 이미 구독중('active' 클래스 또는 텍스트 '구독중')이면 실행 중단 
+      if (btnSubscribe.classList.contains('active') || btnSubscribe.innerText.trim() === '구독중') {
+          alert("이미 구독 중인 회원입니다.");
+          return; // 여기서 함수 종료 -> 모달 안 뜸
+      }
+
       // 1. 필요한 데이터 준비
       const price = btnSubscribe.getAttribute("data-sub-price");
-      const blogOwnerNickname =
-        document.querySelector(".nickname-area h1").innerText;
+      const blogOwnerNickname = document.querySelector(".nickname-area h1").innerText;
 
-      document.getElementById("subDisplayPrice").innerText =
-        Number(price).toLocaleString();
+      document.getElementById("subDisplayPrice").innerText = Number(price).toLocaleString();
       document.getElementById("subBlogOwner").innerText = blogOwnerNickname;
 
       // 3. 내 보유 커피콩 불러오기 (AJAX)

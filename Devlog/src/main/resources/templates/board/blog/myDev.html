@@ -75,7 +75,7 @@
                     <div class="stat-btn" onclick="openUserModal('following')">
                         팔로잉 <strong id="followingCnt" th:text="${followingCount}">0</strong>
                     </div>
-
+                    
                     <div class="stat-btn" th:if="${isOwner}" onclick="openUserModal('subscriber')">
                         구독 <strong th:text="${subscriberCount}">0</strong>
                     </div>
@@ -89,7 +89,12 @@
                         </button>
 
                         <button class="btn-white">메시지</button>
-                        <button th:if="${subPrice > 0}" class="btn-purple" th:data-sub-price="${subPrice}">구독</button>
+                        
+                        <button th:if="${subPrice > 0}" id="btnSubscribe" class="btn-purple"
+                            th:data-sub-price="${subPrice}" th:classappend="${isSubscribed} ? 'active'"
+                            th:text="${isSubscribed} ? '구독중' : '구독'">
+                            구독
+                        </button>
                     </th:block>
 
                     <button class="btn-white" th:if="${isOwner}" onclick="location.href='/blog/write'">

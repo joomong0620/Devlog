@@ -59,6 +59,12 @@ public interface BlogService {
 	// 최근 본 게시물 로그 저장
 	void insertViewLog(Long memberNo, Long boardNo);
 	
+	// 구독 여부 확인
+	boolean isSubscribed(Long me, Long target);
+
+	// 구독자 목록 조회
+	List<UserProfileDto> getSubscriberList(String blogId, Member me);
+	
 	
 	
 }

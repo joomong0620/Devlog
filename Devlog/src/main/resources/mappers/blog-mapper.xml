@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devlog.project.board.blog.mapper.BlogMapper">
-
+	
+	<!-- 게시글 생성 -->
     <insert id="insertBoard" parameterType="com.devlog.project.board.blog.dto.BlogDTO">
         <selectKey keyProperty="boardNo" resultType="long" order="BEFORE">
             SELECT SEQ_BOARD_NO.NEXTVAL FROM DUAL
@@ -14,7 +15,8 @@
             SYSDATE, 'N', 0
         )
     </insert>
-
+	
+	<!-- 블로그 저장 -->
     <insert id="insertBlog" parameterType="com.devlog.project.board.blog.dto.BlogDTO">
         INSERT INTO "BLOG" (
             BOARD_NO, IS_PAID, PRICE, TEMP_FL
@@ -22,16 +24,19 @@
             #{boardNo}, #{isPaid}, #{price}, #{tempFl}
         )
     </insert>
-
+	
+	<!-- 태그 테이블 저장 -->
     <update id="insertTag" parameterType="string">
         MERGE INTO "TAG" t USING DUAL ON (t.TAG_NAME = #{tagName})
         WHEN NOT MATCHED THEN INSERT (TAG_NO, TAG_NAME) VALUES (SEQ_TAG_NO.NEXTVAL, #{tagName})
     </update>
-
+	
+	<!-- 태그 - 게시글 연결 -->
     <select id="selectTagNoByName" parameterType="string" resultType="long">
         SELECT TAG_NO FROM "TAG" WHERE TAG_NAME = #{tagName}
     </select>
-
+	
+	<!-- BLOG_TAG 데이터 삽입 -->
     <insert id="insertBlogTag" parameterType="map">
         INSERT INTO "BLOG_TAG" (BOARD_NO, TAG_NO) VALUES (#{boardNo}, #{tagNo})
     </insert>
@@ -432,5 +437,37 @@
     
     </update>
     
+    <!-- 구독 관련 -->
+    <select id="countSubscriber" parameterType="long" resultType="int">
+        SELECT COUNT(*) 
+        FROM "SUBSCRIBE" 
+        WHERE CREATOR_ID = #{memberNo} 
+    </select>
+
+    <select id="checkSubscribeStatus" parameterType="map" resultType="int">
+        SELECT COUNT(*) 
+        FROM "SUBSCRIBE" 
+        WHERE SUBSCRIBER_ID = #{me} 
+          AND CREATOR_ID = #{target}
+    </select>
+
+    <select id="selectSubscriberList" parameterType="map" resultType="com.devlog.project.board.blog.dto.UserProfileDto">
+        SELECT
+            m.MEMBER_EMAIL AS id,
+            m.MEMBER_NICKNAME AS nickname,
+            m.PROFILE_IMG AS profileImgUrl,
+            m.MY_INFO_INTRO AS bio,
+            <choose>
+                <when test="myMemberNo != null">
+                    (SELECT COUNT(*) FROM "FOLLOW" sub WHERE sub.FOLLOW_ID = #{myMemberNo} AND sub.FOLLOWED_ID = m.MEMBER_NO) AS isFollowed
+                </when>
+                <otherwise>0 AS isFollowed</otherwise>
+            </choose>
+        FROM "SUBSCRIBE" s
+        JOIN "MEMBER" m ON s.SUBSCRIBER_ID = m.MEMBER_NO
+        WHERE s.CREATOR_ID = #{memberNo}
+    </select>
 
 </mapper>
+    
+

@@ -93,6 +93,11 @@ public interface BlogMapper {
     // 썸네일 조회 (for 수정)
 	int selectBoardImg(Long boardNo);
 	void updateBoardImg(Map<String, Object> imgMap);
+	
+	// 구독 관련
+    int countSubscriber(Long memberNo);
+    int checkSubscribeStatus(Map<String, Object> params);
+    List<UserProfileDto> selectSubscriberList(Map<String, Object> params);
     
     
 }
