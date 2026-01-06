@@ -40,8 +40,8 @@ public class OnlineWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes("/app");
+        registry.setApplicationDestinationPrefixes("/online");
         registry.enableSimpleBroker("/topic", "/queue"); 
-        registry.setUserDestinationPrefix("/user");     
+//        registry.setUserDestinationPrefix("/user");     
     }
 }

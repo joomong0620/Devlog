@@ -81,7 +81,9 @@ public class SecurityConfig {
 	                "/job-crawler",
 	                "/ITnews/**",
 	                "/ITnews",
-	                "/coffeebeans/**"
+	                "/coffeebeans/**",
+	                "/online/**"
+	     
 	                
 	                
 	                

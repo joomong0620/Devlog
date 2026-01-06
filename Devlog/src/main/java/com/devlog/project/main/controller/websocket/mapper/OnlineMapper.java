@@ -1,4 +1,4 @@
-package com.devlog.project.main.controller.websocket;
+package com.devlog.project.main.controller.websocket.mapper;
 
 import java.util.List;
 

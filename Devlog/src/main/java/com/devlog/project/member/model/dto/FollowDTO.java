@@ -17,4 +17,5 @@ public class FollowDTO {
 	private Long memberNo;
 	private String memberNickname;
 	private String profile;
+	private String memberEmail;
 }

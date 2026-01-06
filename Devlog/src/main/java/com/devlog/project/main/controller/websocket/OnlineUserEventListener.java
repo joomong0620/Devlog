@@ -1,15 +1,21 @@
 package com.devlog.project.main.controller.websocket;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.data.elasticsearch.core.index.AliasAction.Add;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
@@ -17,62 +23,60 @@ import com.devlog.project.member.model.dto.FollowDTO;
 import com.devlog.project.member.model.entity.Member;
 import com.devlog.project.member.model.repository.MemberRepository;
 
+import co.elastic.clients.elasticsearch._types.Result;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Controller
 @RequiredArgsConstructor
 public class OnlineUserEventListener {
-	
-	
+
+	private final OnlineService onlineService;
 	private final MemberRepository memberRepository;
-	private final OnlineMapper onlineMapper;
 	private final SimpMessageSendingOperations messagingTemplate;
-	private static final Map<String, Long> sessionUserMap = new ConcurrentHashMap<>();
+	private static final Map<String, Set<Long>> onlineUsers = new ConcurrentHashMap<>();
 
-	
-	
-    @Getter
-    @AllArgsConstructor
-    public static class OnlineUser {
-        private String nickname;
-        private String profileImg;
-    }
-    
-    @EventListener
-    public void handleWebSocketConnectListener(SessionConnectEvent event) {
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        Map<String, Object> attributes = headerAccessor.getSessionAttributes();
-        Principal principal = headerAccessor.getUser();
-        String memberEmaiil = principal.getName();
-        Member member = 
-        
-        if (attributes != null && attributes.get("memberNo") != null) {
-            Long memberNo = (Long) attributes.get("memberNo");
-            String sessionId = headerAccessor.getSessionId();
-            sessionUserMap.put(sessionId, memberNo);
+	@EventListener
+	public void handleWebSocketConnectListener(SessionConnectEvent event) {
+		StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+		Map<String, Object> attributes = headerAccessor.getSessionAttributes();
+		Principal principal = headerAccessor.getUser();
+		String memberEmaiil = principal.getName();
+		Member member = memberRepository.findMemberNoByMemberEmail(memberEmaiil);
 
-            List<OnlineUser> friends = getOnlineFollowingList(memberNo); 
-            messagingTemplate.convertAndSendToUser(String.valueOf(memberNo), "/queue/friends", friends);
-        }
-    }
+		Long memberNo = member.getMemberNo();
+		System.out.println(memberNo);
 
-    @EventListener
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-        String sessionId = event.getSessionId();
-        sessionUserMap.remove(sessionId);
-    }
+		onlineUsers.computeIfAbsent("online", k -> ConcurrentHashMap.newKeySet()).add(memberNo);
+		System.out.println("현재 온라인 유저들: " + onlineUsers.get("online"));
 
-    private List<OnlineUser> getOnlineFollowingList(Long memberNo) {
-        List<FollowDTO> followingList = onlineMapper.selectFollow(memberNo);
-        if (followingList == null) return List.of();
+	}
 
-        return followingList.stream()
-            .filter(dto -> sessionUserMap.containsValue(dto.getMemberNo()))
-            .map(dto -> new OnlineUser(dto.getMemberNickname(), dto.getProfile()))
-            .collect(Collectors.toList());
-    }
-	
-	
+	@MessageMapping("/requestOnline")
+	public void sendFollowList(Map<String, Object> paramMap) {
+		Long memberNo = ((Number) paramMap.get("memberNo")).longValue();
+		List<FollowDTO> online = onlineService.selectFollow(memberNo);
+		System.out.println("팔로우리스트" + online);
+
+		List<FollowDTO> resp = new ArrayList<>();
+		Iterator<?> iter = onlineUsers.get("online").iterator();
+		while (iter.hasNext()) {
+			Long onlineMemberNo = (Long) iter.next();
+
+			for (FollowDTO follow : online) {
+				if (follow.getMemberNo().equals(onlineMemberNo)) {
+					resp.add(follow);
+				}
+
+			}
+
+		}
+
+		System.out.println("온라인 유저 목록" + resp);
+
+		messagingTemplate.convertAndSend("/topic/online/" + memberNo, resp);
+
+	}
+
 }

@@ -142,13 +142,10 @@
   <script th:inline="javascript">
     const message = /*[[${message}]]*/ "전달 받은 message";
     if (message != null) alert(message); // message12가 없으면 null값
+     const memberNo = /*[[${session.loginMember?.memberNo}]]*/ null;
   </script>
 
 </body>
-
-<script>
-  const memberNo = /*[[${loginMember.memberNo}]]*/ 0;
-</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
