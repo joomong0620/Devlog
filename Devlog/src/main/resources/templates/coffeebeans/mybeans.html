@@ -113,7 +113,7 @@
 
               <td>
                 <th:block th:switch="${history.contentType}">
-                  <span th:case="'POST'" th:text="|${history.contentId}번 콘텐츠 구매|"></span>
+                  <span th:case="'POST'" th:text="|유료 콘텐츠 구매|"></span>
                   <span th:case="'SUBSCRIBE'" th:text="'구독 서비스 이용'"></span>
                   <span th:case="'CHATBOT'" th:text="'챗봇 이용권 구매'"></span>
                   <span th:case="'충전'" th:text="'커피콩 충전'"></span>

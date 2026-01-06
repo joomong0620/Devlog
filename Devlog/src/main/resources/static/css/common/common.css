@@ -304,10 +304,11 @@ body {
   margin: 22px 0 8px;
 }
 
-.sidebar-menu hr {
-  margin: 20px 0;
+.sidebar-divider {
+  width: 100%;
   border: none;
   border-top: 1px solid var(--border);
+  margin: 16px 0;
 }
 
 .sidebar-menu img {
