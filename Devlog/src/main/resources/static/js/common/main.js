@@ -154,50 +154,43 @@ cafes.forEach((cafe) => {
 let stompClient = null;
 
 function connectOnlineStatus() {
-  const socket = new SockJS("/ws-chat");
+  const socket = new SockJS("/ws");
   stompClient = Stomp.over(socket);
 
-  stompClient.connect(
-    {},
-    function (frame) {
-      console.log("활동 상태 모니터링 시작");
+  stompClient.connect({}, () => {
+    console.log("웹소켓 연결 성공");
 
-      // 서버가 유저 목록을 뿌려주는 채널(/topic/friends) 구독
-      stompClient.subscribe("/topic/friends", function (response) {
-        const onlineUserList = JSON.parse(response.body); // 이름 리스트 ["소연", "철수"]
-        updateFriendsUI(onlineUserList);
-      });
-    },
-    function (error) {
-      console.log("연결 실패, 5초 후 재시도");
-      setTimeout(connectOnlineStatus, 5000);
-    }
-  );
+    // 구독을 먼저 함
+    stompClient.subscribe("/topic/online/" + memberNo,
+      updateFriendsUI
+
+    );
+    stompClient.send(
+      "/online/requestOnline",
+      {},
+      JSON.stringify({
+        memberNo: memberNo,
+      })
+    );
+
+    // 만약 서버에서 Connect 이벤트 때 바로 보내주는 구조라면, 
+    // 여기서 서버에 "나 연결됐으니 목록 줘"라고 한번 더 찌르는게 안전합니다.
+    // stompClient.send("/app/getOnlineFriends", {}, JSON.stringify({memberNo: memberNo}));
+})
+
+
 }
 
-// // 활동중인 친구 목록 나중에 요청으로 바꿀거임 지금은 그냥 더미
-// const activeFriends = [
-//   { img: "/images/common/profile2.jpeg", name: "유저일" },
-//   { img: "/images/common/profile4.jpg", name: "유저이" },
-//   { img: "/images/common/profile1.png", name: "유저삼" },
-//   { img: "/images/common/profile5.png", name: "유저사" },
-//   { img: "/images/common/profile6.png", name: "유저일오" },
-//   { img: "/images/common/profile3.jpg", name: "유저이이" },
-// ];
 
-// const friendsList = document.getElementById("friendsList");
-
-// activeFriends.forEach((friend) => {
-//   const el = `
-//   <div class="friend">
-//     <img src="${friend.img}" alt="${friend.name}" title="${friend.name}" />
-//   </div>
-// `;
-//   friendsList.insertAdjacentHTML("beforeend", el);
-// });
+// function updateFriendsUI(payload) {
+//   const onlinelist = JSON.parse(payload.body);
+//   console.log(onlinelist);
+// }
 
 // 화면에 친구 목록
-function updateFriendsUI(users) {
+function updateFriendsUI(payload) {
+    const onlinelist = JSON.parse(payload.body);
+    console.log(onlinelist);
   const friendsList = document.getElementById("friendsList");
   if (!friendsList) return;
 
@@ -205,25 +198,23 @@ function updateFriendsUI(users) {
 
   const myEmail = document.getElementById("loginUserEmail")?.value || "";
 
-  if (users.length === 0) {
+  if (onlinelist.length === 0) {
     friendsList.innerHTML =
       "<p style='font-size:12px; color:#999;'>현재 활동중인 친구가 없어요.</p>";
     return;
   }
 
-  users
-    .filter((user) => user.name !== myEmail)
-    .forEach((user) => {
-      const displayName = user.name.split("@")[0];
-
-      const profileUrl = `/blog/${user.name}`;
+  onlinelist
+    .forEach((user) => { // 
+// 이메일 나중에 추가 
+      const profileUrl = `/blog/${user.member_email}`;
       const friendHtml = `
-        <div class="friend active" title="${user.name}"
+        <div class="friend active" title="${user.member_nickname}"
         onclick ="location.href='${profileUrl}'"
         style = "cursor: pointer;">
-          <img src="${user.profile_img}" alt="${user.name}">
+          <img src="${user.profile}" alt="${user.member_nickname}">
           <span class="friend-name" style="font-size:11px; display:block; text-align:center; margin-top:4px;">
-            ${displayName}
+            ${user.member_nickname}
           </span>
         </div>
       `;
