@@ -34,7 +34,7 @@ public interface ChattingService {
 	
 	
 	// 채팅방 마지막 메세지 업데이트
-	Long updateLastRead(Long roomNo, Long memberNo);
+	void updateLastRead(Long roomNo, Long memberNo);
 	
 	
 	
@@ -60,6 +60,10 @@ public interface ChattingService {
 	
 	// 텍스트 내용중에 @닉네임 있나 검색
 	void processMention(ChatMessageResponse res);
+
+	Long selectLastReadNo(Long roomNo, Long memberNo);
+
+	
 	
 
 }

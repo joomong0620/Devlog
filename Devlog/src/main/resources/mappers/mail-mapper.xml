@@ -11,13 +11,14 @@
 		        SELECT 
 		            b.BOARD_NO    AS boardNo,
 		            b.BOARD_TITLE AS boardTitle,
-		            (i.IMG_PATH || i.IMG_RENAME)   AS thumnail
+		            NVL((i.IMG_PATH || i.IMG_RENAME), '/images/logo.png')   AS thumnail
 		        FROM BOARD b
 		        LEFT JOIN BOARD_IMG i
 		               ON b.BOARD_NO = i.BOARD_NO
 		              AND i.IMG_ORDER = 0
 		        WHERE b.BOARD_CODE = 1
 		          AND b.BOARD_DEL_FL = 'N'
+		          AND b.BOARD_COUNT > 100
 		        ORDER BY DBMS_RANDOM.VALUE
 		    )
 		    WHERE ROWNUM &lt;= 3
