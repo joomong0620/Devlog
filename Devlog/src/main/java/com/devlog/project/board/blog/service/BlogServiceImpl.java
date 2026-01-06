@@ -85,19 +85,18 @@ public class BlogServiceImpl implements BlogService {
         blogDTO.setMemberNo(member.getMemberNo());
 
         blogMapper.insertBoard(blogDTO);
+        
         blogMapper.insertBlog(blogDTO);
-
-        if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
-            for (String tagName : blogDTO.getTagList()) {
-                blogMapper.insertTag(tagName);
-                Long tagNo = blogMapper.selectTagNoByName(tagName);
-
-                Map<String, Object> tagParams = new HashMap<>();
-                tagParams.put("boardNo", blogDTO.getBoardNo());
-                tagParams.put("tagNo", tagNo);
-                blogMapper.insertBlogTag(tagParams);
-            }
+        
+        // 썸네일 처리
+        if (blogDTO.getThumbnailUrl() != null && !blogDTO.getThumbnailUrl().isEmpty()) {
+            insertThumbnail(blogDTO.getBoardNo(), blogDTO.getThumbnailUrl());
         }
+        
+        
+        // 태그 처리
+        processTags(blogDTO);
+        
         return blogDTO.getBoardNo();
     }
 
@@ -430,7 +429,11 @@ public class BlogServiceImpl implements BlogService {
         if (!existPost.getMemberEmail().equals(blogDTO.getMemberEmail())) {
             throw new AccessDeniedException("본인의 글만 수정할 수 있습니다.");
         }
-
+        System.out.println("썸네일 url : " + blogDTO.getThumbnailUrl());
+        // 썸네일 처리
+        if (blogDTO.getThumbnailUrl() != null && !blogDTO.getThumbnailUrl().isEmpty()) {
+            updateThumbnail(blogDTO.getBoardNo(), blogDTO.getThumbnailUrl());
+        }
         // 3. 내용 수정 (BOARD 테이블)
         blogMapper.updateBoard(blogDTO);
 
@@ -475,6 +478,34 @@ public class BlogServiceImpl implements BlogService {
         imgMap.put("imgOrder", 0);         // 대표 이미지는 항상 0번
         
         blogMapper.insertBoardImg(imgMap); 
+    }
+    
+    private void updateThumbnail(Long boardNo, String fullPath) {
+    	// 예: /images/blog/uuid_filename.png
+    	int lastSlash = fullPath.lastIndexOf("/");
+    	
+    	// 방어 로직: 슬래시가 없으면 전체를 파일명으로
+    	String imgPath = (lastSlash > -1) ? fullPath.substring(0, lastSlash + 1) : "";
+    	String imgRename = (lastSlash > -1) ? fullPath.substring(lastSlash + 1) : fullPath;
+    	
+    	// boardNO -> 이미지 테이블 조회
+    	// 결과 있으면 (이미지테이블 컬럼에 뭐 있으면 update)
+    	//
+    	
+    	int result = blogMapper.selectBoardImg(boardNo);
+    	
+    	if(result == 0) { // 없을 경우
+    		insertThumbnail(boardNo, fullPath);
+    	}else {
+    		
+    		Map<String, Object> imgMap = new HashMap<>();
+    		imgMap.put("boardNo", boardNo);
+    		imgMap.put("imgRename", imgRename); 
+    		
+    		blogMapper.updateBoardImg(imgMap); 
+    		
+    	}
+    	
     }
     
     // 태그 처리 로직 분리

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" >
+    <title>DevLog 챗봇</title>
+    <link rel="stylesheet" th:href="@{/css/board/freeboard/fbChatbot.css}">
+    <link rel="stylesheet" th:href="@{/css/common/font.css}">
+</head>
+<body>
+
+    <p th:text="${session.loginMember}"></p>
+    <p th:text="${chatbotId}"></p>
+    <p th:text="${cbtProfileImg}"></p>
+    <main>
+        <!-- 헤더 -->
+        <!-- <header class="main-header">header</header> -->
+        <!-- header.html (fragment) 추가 -->
+        <!-- <th:block th:replace="~{/common/header}">header.html</th:block> -->
+        <!-- 또는 -->
+        <!-- <div th:replace="common/header :: header"></div> -->
+
+        <!-- 네비게이션 -->
+        <nav class="main-nav"></nav>
+        <!--  ###################################################### -->
+
+        <div class="chatbot-container">
+
+            <!-- Header -->
+            <div class="header">
+                DevLog 자유게시판 챗봇
+            </div>
+
+            <!-- Option Bar -->
+            <div class="option-bar">
+                <button type="button" class="option-btn" onclick="openChatbotType()">챗봇 옵션</button>
+                <div class="select-box">
+                    <select class="option-select" id="chatbotType">
+                        <option class="cb-kong" value="kong">커피콩충전형</option>
+                        <option class="cb-basic" value="basic">기본형</option>
+                    </select>
+                </div>
+                <img th:src="${cbtProfileImg}" class="bot-img" alt="챗봇이미지">
+                <!-- <img th:src="@{/images/{img}(img=${cbtProfileImg})}" class="bot-img" alt="챗봇이미지"> -->
+            </div>
+
+            <!-- Chat Box -->
+            <div class="chat-area-wrapper">
+                <div class="chat-box" id="chatBox">
+                    <!-- ##### JS로 메시지 삽입 ###### -->
+
+                    <!-- ##### 더미 메시지 예시 ###### -->
+                    <!-- User bubble -->
+                    <!-- <div class="chat-row right">
+                        <div class="bubble user">
+                            text
+                            <div class="time">2025.12.08. 오전 12:22</div>
+                            <div class="name">유저칠</div>
+                        </div>
+                    </div> -->
+
+                    <!-- Bot bubble -->
+                    <!-- <div class="chat-row left">
+                        <img th:src="@{/images/board/freeboard/chatbot1.png}" class="bot-img" th:alt="기본챗봇이미지">
+                        <div>
+                            <div class="bubble bot">
+                                text<br>text
+                            </div>
+                            <div class="time">2025.12.08. 오전 12:22</div>
+                            <div class="name">DevLog 챗봇</div>
+                        </div>
+                    </div> -->
+
+                    <!-- User bubble -->
+                    <!-- <div class="chat-row right">
+                        <div class="bubble user">
+                            text<br>text<br>text
+                            <div class="time">2025.12.08. 오전 12:22</div>
+                            <div class="name">유저칠</div>
+                        </div>
+                    </div> -->
+
+                    <!-- Bot long bubble -->
+                    <!-- <div class="chat-row left">
+                        <img th:src="@{/images/board/freeboard/chatbot1.png}" class="bot-img" th:alt="기본챗봇이미지">
+                        <div>
+                            <div class="bubble bot big">
+                                text<br>text<br>text<br>text<br>text<br>text<br>text<br>
+                            </div>
+                            <div class="time">2025.12.08. 오전 12:22</div>
+                            <div class="name">DevLog 챗봇</div>
+                        </div>
+                    </div> -->
+
+                </div>
+            
+                <!-- Token usage info area-->
+                <div class="token-usage-info-area">
+                    <div class="token-usage tu-row1">
+                        
+                        <!-- <div><p class="token-info">무료</p></div>
+                        <div><p class="token-info"></p></div>  -->
+                        <div><p class="token-info">커피콩 잔액: 5,000 포인트</p></div>
+                        <div><p class="token-info">(500토큰/1커피콩 포인트)</p></div>                        
+                       
+                        <!-- <p class="token-info" id="tokenInfo">
+                            서버 토큰: 0 | 클라이언트 토큰: 0
+                        </p> -->
+                    </div>
+
+                    
+                    <div class="token-usage tu-row2">
+                        <!-- <div><p class="token-info"></p></div> -->
+                        <div><p class="token-info">사용 토큰 수: 781 토큰</p></div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-area">
+                    <!-- <input type="text" id="chatInput" class="input-text" placeholder="여기에 내용을 입력"> -->
+                    <textarea id="chatInput" class="input-textarea" placeholder="여기에 내용을 입력" 
+                            rows="3" cols="30" maxlength="4000"></textarea>
+                    <button id="sendBtn" class="send-btn">
+                        <img th:src="@{/images/board/freeboard/cb_send2.png}" >
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!--  ###################################################### -->
+        <!-- <footer class="main-footer">footer</footer> -->
+        <!-- footer.html 추가 -->
+        <!-- <th:block th:replace="~{common/footer}">footer.html</th:block> -->
+        <!-- 또는 -->
+        <!-- <div th:replace="common/footer :: footer"></div> -->
+
+    </main>     
+
+    <p th:text="${session.loginMember}"></p>
+    <p th:text="${chatbotId}"></p>
+    <p th:text="${cbtProfileImg}"></p>
+
+    <script th:inline="javascript"> // fbChatbot.js 에서 사용할 전역 변수들을 선언~~
+
+        let loginMemberNo = /*[[${session.loginMember?.memberNo}]]*/ null; 
+        if(loginMemberNo === null) loginMemberNo = ""; // 들어가는 값이 없으면 대신 빈칸을 넣어준다 (아래 boardDetail.js, comment.js에서 ""로 받아서 처리)
+        let memberNickname = /*[[${session.loginMember?.memberNickname}]]*/ null;
+        let profileImg = /*[[${session.loginMember?.profileImg}]]*/ null;
+        let beansAmount = /*[[${session.loginMember?.beansAmount}]]*/ null;
+        
+        let chatbotId = /*[[${chatbotId}]]*/ null; 
+        let cbtProfileImg = /*[[${cbtProfileImg}]]*/ null;
+
+        // 명시적으로 전역 등록
+        window.loginMemberNo = loginMemberNo;
+        window.memberNickname = memberNickname;     
+        window.profileImg = profileImg;     
+        window.beansAmount = beansAmount;     
+        window.chatbotId = chatbotId;
+        window.cbtProfileImg = cbtProfileImg;                
+        window.boardNo = /*[[${freeboard?.boardNo}]]*/ null;
+        window.boardCode = /*[[${freeboard?.boardCode}]]*/ null;
+        window.boardTitle = /*[[${freeboard?.boardTitle}]]*/ null;
+        
+    </script>
+
+    <!-- fbChatbot.js 추가 -->
+    <script th:src="@{/js/board/freeboard/fbChatbot.js}"></script>    
+
+</body>
+</html>
