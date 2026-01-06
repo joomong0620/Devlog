@@ -48,7 +48,7 @@
             <img th:src="@{/images/manager/report.svg}" alt="report" />
             <span>Report</span>
           </li>
-          <li>
+          <li th:onclick="|location.href='@{/manager/dashboard/pay}'|">
             <img th:src="@{/images/manager/pay.svg}" alt="pay" />
             <span>Pay</span>
           </li>

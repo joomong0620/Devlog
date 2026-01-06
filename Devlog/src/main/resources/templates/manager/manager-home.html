@@ -13,13 +13,14 @@
   <!-- 헤더 -->
   <header class="header">
     <div class="left-area">
-      <img th:src="@{/images/manager/devlog.svg}" alt="Devlog logo" class="logo" />
+      <a th:href="@{/}" class="logo">
+        <img th:href="@{/}" th:src="@{/images/manager/devlog.svg}" alt="Devlog logo" class="logo" />
+      </a>
       <span class="welcome"
         th:text="|${session.loginMember != null ? session.loginMember.memberNickname : '관리자'}님, 돌아오신 것을 환영합니다.|">
         소연님, 돌아오신 것을 환영합니다.
       </span>
     </div>
-
     <div class="dashboard-info">
       Devlog<br />
       <span>Manager Dashboard</span>

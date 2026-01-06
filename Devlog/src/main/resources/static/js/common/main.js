@@ -1,197 +1,86 @@
-const posts = [
-  {
-    image: "/images/sample1.png",
-    likes: 152,
-    writer: "김소연",
-    preview: "따뜻한 조명과 함께 작업하기 좋은 공간을 소개합니다.",
-  },
-  {
-    image: "/images/sample2.png",
-    likes: 87,
-    writer: "홍길동",
-    preview: "오늘은 코드를 정리하면서 느낀 점들을 공유해보려 합니다.",
-  },
-  {
-    image: "/images/sample3.png",
-    likes: 233,
-    writer: "ZeroBoost",
-    preview: "개발자 커뮤니티에 새로운 글 작성 기능을 추가했어요!",
-  },
-  {
-    image: "/images/sample4.png",
-    likes: 402,
-    writer: "요상한고앵이",
-    preview: "회사앞에 제발로 찾아온 고양이, 입사시켜도 될까요?",
-  },
-  {
-    image: "/images/sample5.png",
-    likes: 593,
-    writer: "재택근무워너비",
-    preview: "부서 내에 좋아하는 사람이 생겼어요. 어쩌죠?",
-  },
-  {
-    image: "/images/sample6.png",
-    likes: 553,
-    writer: "김주연",
-    preview:
-      "왜나한테만그러는데왜나한테만그러는데왜나한테만그러는데왜나한테만그러는데",
-  },
-];
-
+/* 오늘의 인기글 */
 const postGrid = document.getElementById("postGrid");
 
-posts.forEach((post) => {
-  const card = `
-  <div class="post-card">
-    <div class="post-img">
-      <img src="${post.image}" alt="post" />
-    </div>
-    <div class="post-info">
-      <div class="post-top">
-        <div class="likes">
-          <img src="heart.svg" alt="like" />
-          <span>${post.likes}</span>
+fetch("/api/blog/list?page=0&size=6&sort=like")
+  .then((res) => res.json())
+  .then((data) => renderPopularPosts(data.content));
+
+function renderPopularPosts(posts) {
+  postGrid.innerHTML = "";
+
+  posts.forEach((post) => {
+    const card = `
+      <div class="post-card"
+           onclick="location.href='/blog/detail/${post.board_no}'"
+           style="cursor:pointer">
+        <div class="post-img">
+          <img src="${
+            post.thumbnail_url ?? "/images/logo.png"
+          }">
         </div>
-        <span class="writer">Writer. ${post.writer}</span>
+        <div class="post-info">
+          <div class="post-top">
+            <div class="likes">
+              <img src="/images/common/like.png">
+              <span>${post.like_count ?? 0}</span>
+            </div>
+            <span class="writer">Writer. ${
+              post.member_nickname ?? "익명"
+            }</span>
+          </div>
+          <p class="post-preview">${post.board_title}</p>
+        </div>
       </div>
-      <p class="post-preview">${post.preview}</p>
-    </div>
-  </div>
-`;
-  postGrid.insertAdjacentHTML("beforeend", card);
-});
+    `;
+    postGrid.insertAdjacentHTML("beforeend", card);
+  });
+}
 
-// 최신 피드용 더미 데이터
-// 지금은 더미데이터고, 나중에는 스프링부트 fetch 요청으로 바꿀 예정입니다.
-const latestPosts = [
-  {
-    image: "sample1.jpg",
-    likes: 284,
-    writer: "소연",
-    preview: "회사 앞에 있는 길냥이인데 이 자식 자세가 심상치 않습니다.",
-  },
-  {
-    image: "sample2.jpg",
-    likes: 212,
-    writer: "스크롤",
-    preview: "어쩌다보니 그림 그리는데 이게 또 재밌더라구요.",
-  },
-  {
-    image: "sample3.jpg",
-    likes: 195,
-    writer: "소요",
-    preview: "아직까지 지금 회사 구내식당만큼 맛있는 곳을 찾지 못한 것 같다.",
-  },
-  {
-    image: "sample4.jpg",
-    likes: 153,
-    writer: "소빵",
-    preview: "부서 내에 좋아하는 사람이 생긴 것 같아요. 사내연애는 비추인가요?",
-  },
-  {
-    image: "sample5.jpg",
-    likes: 93,
-    writer: "소샤",
-    preview:
-      "오늘은 재택근무 하는 날~ 혹시 저처럼 데스크테리어 좋아하는 분들 계신가요?",
-  },
-  {
-    image: "sample1.jpg",
-    likes: 284,
-    writer: "소연",
-    preview: "회사 앞에 있는 길냥이인데 이 자식 자세가 심상치 않습니다.",
-  },
-  {
-    image: "sample2.jpg",
-    likes: 212,
-    writer: "스크롤",
-    preview: "어쩌다보니 그림 그리는데 이게 또 재밌더라구요.",
-  },
-  {
-    image: "sample3.jpg",
-    likes: 195,
-    writer: "소요",
-    preview: "아직까지 지금 회사 구내식당만큼 맛있는 곳을 찾지 못한 것 같다.",
-  },
-  {
-    image: "sample4.jpg",
-    likes: 153,
-    writer: "소빵",
-    preview: "부서 내에 좋아하는 사람이 생긴 것 같아요. 사내연애는 비추인가요?",
-  },
-  {
-    image: "sample5.jpg",
-    likes: 93,
-    writer: "소샤",
-    preview:
-      "오늘은 재택근무 하는 날~ 혹시 저처럼 데스크테리어 좋아하는 분들 계신가요?",
-  },
-];
-
+/* 최신 피드  */
 const latestFeedGrid = document.getElementById("latestFeedGrid");
 
-latestPosts.forEach((post) => {
-  const card = `
-  <div class="post-card">
-    <div class="post-img">
-      <img src="${post.image}" alt="post" />
-    </div>
-    <div class="post-info">
-      <div class="post-top">
-        <div class="likes">
-          <img src="heart.svg" alt="like" />
-          <span>${post.likes}</span>
+fetch("/api/blog/list?page=0&size=6")
+  .then((res) => res.json())
+  .then((data) => renderLatestFeed(data.content))
+  .catch(console.error);
+
+function renderLatestFeed(posts) {
+  latestFeedGrid.innerHTML = "";
+
+  posts.forEach((post) => {
+    const preview = post.board_content
+      ? post.board_content.replace(/<[^>]*>/g, "").slice(0, 60)
+      : "";
+
+    const card = `
+      <div class="post-card"
+           onclick="location.href='/blog/detail/${post.board_no}'"
+           style="cursor:pointer">
+        <div class="post-img">
+          <img src="${
+            post.thumbnail_url ?? "/images/logo.png"
+          }">
         </div>
-        <span class="writer">Writer. ${post.writer}</span>
+        <div class="post-info">
+          <div class="post-top">
+            <div class="likes">
+              <img src="/images/common/heart.svg">
+              <span>${post.like_count ?? 0}</span>
+            </div>
+            <span class="writer">Writer. ${
+              post.member_nickname ?? "익명"
+            }</span>
+          </div>
+          <p class="post-preview">${preview}</p>
+        </div>
       </div>
-      <p class="post-preview">${post.preview}</p>
-    </div>
-  </div>
-`;
-  latestFeedGrid.insertAdjacentHTML("beforeend", card);
-});
+    `;
+    latestFeedGrid.insertAdjacentHTML("beforeend", card);
+  });
+}
 
+/* 지식 뉴스는 컨트롤러 통해서 메인에서 타임리프로 불러옴 */
 
-
-const newsList = [
-  {
-    title: "게임 축제 'AGF 2025', 뜨거운 열기…일산 킨텍스 '인산인해'",
-    desc: "(지디넷코리아=정진성 기자)국내 최대 규모의 서브컬쳐 축제 'AGF 2025(Anime X Game Festival)'가 지난 5일 고양시 킨텍스에서 화려한 막을 올렸다. 7일까지 사흘 동안...",
-    image: "sample_news1.jpg",
-  },
-  {
-    title: "폴더블 아이폰, 300만원대?…‘돈값’ 할까",
-    desc: "(지디넷코리아=이정현 미디어연구소) 최근 원자재 및 부품 가격이 상승하면서 내년에 출시될 것으로 예상되는 아이폰 폴드의 가격에 관심이 높아지고 있다.",
-    image: "sample_news2.jpg",
-  },
-  {
-    title: "여친에게 사과 메시지 보냈다가 '식겁'...카톡 대참사 무슨 일?..",
-    desc: "“그렇게 느낄 수도 있겠다 미안해. 나도 진짜 같이 준비하는 게 좋고 너랑 이런 얘기 나누는 게 설레는데...” 네티즌들 사이에서 화제인 카톡 대화 사건.",
-    image: "sample_news3.jpg",
-  },
-  {
-    title: "크래프톤, 'AI 펠로우십' 4기 모집 '1000만원 장학금'",
-    desc: "(주)크래프톤은 AI 인재 양성 프로그램 ‘크래프톤 AI 펠로우십(KRAFTON AI Fellowship Program)’ 4기를 모집한다고 밝혔다.",
-    image: "sample_news4.jpg",
-  },
-];
-
-const newsGrid = document.getElementById("newsGrid");
-
-newsList.forEach((news) => {
-  const card = `
-    <div class="news-card">
-      <div class="news-text">
-        <h3 class="news-title">${news.title}</h3>
-        <p class="news-desc">${news.desc}</p>
-      </div>
-      <div class="news-thumb">
-        <img src="${news.image}" alt="news thumbnail" />
-      </div>
-    </div>
-  `;
-  newsGrid.insertAdjacentHTML("beforeend", card);
-});
 
 const cafes = [
   {
@@ -286,7 +175,6 @@ function connectOnlineStatus() {
   );
 }
 
-
 // // 활동중인 친구 목록 나중에 요청으로 바꿀거임 지금은 그냥 더미
 // const activeFriends = [
 //   { img: "/images/common/profile2.jpeg", name: "유저일" },
@@ -308,12 +196,6 @@ function connectOnlineStatus() {
 //   friendsList.insertAdjacentHTML("beforeend", el);
 // });
 
-
-
-
-
-
-
 // 화면에 친구 목록
 function updateFriendsUI(users) {
   const friendsList = document.getElementById("friendsList");
@@ -329,12 +211,13 @@ function updateFriendsUI(users) {
     return;
   }
 
+  users
+    .filter((user) => user.name !== myEmail)
+    .forEach((user) => {
+      const displayName = user.name.split("@")[0];
 
-users.filter(user => user.name !== myEmail).forEach((user) => {
-  const displayName = user.name.split('@')[0];
-
-  const profileUrl = `/blog/${user.name}`
-  const friendHtml = `
+      const profileUrl = `/blog/${user.name}`;
+      const friendHtml = `
         <div class="friend active" title="${user.name}"
         onclick ="location.href='${profileUrl}'"
         style = "cursor: pointer;">
@@ -344,15 +227,10 @@ users.filter(user => user.name !== myEmail).forEach((user) => {
           </span>
         </div>
       `;
-    friendsList.insertAdjacentHTML("beforeend", friendHtml);
-  });
+      friendsList.insertAdjacentHTML("beforeend", friendHtml);
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   connectOnlineStatus();
 });
-
-
-
-
-
