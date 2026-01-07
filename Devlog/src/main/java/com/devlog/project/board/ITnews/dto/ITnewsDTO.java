@@ -12,6 +12,7 @@ public class ITnewsDTO {
 	private int boardNo;
 	private String boardTitle;
 	private String boardContent;
+	private String boardName;
 	private String bCreateDate;
 	private String bUpdateDate;
 	private int boardCount;

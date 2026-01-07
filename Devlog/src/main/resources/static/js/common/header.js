@@ -87,5 +87,52 @@ darkModeBtn?.addEventListener("click", () => {
 });
 
 
+// ----------- elasticSearch 검색엔진 -----------------
+
+// 연관 검색어 추천
+const input = document.getElementById("searchInput");
+const suggestList = document.getElementById("suggestList");
+
+let debounceTimer = null;
+
+input.addEventListener("input", () => {
+  const keyword = input.value.trim();
+
+  // 비어있으면 닫기
+  if (keyword.length < 2) {
+    suggestList.innerHTML = "";
+    suggestList.style.display = "none";
+    return;
+  }
+
+  if (debounceTimer) clearTimeout(debounceTimer);
+
+  debounceTimer = setTimeout(() => {
+    fetch(`/api/search/suggest?keyword=${encodeURIComponent(keyword)}`)
+      .then(res => res.json())
+      .then(data => {
+        suggestList.innerHTML = "";
+
+        if (data.length === 0) {
+          suggestList.style.display = "none";
+          return;
+        }
+
+        data.forEach(word => {
+          const li = document.createElement("li");
+          li.textContent = word;
+
+        li.addEventListener("click", () => {
+          location.href = `/search/blog?keyword=${encodeURIComponent(word)}`;
+        });
+
+          suggestList.appendChild(li);
+        });
+
+        suggestList.style.display = "block";
+      })
+      .catch(err => console.error(err));
+  }, 300);
+});
 
 

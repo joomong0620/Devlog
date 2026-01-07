@@ -108,6 +108,7 @@
         <form th:action="@{/search/blog}" method="get" class="search">
           <input
             type="text"
+            id="searchInput"
             name="keyword"
             placeholder="여기에 검색어를 입력하세요."
             required
@@ -115,6 +116,9 @@
           <button type="submit" aria-label="search">
             <img th:src="@{/images/common/search.svg}" class="theme-icon" alt="search" />
           </button>
+          
+          <!-- 연관검색어 -->
+          <ul id="suggestList" class="suggest-list"></ul>
         </form>
 
         <!-- 알림 -->

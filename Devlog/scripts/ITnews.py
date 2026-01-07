@@ -96,7 +96,7 @@ for name, info in CATEGORIES.items():
                 print(f"수집 성공: {data['BOARD_TITLE'][:20]}...")
                 count += 1
             
-            if count == 2: # 카테고리당 4개 채우면 종료
+            if count == 12: # 카테고리당 4개 채우면 종료
                 break
             time.sleep(0.3)
             

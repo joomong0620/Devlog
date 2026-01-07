@@ -25,7 +25,8 @@ public class MainController {
 		
 	    model.addAttribute("loginMember", session.getAttribute("loginMember"));
 
-		List<ITnewsDTO> itnews = itnewsService.selectITnewsList();
+	    Integer boardCode = null;
+		List<ITnewsDTO> itnews = itnewsService.selectITnewsList(boardCode);
 		model.addAttribute("itnews", itnews);
 	    
 	    return "common/main";

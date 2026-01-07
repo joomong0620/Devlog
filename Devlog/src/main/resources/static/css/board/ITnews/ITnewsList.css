@@ -19,6 +19,32 @@
 
 }
 
+
+
+.form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+
+.form-inline button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 15px;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 100px;
+  height: 50px;
+  border-color: #BD83CE;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  background-color: white;
+
+}
+
 .ITnews-category button {
   background-color: white;
   border-radius: 10px;
@@ -32,7 +58,7 @@
 
 }
 
-.ITnews-category button:hover {
+.form-inline button:hover {
   background-color: #BD83CE;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   color: white;
@@ -40,12 +66,15 @@
 
 }
 
-.ITnews-category button:hover img {
+.form-inline button:hover img {
   filter: invert(1) brightness(500%);
   /* 흰색으로 반전 */
 }
 
-
+.filter-btn img {
+  width: 26px;
+  height: 26px;
+}
 
 /* 목록 리스트 */
 .news-list {

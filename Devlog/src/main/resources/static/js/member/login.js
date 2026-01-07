@@ -52,6 +52,12 @@ if (loginFrm != null) {
             if (!response.ok) {
                 // 실패 시 Body에서 메시지 추출
                 const data = await response.json();
+                if(data == null) {
+                    console.log('data is null');
+                }
+                else {
+                    console.log(data); 
+                }
                 throw new Error(data.message || '로그인 실패');
             }
             return response.json();

@@ -11,7 +11,7 @@ import com.devlog.project.board.ITnews.dto.ITnewsDTO;
 public interface ITnewsService {
 
 	//IT뉴스 화면 전환
-	List<ITnewsDTO> selectITnewsList();
+	List<ITnewsDTO> selectITnewsList(Integer boardCode);
 
 	//IT뉴스 상세
 	ITnewsDTO selectNewsDetail(int boardNo);
@@ -47,6 +47,8 @@ public interface ITnewsService {
 	
 	// 스크랩 확인
 	int checkScrap(Map<String, Object> scrapMap);
+
+	// 메인
 
 	
 

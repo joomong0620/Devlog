@@ -42,19 +42,25 @@ public class ITnewsController {
 	// IT뉴스 화면 전환
 	@GetMapping("/ITnews")
 	public String ITnews(Model model,
-			@RequestParam(value="cp", required=false, defaultValue ="1") int cp) {
+			@RequestParam(value="cp", required=false, defaultValue ="1") int cp,
+			@RequestParam(value="boardCode", required=false) Integer boardCode)
+			{
 		
 		// 페이지 헬퍼 페이지네이션
 		PageHelper.startPage(cp, 6);
-		List<ITnewsDTO> itnews = itnewsService.selectITnewsList();
+		List<ITnewsDTO> itnews = itnewsService.selectITnewsList(boardCode);
+		System.out.println(itnews);
+//		System.out.println("itnewssize:" +itnews.size());
 		
-		PageInfo<ITnewsDTO> pageInfo = new PageInfo<>(itnews, 5);
-//		System.out.println(itnews);
+		PageInfo<ITnewsDTO> pageInfo = new PageInfo<>(itnews, 2);
+//		System.out.println(pageInfo);
+		
 		
 		model.addAttribute("itnews", itnews);
 
-		model.addAttribute("itnews", itnews); 
 	    model.addAttribute("pagination", pageInfo); 
+	    
+	    model.addAttribute("boardCode", boardCode);
 	    
 	    
 		return "board/ITnews/ITnewsList";
@@ -146,10 +152,27 @@ public class ITnewsController {
 
 	// IT뉴스 크롤링
 	@GetMapping("/ITnews/ITnews-crawler")
-	@ResponseBody
-	public void ITnewsCrawler() {
-		itnewsService.ITnewsCrawler();
+	public String ITnewsCrawler(
+			@SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember,
+			RedirectAttributes ra) {
+		
+		
+		//  권한 체크 로직 수정 (로그인 안했거나 2번이 아니면)
+	    if(loginMember == null || loginMember.getMemberNo() != 2) {
+	        ra.addFlashAttribute("message", "접근 권한이 없습니다.");
+	        return "redirect:/ITnews"; // 뉴스 목록으로 튕겨내기
+	    }
 
+	    try {
+	        // 크롤링 실행
+	        itnewsService.ITnewsCrawler();
+	        ra.addFlashAttribute("message", "크롤링이 성공적으로 완료되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        ra.addFlashAttribute("message", "크롤링 중 오류가 발생했습니다.");
+	    }
+
+	    return "redirect:/ITnews"; 
 	}
 
 	// 좋아요 처리
