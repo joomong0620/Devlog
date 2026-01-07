@@ -122,7 +122,6 @@ input[type="search"]::-webkit-search-cancel-button {
     height: 100%;
     align-items: center;
     justify-content: center;
-    margin-left: 25%;
 }
 
 .room-list {
