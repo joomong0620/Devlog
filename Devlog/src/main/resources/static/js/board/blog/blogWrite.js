@@ -415,6 +415,7 @@ function savePost(isTemp) {
     const postData = {
         // 수정일 때는 board_no 값 넣기, 아닐 때는 null
         "board_no": boardNo ? parseInt(boardNo) : null,
+        "board_type": 1,
         "board_title": title,
         "board_content": content,
         "thumbnail_url": thumbnailUrl,
