@@ -33,8 +33,8 @@ public class ITnewsServiceImpl implements ITnewsService {
     private String filePath;
 	// 뉴스 목록 조회
 	@Override
-	public List<ITnewsDTO> selectITnewsList() {
-		return ITnewsmapper.selectITnewsList();
+	public List<ITnewsDTO> selectITnewsList(Integer boardCode) {
+		return ITnewsmapper.selectITnewsList(boardCode);
 	}
 
 	// 뉴스 상세 조회

@@ -12,7 +12,7 @@ import com.devlog.project.board.ITnews.dto.ITnewsDTO;
 public interface ITnewsMapper {
 
 	// IT뉴스 리스트 이동
-	public List<ITnewsDTO> selectITnewsList();
+	public List<ITnewsDTO> selectITnewsList(Integer boardCode);
 
 	// IT뉴스 상세
 	public ITnewsDTO selectNewsDetail(int boardNo);

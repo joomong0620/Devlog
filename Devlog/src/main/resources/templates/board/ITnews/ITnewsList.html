@@ -16,61 +16,71 @@
 
   <div class="ITnews">
     <h1>IT지식뉴스</h1><br>
-    <div class="ITnews-category">
-      <div class="form-inline">
-        <button class="filter-btn" data-type="21">
-          <img th:src="@{/images/board/ITnews/ITnews_AI.svg}">
-          <span>AI</span>
-        </button>
-        <button class="filter-btn" data-type="22">
-          <img th:src="@{/images/board/ITnews/ITnews_tech.svg}">
-          <span>테크</span>
-        </button>
-        <button class="filter-btn" data-type="23">
-          <img th:src="@{/images/board/ITnews/ITnews_IT.svg}">
-          <span>IT기업</span>
-        </button>
-        <button class="filter-btn" data-type="24">
-          <img th:src="@{/images/board/ITnews/ITnews_game.svg}">
-          <span>게임</span>
-        </button>
-        <button class="filter-btn" data-type="25">
-          <img th:src="@{/images/board/ITnews/ITnews_Science.svg}">
-          <span>과학</span>
-        </button>
-        <button class="filter-btn" data-type="26">
-          <img th:src="@{/images/board/ITnews/ITnews_space.svg}">
-          <span>우주</span>
-        </button>
-      </div><br><br>
+    <div class="form-inline">
+      <button class="filter-btn" data-type="0" th:classappend="${boardCode == null or boardCode == 0} ? 'active' : ''">
+        <img th:src="@{/images/board/ITnews/all.png}">
+        <span>전체</span>
+      </button>
+
+      <button class="filter-btn" data-type="21" th:classappend="${boardCode == 21} ? 'active' : ''">
+        <img th:src="@{/images/board/ITnews/ITnews_AI.svg}">
+        <span>AI</span>
+      </button>
+
+      <button class="filter-btn" data-type="22" th:classappend="${boardCode == 22} ? 'active' : ''">
+        <img th:src="@{/images/board/ITnews/ITnews_tech.svg}">
+        <span>테크</span>
+      </button>
+
+      <button class="filter-btn" data-type="23" th:classappend="${boardCode == 23} ? 'active' : ''">
+        <img th:src="@{/images/board/ITnews/ITnews_IT.svg}">
+        <span>IT기업</span>
+      </button>
+
+      <button class="filter-btn" data-type="24" th:classappend="${boardCode == 24} ? 'active' : ''">
+        <img th:src="@{/images/board/ITnews/ITnews_game.svg}">
+        <span>게임</span>
+      </button>
+
+      <button class="filter-btn" data-type="25" th:classappend="${boardCode == 25} ? 'active' : ''">
+        <img th:src="@{/images/board/ITnews/ITnews_Science.svg}">
+        <span>과학</span>
+      </button>
+
+      <button class="filter-btn" data-type="26" th:classappend="${boardCode == 26} ? 'active' : ''">
+        <img th:src="@{/images/board/ITnews/ITnews_space.svg}">
+        <span>우주</span>
+      </button>
+    </div><br><br>
 
 
-    </div>
+  </div>
 
-    <main>
-      <div class="news-list">
-        <article class="news-item" th:each="news : ${itnews}" th:attr="data-type=${news.boardCode}"
-          th:onclick="|location.href='/ITnews/${news.boardNo}'|" style="cursor: pointer;">
-          <div class="content">
-            <h3 class="title" th:text="${news.boardTitle}">뉴스 제목</h3>
+  <main>
+    <div class="news-list">
+      <article class="news-item" th:each="news : ${itnews}" th:attr="data-type=${news.boardCode}"
+        th:onclick="|location.href='/ITnews/${news.boardNo}'|" style="cursor: pointer;">
+        <div class="content">
+          <h3 class="title" th:text="${news.boardTitle}">뉴스 제목</h3>
 
-            <p class="summary" th:text="${news.boardContent}">뉴스 요약 내용...</p>
+          <p class="summary" th:text="${news.boardContent}">뉴스 요약 내용...</p>
 
-            <div class="news-info">
-              <span th:text="${news.newsReporter}">기자명</span> |
-              <span th:text="${news.bCreateDate}">2025.12.28</span>
-            </div>
+          <div class="news-info">
+            <span th:text="${news.boardName}">카테고리</span>
+            <span th:text="${news.newsReporter}">기자명</span> |
+            <span th:text="${news.bCreateDate}">2025.12.28</span>
           </div>
-
-          <img class="thumbnail"
-            th:src="${news.imgPath.startsWith('http') ? news.imgPath : news.imgPath + news.imgRename}" alt="썸네일">
-        </article>
-
-        <div th:if="${#lists.isEmpty(itnews)}" style="text-align: center; padding: 50px;">
-          <p>수집된 뉴스가 없습니다.</p>
         </div>
+
+        <img class="thumbnail"
+          th:src="${news.imgPath.startsWith('http') ? news.imgPath : news.imgPath + news.imgRename}" alt="썸네일">
+      </article>
+
+      <div th:if="${#lists.isEmpty(itnews)}" style="text-align: center; padding: 50px;">
+        <p>수집된 뉴스가 없습니다.</p>
       </div>
-    </main>
+    </div>
+  </main>
 
   </div>
 

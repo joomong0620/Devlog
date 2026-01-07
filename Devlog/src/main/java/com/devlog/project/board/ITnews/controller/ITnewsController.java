@@ -42,19 +42,25 @@ public class ITnewsController {
 	// IT뉴스 화면 전환
 	@GetMapping("/ITnews")
 	public String ITnews(Model model,
-			@RequestParam(value="cp", required=false, defaultValue ="1") int cp) {
+			@RequestParam(value="cp", required=false, defaultValue ="1") int cp,
+			@RequestParam(value="boardCode", required=false) Integer boardCode)
+			{
 		
 		// 페이지 헬퍼 페이지네이션
 		PageHelper.startPage(cp, 6);
-		List<ITnewsDTO> itnews = itnewsService.selectITnewsList();
+		List<ITnewsDTO> itnews = itnewsService.selectITnewsList(boardCode);
+		System.out.println(itnews);
+//		System.out.println("itnewssize:" +itnews.size());
 		
-		PageInfo<ITnewsDTO> pageInfo = new PageInfo<>(itnews, 5);
-//		System.out.println(itnews);
+		PageInfo<ITnewsDTO> pageInfo = new PageInfo<>(itnews, 2);
+//		System.out.println(pageInfo);
+		
 		
 		model.addAttribute("itnews", itnews);
 
-		model.addAttribute("itnews", itnews); 
 	    model.addAttribute("pagination", pageInfo); 
+	    
+	    model.addAttribute("boardCode", boardCode);
 	    
 	    
 		return "board/ITnews/ITnewsList";
