@@ -47,6 +47,7 @@ public class ReplyDto {
     @JsonProperty("likeCount")
     private int likeCount;          
     
+    @JsonProperty("isLiked")
     private boolean isLiked;
     
     private List<ReplyDto> children = new ArrayList<>();

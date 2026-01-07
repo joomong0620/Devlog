@@ -31,5 +31,10 @@ public interface MyPageMapper {
     // 최근 본 게시물 기록 저장 (로그 쌓기)
     void insertViewLog(@Param("memberNo") Long memberNo, @Param("boardNo") Long boardNo);
     
+    // [추가] 탈퇴 시 팔로우 삭제
+    int deleteMemberFollows(Long memberNo);
+
+    // [추가] 탈퇴 시 구독 삭제
+    int deleteMemberSubscribes(Long memberNo);
 
 }

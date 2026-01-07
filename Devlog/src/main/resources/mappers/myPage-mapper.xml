@@ -139,6 +139,16 @@
         VALUES (SEQ_VIEW_LOG_NO.NEXTVAL, #{memberNo}, #{boardNo}, SYSDATE)
     </insert>
     
+    <!-- 회원 탈퇴 시 팔로워 목록에서 삭제하는거 -->
+    <delete id="deleteMemberFollows" parameterType="long">
+	    DELETE FROM "FOLLOW"
+	    WHERE FOLLOW_ID = #{memberNo}   OR FOLLOWED_ID = #{memberNo} </delete>
+	
+	<delete id="deleteMemberSubscribes" parameterType="long">
+	    DELETE FROM "SUBSCRIBE"
+	    WHERE SUBSCRIBER_ID = #{memberNo} OR CREATOR_ID = #{memberNo}    </delete>
+
+    
     
     
     

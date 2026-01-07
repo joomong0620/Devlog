@@ -32,7 +32,7 @@
 
 }
 
-button:hover {
+.ITnews-category button:hover {
   background-color: #BD83CE;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   color: white;
@@ -40,7 +40,7 @@ button:hover {
 
 }
 
-button:hover img {
+.ITnews-category button:hover img {
   filter: invert(1) brightness(500%);
   /* 흰색으로 반전 */
 }
@@ -54,7 +54,8 @@ button:hover img {
   flex-direction: column;
   gap: 16px;
   max-width: 1200px;
-  align-items: center;
+  width: 100%;
+  margin: 0 auto;
 }
 
 
@@ -64,6 +65,9 @@ button:hover img {
   gap: 16px;
   padding: 16px;
   border-bottom: 1px solid #BD83CE;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: space-between;
 
 }
 
@@ -86,4 +90,43 @@ button:hover img {
   /* 보여줄 줄 수 */
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+
+.pagination-area {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  gap: 8px;
+}
+
+.pagination a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.pagination a:hover {
+  background-color: #f4f4f4;
+}
+
+.pagination a.current {
+  background-color: #6c5ce7;
+  color: white;
+  border-color: #6c5ce7;
+  font-weight: bold;
 }

@@ -851,6 +851,8 @@ input[name='msgSearch'] {
 .member-list {
     margin-top: 16px;
     padding-left: 0;
+    max-height: 350px;
+    overflow-y: scroll;
 }
 
 .member-item {

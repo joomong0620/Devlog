@@ -23,6 +23,10 @@ public class ChatWebSocketConfig implements WebSocketMessageBrokerConfigurer{
 			.setAllowedOriginPatterns("*") // CORS 허용
 			.withSockJS(); // WebSocket 지원 안 될 경우 fallback 제공
 							// websocke 안 될 시 sockjs 사용
+		
+		reg.addEndpoint("/ws")
+        .setAllowedOriginPatterns("*")
+        .withSockJS();
 	}
 	
 	
@@ -36,7 +40,7 @@ public class ChatWebSocketConfig implements WebSocketMessageBrokerConfigurer{
 		// 클라이언트 -> 서버로 보내는 메세지의 접두사
 		// ex ) stompClient.send("/app/chat..send", .. )
 		// 	    -> @MessageMapping("/chat.send")로 매핑
-		reg.setApplicationDestinationPrefixes("/devtalk");
+		reg.setApplicationDestinationPrefixes("/devtalk", "/online");
 		
 		// 서버 -> 클라이언트로 보내는 브로드캐스트 경로
 		// 			구독 중인 모든 클라이언트가 수신

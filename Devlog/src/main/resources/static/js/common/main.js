@@ -14,9 +14,7 @@ function renderPopularPosts(posts) {
            onclick="location.href='/blog/detail/${post.board_no}'"
            style="cursor:pointer">
         <div class="post-img">
-          <img src="${
-            post.thumbnail_url ?? "/images/logo.png"
-          }">
+          <img src="${post.thumbnail_url ?? "/images/logo.png"}">
         </div>
         <div class="post-info">
           <div class="post-top">
@@ -57,9 +55,7 @@ function renderLatestFeed(posts) {
            onclick="location.href='/blog/detail/${post.board_no}'"
            style="cursor:pointer">
         <div class="post-img">
-          <img src="${
-            post.thumbnail_url ?? "/images/logo.png"
-          }">
+          <img src="${post.thumbnail_url ?? "/images/logo.png"}">
         </div>
         <div class="post-info">
           <div class="post-top">
@@ -80,7 +76,6 @@ function renderLatestFeed(posts) {
 }
 
 /* 지식 뉴스는 컨트롤러 통해서 메인에서 타임리프로 불러옴 */
-
 
 const cafes = [
   {
@@ -161,10 +156,7 @@ function connectOnlineStatus() {
     console.log("웹소켓 연결 성공");
 
     // 구독을 먼저 함
-    stompClient.subscribe("/topic/online/" + memberNo,
-      updateFriendsUI
-
-    );
+    stompClient.subscribe("/topic/online/" + memberNo, updateFriendsUI);
     stompClient.send(
       "/online/requestOnline",
       {},
@@ -172,25 +164,20 @@ function connectOnlineStatus() {
         memberNo: memberNo,
       })
     );
-
-    // 만약 서버에서 Connect 이벤트 때 바로 보내주는 구조라면, 
-    // 여기서 서버에 "나 연결됐으니 목록 줘"라고 한번 더 찌르는게 안전합니다.
-    // stompClient.send("/app/getOnlineFriends", {}, JSON.stringify({memberNo: memberNo}));
-})
-
-
+  });
 }
 
-
-// function updateFriendsUI(payload) {
-//   const onlinelist = JSON.parse(payload.body);
-//   console.log(onlinelist);
-// }
+// 로그아웃
+window.addEventListener("beforeunload", () => {
+  if (stompClient && stompClient.connected) {
+    stompClient.disconnect();
+  }
+});
 
 // 화면에 친구 목록
 function updateFriendsUI(payload) {
-    const onlinelist = JSON.parse(payload.body);
-    console.log(onlinelist);
+  const onlinelist = JSON.parse(payload.body);
+  console.log(onlinelist);
   const friendsList = document.getElementById("friendsList");
   if (!friendsList) return;
 
@@ -204,11 +191,11 @@ function updateFriendsUI(payload) {
     return;
   }
 
-  onlinelist
-    .forEach((user) => { // 
-// 이메일 나중에 추가 
-      const profileUrl = `/blog/${user.member_email}`;
-      const friendHtml = `
+  onlinelist.forEach((user) => {
+    //
+    // 이메일 나중에 추가
+    const profileUrl = `/blog/${user.member_email}`;
+    const friendHtml = `
         <div class="friend active" title="${user.member_nickname}"
         onclick ="location.href='${profileUrl}'"
         style = "cursor: pointer;">
@@ -218,8 +205,8 @@ function updateFriendsUI(payload) {
           </span>
         </div>
       `;
-      friendsList.insertAdjacentHTML("beforeend", friendHtml);
-    });
+    friendsList.insertAdjacentHTML("beforeend", friendHtml);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", function () {

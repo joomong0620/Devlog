@@ -114,6 +114,11 @@ function openUserModal(type) {
     apiUrl = `/api/blog/${blogOwnerId}/subscribers`;
   }
 
+  // 캐시 방지를 위해 타임스탬프 쿼리 스트링 추가
+  // 브라우저는 URL이 다르면 새로운 요청으로 인식.
+  const timestamp = new Date().getTime();
+  apiUrl += `?t=${timestamp}`;
+
   modalTitle.innerText = titleText;
   modalUserList.innerHTML =
     '<li style="text-align:center; padding:20px;">로딩 중...</li>';
@@ -143,28 +148,42 @@ async function fetchUserList(url) {
 
 // 3. 리스트 HTML 그리기
 function renderUserList(users) {
-  modalUserList.innerHTML = ""; // 초기화
+  modalUserList.innerHTML = ""; 
 
   if (!users || users.length === 0) {
-    modalUserList.innerHTML =
-      '<li style="text-align:center; padding:20px; color:#999;">목록이 비어있습니다.</li>';
+    modalUserList.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">목록이 비어있습니다.</li>';
     return;
   }
 
   users.forEach((user) => {
-    // 프로필 이미지 없으면 기본 이미지
-    const profileImg = user.profileImgUrl
-      ? user.profileImgUrl
-      : "https://placehold.co/40x40/eee/999?text=U";
-    // 소개글 없으면 빈칸
+    // 프로필 이미지, 소개글 처리
+    const profileImg = user.profileImgUrl ? user.profileImgUrl : "/images/logo.png";
     const bio = user.bio ? user.bio : "";
+    
+    // [나] 확인: 느슨한 비교(==)로 숫자/문자열 모두 처리
+    const isMe = (user.memberNo == loginMemberNo);
+
+    console.log(`유저: ${user.nickname}, ID: ${user.memberNo}, 로그인ID: ${loginMemberNo}, isMe: ${isMe}`);
 
     let btnHtml = "";
 
-    if (user.isFollowed) {
-      btnHtml = `<button class="modal-follow-btn active" onclick="toggleModalFollow(this, '${user.id}')" style="margin-left:auto;">팔로잉</button>`;
+    if (isMe) {
+        // 1. [나]인 경우
+        btnHtml = `<span style="margin-left:auto; font-size:12px; color:#999; font-weight:bold;">나</span>`;
     } else {
-      btnHtml = `<button class="modal-follow-btn" onclick="toggleModalFollow(this, '${user.id}')" style="margin-left:auto;">팔로우</button>`;
+        // 2. [남]인 경우
+        // 숫자(1)든 boolean(true)이든 값이 있으면 "팔로잉"으로 처리
+        if (user.isFollowed) { 
+             // [맞팔 상태] -> 회색 '팔로잉' 버튼
+             btnHtml = `<button class="modal-follow-btn active" 
+                                onclick="toggleModalFollow(this, '${user.id}')" 
+                                style="margin-left:auto;">팔로잉</button>`;
+        } else { 
+             // [팔로우 안 한 상태] -> 보라색 '팔로우' 버튼
+             btnHtml = `<button class="modal-follow-btn" 
+                                onclick="toggleModalFollow(this, '${user.id}')" 
+                                style="margin-left:auto;">팔로우</button>`;
+        }
     }
 
     // 유저 아이템 HTML (클릭 시 해당 유저 블로그로 이동 기능 추가 가능)
@@ -186,6 +205,12 @@ function renderUserList(users) {
 
 // 모달 내부 팔로우 버튼 동작
 function toggleModalFollow(btn, targetId) {
+
+  // 팔로잉 상태(active)에서 클릭 시 "언팔로우 하시겠습니까?" 물어보기
+  if (btn.classList.contains("active")) {
+    if (!confirm("팔로우를 취소하시겠습니까?")) return;
+  }
+
   fetch(`/api/blog/follow/${targetId}`, { method: "POST" })
     .then((res) => {
       if (res.status === 401) {
@@ -198,32 +223,17 @@ function toggleModalFollow(btn, targetId) {
       if (!data) return;
 
       if (data.success) {
-        // 1. 모달 버튼 디자인 토글 (modal-follow-btn active 클래스 활용)
+        // 1. 버튼 상태 즉시 변경
         if (data.isFollowed) {
+          // 팔로우 성공 -> '팔로잉'
           btn.innerText = "팔로잉";
           btn.classList.add("active");
         } else {
+          // 언팔로우 성공 -> '팔로우'
           btn.innerText = "팔로우";
           btn.classList.remove("active");
         }
 
-        // 2. [핵심] 메인 화면의 '팔로잉 숫자' 즉시 업데이트
-        // 방금 HTML에 추가한 id="followingCnt"를 찾습니다.
-        const followingCntEl = document.getElementById("followingCnt");
-
-        if (followingCntEl) {
-          // 현재 숫자를 가져와서 정수로 변환 (콤마가 있을 수 있으니 제거 후 변환 추천)
-          let currentVal =
-            parseInt(followingCntEl.innerText.replace(/,/g, "")) || 0;
-
-          if (data.isFollowed) {
-            // 팔로우 성공 -> 숫자 +1
-            followingCntEl.innerText = currentVal + 1;
-          } else {
-            // 언팔로우 성공 -> 숫자 -1 (0보다 작아지진 않게 방어)
-            followingCntEl.innerText = Math.max(0, currentVal - 1);
-          }
-        }
       }
     })
     .catch(console.error);
@@ -476,8 +486,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 이미 구독중('active' 클래스 또는 텍스트 '구독중')이면 실행 중단 
       if (btnSubscribe.classList.contains('active') || btnSubscribe.innerText.trim() === '구독중') {
-          alert("이미 구독 중인 회원입니다.");
-          return; // 여기서 함수 종료 -> 모달 안 뜸
+        alert("이미 구독 중인 회원입니다.");
+        return; // 여기서 함수 종료 -> 모달 안 뜸
       }
 
       // 1. 필요한 데이터 준비

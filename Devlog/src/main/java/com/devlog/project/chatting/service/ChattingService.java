@@ -62,6 +62,13 @@ public interface ChattingService {
 	void processMention(ChatMessageResponse res);
 
 	Long selectLastReadNo(Long roomNo, Long memberNo);
+	
+	
+	// 방 이름 변경
+	void roomNameChange(Map<String, Object> paramMap);
+	
+	// 고정 여부 변경
+	void pinUpdate(Map<String, Object> paramMap);
 
 	
 	

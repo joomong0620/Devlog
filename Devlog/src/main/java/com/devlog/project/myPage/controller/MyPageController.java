@@ -148,6 +148,7 @@ public class MyPageController {
         return myPageService.getMyActivityList(member.getMemberNo(), type);
     }
     
+    // 비밀번호 변경
     @PostMapping("/api/changePw")
     @ResponseBody
     public ResponseEntity<Integer> changePw(
@@ -162,7 +163,7 @@ public class MyPageController {
     	return ResponseEntity.ok(result);
     }
     
-    
+    // 회원 탈퇴
     @DeleteMapping("/api/withdraw")
     @ResponseBody
     public ResponseEntity<Integer> withdraw(

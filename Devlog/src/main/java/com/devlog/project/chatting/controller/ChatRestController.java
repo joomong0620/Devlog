@@ -190,4 +190,28 @@ public class ChatRestController {
 		return ResponseEntity.ok(resp);
 	}
 	
+	
+	// 그룹 채팅방 이름 변경
+	@PostMapping("/devtalk/roomName")
+	public ResponseEntity<Void> roomNameChange(
+			@RequestBody Map<String, Object> paramMap
+			) {
+		
+		chattingService.roomNameChange(paramMap);
+		
+		
+		return ResponseEntity.ok().build();
+	}
+	
+	@PostMapping("/devtalk/pinUpdate")
+	public ResponseEntity<Void> pinUpdate(
+			@RequestBody Map<String, Object> paramMap
+			){
+		
+		chattingService.pinUpdate(paramMap);
+		
+		return ResponseEntity.ok().build();
+	}
+	
+	
 }	

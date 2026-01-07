@@ -25,6 +25,8 @@ import com.devlog.project.board.ITnews.dto.ITnewsDTO;
 import com.devlog.project.board.ITnews.service.ITnewsService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.member.model.entity.Member;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,11 +41,22 @@ public class ITnewsController {
 
 	// IT뉴스 화면 전환
 	@GetMapping("/ITnews")
-	public String ITnews(Model model) {
+	public String ITnews(Model model,
+			@RequestParam(value="cp", required=false, defaultValue ="1") int cp) {
+		
+		// 페이지 헬퍼 페이지네이션
+		PageHelper.startPage(cp, 6);
 		List<ITnewsDTO> itnews = itnewsService.selectITnewsList();
+		
+		PageInfo<ITnewsDTO> pageInfo = new PageInfo<>(itnews, 5);
 //		System.out.println(itnews);
+		
 		model.addAttribute("itnews", itnews);
 
+		model.addAttribute("itnews", itnews); 
+	    model.addAttribute("pagination", pageInfo); 
+	    
+	    
 		return "board/ITnews/ITnewsList";
 	}
 

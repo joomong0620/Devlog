@@ -282,13 +282,24 @@ public class ChattingServiceImpl implements ChattingService {
 		
 		if(room.getRoomType() == RoomType.GROUP) {
 			roomInfo.setRoomName(room.getChattingRoomName());
-			roomInfo.setRoomProfile(room.getRoomImg());
+			if(room.getRoomImg()!=null) {
+				roomInfo.setRoomProfile(room.getRoomImg());
+				
+			} else {
+				roomInfo.setRoomProfile("/images/logo.png");
+			}
 		}else {
 			ChattingUser opponent = chattingUserRepository.findOpponent(roomNo, memberNo);
 			
-			Member opponentMember = opponent.getMember();
-			roomInfo.setRoomName(opponentMember.getMemberNickname());
-			roomInfo.setRoomProfile(opponentMember.getProfileImg());
+			if(opponent != null) {
+				
+				Member opponentMember = opponent.getMember();
+				roomInfo.setRoomName(opponentMember.getMemberNickname());
+				roomInfo.setRoomProfile(opponentMember.getProfileImg());
+			} else {
+				roomInfo.setRoomName("알수없음");
+				roomInfo.setRoomProfile("/images/logo.png");
+			}
 		}
 		
 		
@@ -302,7 +313,7 @@ public class ChattingServiceImpl implements ChattingService {
 		List<MessageDTO> message = messageRepository.findByMessageList(roomNo, memberNo);
 		
 		
-		
+			
 		// 3-1 메세지에 달린 이모지 조회
 		// 메세지 번호들 꺼내오기
 		List<Long> messageNos = message.stream()
@@ -587,6 +598,41 @@ public class ChattingServiceImpl implements ChattingService {
 		
 		
 		return chattingUserRepository.selectLastReadMessagNo(roomNo, memberNo);
+	}
+
+	
+	// 방 이름 변경
+	@Override
+	@Transactional
+	public void roomNameChange(Map<String, Object> paramMap) {
+		
+		Long roomNo = ((Number)paramMap.get("roomNo")).longValue();
+		
+		ChatRoom room = roomRepository.findById(roomNo).orElseThrow();
+		
+		room.setChattingRoomName((String) paramMap.get("newName"));
+		
+		
+	}
+
+	
+	// 고정 여부 변경
+	@Override
+	@Transactional
+	public void pinUpdate(Map<String, Object> paramMap) {
+		
+		Long roomNo = ((Number)paramMap.get("roomNo")).longValue();
+		Long memberNo = ((Number)paramMap.get("memberNo")).longValue();
+		
+		
+		ChattingUserId id = new ChattingUserId(roomNo, memberNo);
+
+		ChattingUser user = chattingUserRepository.findById(id).orElseThrow();
+		
+		user.setPinnedYn(
+				user.getPinnedYn() == ChatEnums.YesNo.Y ? ChatEnums.YesNo.N : ChatEnums.YesNo.Y
+				);
+		
 	}
 
 
