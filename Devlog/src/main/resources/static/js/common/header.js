@@ -93,7 +93,7 @@ darkModeBtn?.addEventListener("click", () => {
 const input = document.getElementById("searchInput");
 const suggestList = document.getElementById("suggestList");
 
-let debounceTimer = null;
+let debounceTimer2 = null;
 
 input.addEventListener("input", () => {
   const keyword = input.value.trim();
@@ -105,9 +105,9 @@ input.addEventListener("input", () => {
     return;
   }
 
-  if (debounceTimer) clearTimeout(debounceTimer);
+  if (debounceTimer2) clearTimeout(debounceTimer2);
 
-  debounceTimer = setTimeout(() => {
+  debounceTimer2 = setTimeout(() => {
     fetch(`/api/search/suggest?keyword=${encodeURIComponent(keyword)}`)
       .then(res => res.json())
       .then(data => {

@@ -55,6 +55,8 @@ public interface PayMapper {
 
 	// 30일마다 조회
 	public List<PayDTO> selectExpiringSubscriptions();
-
+	
+	// 게시글 구매자 수 카운트
+	int countPostBuyers(Long boardNo);
 
 }
