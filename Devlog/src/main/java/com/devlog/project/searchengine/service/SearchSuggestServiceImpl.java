@@ -22,22 +22,22 @@ public class SearchSuggestServiceImpl implements SearchSuggestService {
     public List<String> getRelatedKeywords(String keyword) {
 
         // Elasticsearch Query DSL
-        Map<String, Object> requestBody = Map.of(
-            "size", 0,
-            "query", Map.of(
-                "wildcard", Map.of(
-                    "search_keyword.keyword", "*" + keyword + "*"
-                )
-            ),
-            "aggs", Map.of(
-                "related_keywords", Map.of(
-                    "terms", Map.of(
-                        "field", "search_keyword.keyword",
-                        "size", 10
-                    )
-                )
-            )
-        );
+    	Map<String, Object> requestBody = Map.of(
+    		    "size", 0,
+    		    "query", Map.of(
+    		        "match_phrase_prefix", Map.of(
+    		            "search_keyword", keyword
+    		        )
+    		    ),
+    		    "aggs", Map.of(
+    		        "related_keywords", Map.of(
+    		            "terms", Map.of(
+    		                "field", "search_keyword.keyword",
+    		                "size", 10
+    		            )
+    		        )
+    		    )
+    		);
 
         Map<String, Object> response = webClient.post()
             .uri("/search-engine-*/_search")

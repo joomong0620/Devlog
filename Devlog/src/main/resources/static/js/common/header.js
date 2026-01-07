@@ -93,45 +93,61 @@ darkModeBtn?.addEventListener("click", () => {
 const input = document.getElementById("searchInput");
 const suggestList = document.getElementById("suggestList");
 
-let debounceTimer = null;
+let debounceTimer2 = null;
 
 input.addEventListener("input", () => {
   const keyword = input.value.trim();
+  console.log("[1] input event fired, keyword =", keyword);
 
   // 비어있으면 닫기
   if (keyword.length < 2) {
+    console.log("[1-1] keyword too short, hide dropdown");
     suggestList.innerHTML = "";
     suggestList.style.display = "none";
     return;
   }
 
-  if (debounceTimer) clearTimeout(debounceTimer);
+  if (debounceTimer2) clearTimeout(debounceTimer2);
 
-  debounceTimer = setTimeout(() => {
+  debounceTimer2 = setTimeout(() => {
+    console.log("[2] debounce fired, sending request:", keyword);
     fetch(`/api/search/suggest?keyword=${encodeURIComponent(keyword)}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => {
+        console.log("[3] fetch response status =", res.status);
+        return res.json();
+      })
+      .then((data) => {
+        console.log("[4] response data =", data);
+        console.log("[4-1] Array?", Array.isArray(data));
+
         suggestList.innerHTML = "";
 
-        if (data.length === 0) {
+        if (!Array.isArray(data)) {
+          console.error("[4-ERROR] data is not array");
           suggestList.style.display = "none";
           return;
         }
 
-        data.forEach(word => {
+        if (data.length === 0) {
+          console.log("[4-2] empty result");
+          suggestList.style.display = "none";
+          return;
+        }
+
+        data.forEach((word) => {
           const li = document.createElement("li");
           li.textContent = word;
 
-        li.addEventListener("click", () => {
-          location.href = `/search/blog?keyword=${encodeURIComponent(word)}`;
-        });
+          li.addEventListener("click", () => {
+            location.href = `/search/blog?keyword=${encodeURIComponent(word)}`;
+          });
 
           suggestList.appendChild(li);
         });
 
         suggestList.style.display = "block";
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, 300);
 });
 
