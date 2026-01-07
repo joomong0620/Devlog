@@ -188,4 +188,6 @@ public class ITnewsServiceImpl implements ITnewsService {
 	public int checkScrap(Map<String, Object> scrapMap) {
 		return ITnewsmapper.checkScrap(scrapMap);
 	}
+
+
 }

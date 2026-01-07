@@ -48,6 +48,8 @@ public interface ITnewsService {
 	// 스크랩 확인
 	int checkScrap(Map<String, Object> scrapMap);
 
+	// 메인
+
 	
 
 

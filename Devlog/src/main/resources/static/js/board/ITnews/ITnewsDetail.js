@@ -102,8 +102,10 @@ if (updateBtn != null) {
 }
 
 // 스크랩
-function toggleScrap(element, boardNo) {
-  if (loginMemberNo == 0) {
+  const scrapIcon = document.getElementById("scrapIcon");
+  scrapIcon.addEventListener("click", (e) => {
+  // 로그인 X
+  if (!loginMemberNo || loginMemberNo === "") {
     alert("로그인 후 이용해주세요.");
     return;
   }
@@ -135,7 +137,7 @@ function toggleScrap(element, boardNo) {
       }
     })
     .catch((err) => console.log(err));
-}
+})
 
 function openReportModal(targetMemberNo, targetNo) {
   //<--------------------------- 함수 호출 시 타겟 회원 번호 넣어서 호출

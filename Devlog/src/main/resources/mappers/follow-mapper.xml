@@ -6,7 +6,7 @@
 	SELECT
 	M.MEMBER_NO, 
 	        M.MEMBER_NICKNAME, 
-	        M.PROFILE_IMG AS profile,
+	        NVL(M.PROFILE_IMG, '/images/user.png') AS profile,
 	        M.MEMBER_EMAIL
 	    FROM FOLLOW F
 	    JOIN "MEMBER" M ON F.FOLLOWED_ID = M.MEMBER_NO
@@ -20,7 +20,7 @@
 	    SELECT
 	        M.MEMBER_NO, 
 	        M.MEMBER_NICKNAME, 
-	        M.PROFILE_IMG AS profile,
+	        NVL(M.PROFILE_IMG, '/images/user.png') AS profile,
 	        M.MEMBER_EMAIL
 	    FROM FOLLOW F
 	    JOIN "MEMBER" M ON F.FOLLOW_ID = M.MEMBER_NO
