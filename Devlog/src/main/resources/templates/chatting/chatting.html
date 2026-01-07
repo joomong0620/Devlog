@@ -89,7 +89,7 @@
                             <li th:each="fwl : ${followList}">
                                 <label class="follow-item flex">
                                     <div class="flex gap-12">
-                                        <img class="profile-img" th:src="${fwl.profileImg}">
+                                        <img class="profile-img" th:src="${fwl.profileImg} ?: @{/images/logo.png}">
                                         <span class="name" th:text="${fwl.memberNickname}">회원 닉네임</span>
                                     </div>
                                     <input type="checkbox" name="invite" th:data-member-no ="${fwl.memberNo}">
@@ -261,7 +261,7 @@
                         <div class="flex gap-12">
 
                             <div class="group-profile">
-                                <img th:src="${roomInfo.roomProfile}">
+                                <img th:src="${roomInfo.roomProfile} ?: @{/images/logo.png}">
                             </div>
 
                             <div class="flex-col gap-8">
