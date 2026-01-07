@@ -416,7 +416,7 @@ deleteBtn.addEventListener('click', e => {
 
 
 /* 그룹 채팅방 추가 함수 */
-async function createGroup(){
+async function  createGroup(){
     
     try{
 
@@ -1211,8 +1211,8 @@ document.addEventListener("click", async e=> {
     if (!pin) return;
 
     const data = {
-        memberNo : myNo,
-        roomNo : currentRoomNo
+        memberNo : Number(myNo),
+        roomNo : Number(currentRoomNo)
     };
 
     const resp = await fetch('/devtalk/pinUpdate', {
