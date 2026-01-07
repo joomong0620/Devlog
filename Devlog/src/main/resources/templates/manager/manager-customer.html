@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-
 <head>
   <meta charset="UTF-8" />
   <title>회원 관리</title>
 
   <link rel="stylesheet" th:href="@{/css/manager/manager-layout.css}">
-  <link rel="stylesheet" th:href="@{/css/manager/manager-report.css}">
+  <link rel="stylesheet" th:href="@{/css/manager/manager-customer.css}">
 </head>
 
 <body>
@@ -17,8 +16,8 @@
     <img th:src="@{/images/manager/devlog.svg}" alt="Devlog logo" class="logo" />
     <span class="welcome"
           th:text="|${session.loginMember != null 
-                    ? session.loginMember.memberNickname 
-                    : '관리자'}님, 돌아오신 것을 환영합니다.|">
+          ? session.loginMember.memberNickname 
+          : '관리자'}님, 돌아오신 것을 환영합니다.|">
     </span>
   </div>
 
@@ -63,56 +62,61 @@
   <main class="main">
     <h2>회원 관리</h2>
 
-    <!-- 검색 -->
-    <div class="search-filter">
-      <div class="search-box">
-        <label>회원 검색</label>
-        <input type="text" placeholder="아이디 / 이름 / 이메일" />
-        <button>
-          <img th:src="@{/images/manager/search.svg}" />
-        </button>
+    <section class="table-section">
+
+      <div class="table-header">
+        <h3>회원 검색</h3>
+
+        <div class="search-box">
+          <input
+            type="text"
+            placeholder="이메일로 회원 검색"
+          />
+          <button>
+            <img th:src="@{/images/manager/search.svg}" />
+          </button>
+        </div>
       </div>
-    </div>
 
-    <!-- ===== 회원 목록 ===== -->
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>번호</th>
-          <th>아이디</th>
-          <th>이름</th>
-          <th>이메일</th>
-          <th>연락처</th>
-          <th>가입일</th>
-          <th>상태</th>
-        </tr>
-      </thead>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>번호</th>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>연락처</th>
+            <th>가입일</th>
+            <th>상태</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr th:each="member : ${memberList}">
-          <td th:text="${member.memberNo}">1</td>
-          <td th:text="${member.memberId}">soyeon03</td>
-          <td th:text="${member.memberName}">김소연</td>
-          <td th:text="${member.memberEmail}">soyeon@devlog.com</td>
-          <td th:text="${member.memberPhone}">010-1234-5678</td>
-          <td th:text="${#temporals.format(member.enrollDate, 'yyyy.MM.dd')}">
-            2025.01.01
-          </td>
+        <tbody id="memberTableBody">
+          <!-- 전체 회원 목록 (서버에서 최초 렌더링) -->
+          <tr th:each="member : ${memberList}">
+            <td th:text="${member.memberNo}"></td>
+            <td th:text="${member.memberId}"></td>
+            <td th:text="${member.memberName}"></td>
+            <td th:text="${member.memberEmail}"></td>
+            <td th:text="${member.memberPhone}"></td>
+            <td th:text="${#temporals.format(member.enrollDate,'yyyy.MM.dd')}"></td>
+            <td>
+              <span th:text="${member.status}"
+                    th:classappend="
+                      ${member.status == 'ACTIVE'} ? 'status-active' :
+                      ${member.status == 'BLOCKED'} ? 'status-blocked' : ''">
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-          <!-- 상태 -->
-          <td>
-            <span th:text="${member.status}"
-                  th:classappend="
-                    ${member.status == 'ACTIVE'} ? 'status-active' :
-                    ${member.status == 'BLOCKED'} ? 'status-blocked' : ''">
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
+    </section>
   </main>
+
 </div>
+
+<script th:src="@{/js/manager/manager-customer.js}"></script>
 
 </body>
 </html>

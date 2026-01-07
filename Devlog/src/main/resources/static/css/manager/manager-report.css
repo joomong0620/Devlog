@@ -1,8 +1,8 @@
-/* 검색 / 필터 */
 .search-filter {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 16px;
   margin-bottom: 20px;
 }
 
@@ -13,12 +13,23 @@
   position: relative;
 }
 
+.search-box label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .search-box input {
   width: 280px;
   padding: 8px 36px 8px 12px;
   border: 1.5px solid #d3bce8;
   border-radius: 6px;
   outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-box input:focus {
+  border-color: #b986cf;
+  box-shadow: 0 0 0 3px rgba(185, 134, 207, 0.15);
 }
 
 .search-box button {
@@ -31,7 +42,7 @@
 
 .search-box button img {
   width: 20px;
-  height: 25px;
+  height: 20px;
   opacity: 0.7;
 }
 
@@ -45,14 +56,14 @@
   padding: 6px 10px;
   border: 1.5px solid #ddd;
   border-radius: 6px;
+  background: #fff;
 }
 
-/* 신고 테이블 */
 .report-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -64,12 +75,50 @@
 .report-table th,
 .report-table td {
   padding: 12px 14px;
-  text-align: center;
   font-size: 14px;
   border-bottom: 1px solid #eee;
 }
 
-/* 상태 드롭다운 */
+.report-table th {
+  text-align: center;
+  font-weight: 600;
+  color: #444;
+}
+
+/* 가독성 좋은 컬럼만 왼쪽 정렬 */
+.report-table td:nth-child(2),
+.report-table td:nth-child(3),
+.report-table td:nth-child(4) {
+  text-align: left;
+}
+
+.report-table td {
+  text-align: center;
+  color: #333;
+}
+
+.report-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.report-table tbody tr:hover {
+  background-color: #f6f4fa;
+  cursor: pointer;
+}
+
+.status-active {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.status-blocked {
+  color: #c62828;
+  font-weight: 600;
+}
+
+/* ===============================
+   상태 드롭다운 (추후 확장용)
+================================ */
 .status-wrapper {
   position: relative;
   display: inline-block;
@@ -78,7 +127,7 @@
 .status-wrapper::after {
   content: "▼";
   position: absolute;
-  right: 15px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 10px;
@@ -91,7 +140,7 @@
   background-color: #f3e5f5;
   border: 1.5px solid #d8b8e8;
   border-radius: 6px;
-  padding: 4px 25px 4px 10px;
+  padding: 4px 24px 4px 10px;
   color: #6a1b9a;
   cursor: pointer;
   transition: 0.2s;
@@ -102,6 +151,62 @@
   background-color: #e9d5f2;
 }
 
+.manager-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+}
+
+.left-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  min-height: 600px;
+  box-shadow: var(--shadow);
+}
+
+.placeholder {
+  height: 100%;
+  border: 2px dashed #e5e5e5;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #999;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.member-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.member-detail {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.member-detail h3 {
+  margin-bottom: 16px;
+}
+
+.empty-detail {
+  margin-top: 60px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
 
 .modal-overlay {
   position: fixed;
@@ -118,7 +223,8 @@
 
 .modal {
   background: #fff;
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   border-radius: 16px;
   padding: 30px;
   position: relative;
@@ -174,7 +280,7 @@
 }
 
 .info-item input {
-  width: 80%;
+  width: 100%;
   padding: 8px;
   border: 1.5px solid #f0c6e8;
   border-radius: 8px;
@@ -210,7 +316,6 @@
 
 .chat-preview {
   margin-top: 14px;
-  padding: 0 16px;
   background: #f4f6f8;
   border-radius: 12px;
   font-size: 14px;
@@ -220,13 +325,13 @@
 
   max-height: 0;
   overflow: hidden;
+  opacity: 0;
+  padding: 0;
 
   transition:
     max-height 0.35s ease,
     padding 0.25s ease,
     opacity 0.25s ease;
-
-  opacity: 0;
 }
 
 .chat-preview.open {

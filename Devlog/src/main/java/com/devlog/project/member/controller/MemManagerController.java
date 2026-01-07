@@ -30,7 +30,7 @@ public class MemManagerController {
 	@GetMapping({"", "/"})
 	public String login(HttpServletRequest request, Model model) {  
 		    	    
-	    return "member/retrieveMemberInfo";
+	    return "manager/manager-customer";
 	}	
 	
 	

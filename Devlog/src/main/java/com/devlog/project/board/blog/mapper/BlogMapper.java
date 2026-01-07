@@ -99,5 +99,8 @@ public interface BlogMapper {
     int checkSubscribeStatus(Map<String, Object> params);
     List<UserProfileDto> selectSubscriberList(Map<String, Object> params);
     
+	List<BlogDTO> searchBlogByTitle(Map<String, Object> params);
+	int countSearchBlogByTitle(Map<String, Object> params);
+    
     
 }

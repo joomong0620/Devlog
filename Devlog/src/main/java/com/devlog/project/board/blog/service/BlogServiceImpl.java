@@ -2,6 +2,7 @@ package com.devlog.project.board.blog.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -583,5 +584,39 @@ public class BlogServiceImpl implements BlogService {
             System.out.println("조회 로그 저장 실패 (무시됨): " + e.getMessage());
         }
 	}
+
+	// 소연 - 메인화면 검색창을 통해 일치하는 블로그 목록 조회
+	@Override
+	public Map<String, Object> searchBlogByTitle(
+		    String keyword,
+		    int page,
+		    int size,
+		    String sort
+		) {
+		    Map<String, Object> params = new HashMap<>();
+		    params.put("keyword", keyword);
+		    params.put("offset", page * size);
+		    params.put("limit", size);
+		    params.put("sort", sort);
+
+		    List<BlogDTO> list = blogMapper.searchBlogByTitle(params);
+
+		    for (BlogDTO dto : list) {
+		        if (dto.getTagsStr() != null) {
+		            dto.setTagList(Arrays.asList(dto.getTagsStr().split(",")));
+		        }
+		    }
+
+		    int totalCount = blogMapper.countSearchBlogByTitle(params);
+
+		    Map<String, Object> result = new HashMap<>();
+		    result.put("content", list);
+		    result.put("totalElements", totalCount);
+		    result.put("totalPages", (int) Math.ceil((double) totalCount / size));
+		    result.put("last", (page + 1) * size >= totalCount);
+
+		    return result;
+		}
+
     
 }

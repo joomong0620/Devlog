@@ -65,6 +65,9 @@ public interface BlogService {
 	// 구독자 목록 조회
 	List<UserProfileDto> getSubscriberList(String blogId, Member me);
 
+	// 소연 - 검색 기반으로 일치하는 제목의 블로그 목록 조회
+	Map<String, Object> searchBlogByTitle(String keyword, int pageNumber, int pageSize, String string);
+  
 	// 게시글 좋아요 확인
 	boolean isBoardLiked(Long boardNo, Long memberNo);
 	

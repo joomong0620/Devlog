@@ -514,5 +514,27 @@ public class BlogController {
 		}
 		return null;
 	}
+	
+	// 소연 - 메인화면 검색창을 통해 일치하는 블로그 목록 조회
+	@GetMapping("/search/blog")
+	public String searchBlog(
+	    @RequestParam("keyword") String keyword,
+	    @PageableDefault(size = 12, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+	    Model model
+	) {
+
+	    Map<String, Object> result = blogService.searchBlogByTitle(
+	        keyword,
+	        pageable.getPageNumber(),
+	        pageable.getPageSize(),
+	        "id"
+	    );
+
+	    model.addAttribute("blogList", result.get("content"));
+	    model.addAttribute("keyword", keyword);
+
+	    return "board/blog/blogList"; // 기존 화면에서 로직만 조금 변경하면 된다..
+	}
+	
 
 }

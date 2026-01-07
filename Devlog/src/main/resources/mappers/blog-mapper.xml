@@ -467,6 +467,71 @@
         JOIN "MEMBER" m ON s.SUBSCRIBER_ID = m.MEMBER_NO
         WHERE s.CREATOR_ID = #{memberNo}
     </select>
+    
+    <!-- 소연 - 블로그 검색 결과 조회용 (희준님 sql문 좀 빌려쓰겠습니다)-->
+    <select id="searchBlogByTitle"
+        parameterType="map"
+        resultType="com.devlog.project.board.blog.dto.BlogDTO">
+
+    SELECT * FROM (
+        SELECT ROWNUM AS RNUM, A.* FROM (
+            SELECT
+                b.BOARD_NO AS boardNo,
+                b.BOARD_TITLE AS boardTitle,
+                DBMS_LOB.SUBSTR(b.BOARD_CONTENT, 600, 1) AS boardContent,
+                b.BOARD_COUNT AS boardCount,
+                TO_CHAR(b.B_CREATE_DATE, 'YYYY.MM.DD') AS bCreateDate,
+                m.MEMBER_NICKNAME AS memberNickname,
+                m.MEMBER_EMAIL AS memberEmail,
+
+                /* 썸네일 */
+                (SELECT i.IMG_PATH || i.IMG_RENAME
+                 FROM BOARD_IMG i
+                 WHERE i.BOARD_NO = b.BOARD_NO AND i.IMG_ORDER = 0) AS thumbnailUrl,
+
+                /* 태그 */
+                (SELECT LISTAGG(T.TAG_NAME, ',') WITHIN GROUP (ORDER BY BT.TAG_NO)
+                 FROM BLOG_TAG BT
+                 JOIN TAG T ON BT.TAG_NO = T.TAG_NO
+                 WHERE BT.BOARD_NO = b.BOARD_NO) AS tagsStr,
+
+                bl.IS_PAID AS isPaid,
+                bl.PRICE AS price,
+
+                (SELECT COUNT(*) FROM "COMMENT" c
+                 WHERE c.BOARD_NO = b.BOARD_NO AND c.COMMENT_DEL_FL = 'N') AS commentCount,
+
+                (SELECT COUNT(*) FROM "BOARD_LIKE" l
+                 WHERE l.BOARD_NO = b.BOARD_NO) AS likeCount
+
+            FROM "BOARD" b
+            JOIN "MEMBER" m ON b.MEMBER_NO = m.MEMBER_NO
+            JOIN "BLOG" bl ON b.BOARD_NO = bl.BOARD_NO
+
+            WHERE b.BOARD_CODE = 1
+              AND b.BOARD_DEL_FL = 'N'
+              AND bl.TEMP_FL = 'N'
+              AND b.BOARD_TITLE LIKE '%' || #{keyword} || '%'
+
+            ORDER BY b.BOARD_NO DESC
+        	) A
+    	)
+    	WHERE RNUM BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+	</select>
+	
+	<select id="countSearchBlogByTitle"
+        parameterType="map"
+        resultType="_int">
+
+    SELECT COUNT(*)
+    FROM "BOARD" b
+    JOIN "BLOG" bl ON b.BOARD_NO = bl.BOARD_NO
+    WHERE b.BOARD_CODE = 1
+      AND b.BOARD_DEL_FL = 'N'
+      AND bl.TEMP_FL = 'N'
+      AND b.BOARD_TITLE LIKE '%' || #{keyword} || '%'
+	</select>
+
 
 </mapper>
     

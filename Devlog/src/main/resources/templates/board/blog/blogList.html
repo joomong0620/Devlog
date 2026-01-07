@@ -18,6 +18,12 @@
     <div th:replace="~{common/header :: header}"></div>
 
     <main class="container">
+        <!-- 소연 - 블로그 검색 결과 할 때, 키워드 없으면(검색창을 통해 이 페이지에 온게 아니면 일반 목록 조회, 검색해서 들어온거면 검색 결과 라고 뜸) -->
+        <div class="search-result-title" th:if="${keyword != null}">
+        <h2>
+            "<span th:text="${keyword}"></span>" 검색 결과
+        </h2>
+        </div>
         <div class="list-control">
             <div class="filter-group">
                 <button class="filter-btn active" data-sort="id">최신순</button>
