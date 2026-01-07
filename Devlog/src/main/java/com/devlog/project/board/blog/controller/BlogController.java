@@ -361,6 +361,7 @@ public class BlogController {
 		return "board/blog/blogDetail";
 	}
 
+	
 	// 팔로워 / 팔로잉 목록 API (모달 연동용)
 	// 9. 팔로워 목록 조회
 	@GetMapping("/api/blog/{blogId}/followers")
@@ -382,8 +383,7 @@ public class BlogController {
 		return ResponseEntity.ok(list);
 	}
 
-	// 11. 구독자 목록 조회 (현재 로직상 준비 안됨, 추후 구현 필요)
-	// 현재 JS에서는 /subscribers 를 호출하므로 빈 리스트라도 리턴해야 에러가 안 남
+	// 11. 구독자 목록 조회
 	@GetMapping("/api/blog/{blogId}/subscribers")
 	@ResponseBody
 	public ResponseEntity<List<UserProfileDto>> getSubscribers(@PathVariable String blogId) {
@@ -397,7 +397,6 @@ public class BlogController {
 	}
 
 	// 게시글 스크랩 API
-	// BlogController.java 내 추가
 	@PostMapping("/api/blog/scrap/{boardNo}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> toggleBoardScrap(@PathVariable Long boardNo) {

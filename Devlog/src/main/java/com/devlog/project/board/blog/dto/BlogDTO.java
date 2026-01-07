@@ -40,6 +40,9 @@ public class BlogDTO {
     private int commentCount; 		// 댓글 수
     private int likeCount;			// 좋아요 수
     
+    // 스크랩 목록 구분용 ('1':게시글(블로그/뉴스), '2':채용공고)
+    private String type;
+    
     private List<String> tagList;   // 태그 리스트 (저장/조회용)
     
     private String tagsStr;

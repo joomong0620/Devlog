@@ -148,7 +148,7 @@ async function fetchUserList(url) {
 
 // 3. 리스트 HTML 그리기
 function renderUserList(users) {
-  modalUserList.innerHTML = ""; 
+  modalUserList.innerHTML = "";
 
   if (!users || users.length === 0) {
     modalUserList.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">목록이 비어있습니다.</li>';
@@ -159,7 +159,7 @@ function renderUserList(users) {
     // 프로필 이미지, 소개글 처리
     const profileImg = user.profileImgUrl ? user.profileImgUrl : "/images/logo.png";
     const bio = user.bio ? user.bio : "";
-    
+
     // [나] 확인: 느슨한 비교(==)로 숫자/문자열 모두 처리
     const isMe = (user.memberNo == loginMemberNo);
 
@@ -168,22 +168,22 @@ function renderUserList(users) {
     let btnHtml = "";
 
     if (isMe) {
-        // 1. [나]인 경우
-        btnHtml = `<span style="margin-left:auto; font-size:12px; color:#999; font-weight:bold;">나</span>`;
+      // 1. [나]인 경우
+      btnHtml = `<span style="margin-left:auto; font-size:12px; color:#999; font-weight:bold;">나</span>`;
     } else {
-        // 2. [남]인 경우
-        // 숫자(1)든 boolean(true)이든 값이 있으면 "팔로잉"으로 처리
-        if (user.isFollowed) { 
-             // [맞팔 상태] -> 회색 '팔로잉' 버튼
-             btnHtml = `<button class="modal-follow-btn active" 
+      // 2. [남]인 경우
+      // 숫자(1)든 boolean(true)이든 값이 있으면 "팔로잉"으로 처리
+      if (user.isFollowed) {
+        // [맞팔 상태] -> 회색 '팔로잉' 버튼
+        btnHtml = `<button class="modal-follow-btn active" 
                                 onclick="toggleModalFollow(this, '${user.id}')" 
                                 style="margin-left:auto;">팔로잉</button>`;
-        } else { 
-             // [팔로우 안 한 상태] -> 보라색 '팔로우' 버튼
-             btnHtml = `<button class="modal-follow-btn" 
+      } else {
+        // [팔로우 안 한 상태] -> 보라색 '팔로우' 버튼
+        btnHtml = `<button class="modal-follow-btn" 
                                 onclick="toggleModalFollow(this, '${user.id}')" 
                                 style="margin-left:auto;">팔로우</button>`;
-        }
+      }
     }
 
     // 유저 아이템 HTML (클릭 시 해당 유저 블로그로 이동 기능 추가 가능)
@@ -397,6 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
         posts.forEach((post) => {
           const bNo = post.boardNo || post.board_no;
           const bTitle = post.boardTitle || post.board_title || "제목 없음";
+
           const bContent = post.boardContent || post.board_content || "";
           const bDate = post.bcreateDate || post.bcreate_date || "";
 
@@ -407,6 +408,27 @@ document.addEventListener("DOMContentLoaded", () => {
           const isPaidStatus = post.isPaid || post.is_paid || "N";
           let thumb = post.thumbnailUrl || post.thumbnail_url;
           const desc = stripHtml(bContent);
+
+          let detailLink = "";
+          const postType = post.type; // DTO에 추가한 type ('1' or '2')
+          const bCode = post.boardCode || post.board_code || post.BOARD_CODE; // 게시판 코드 (1:블로그, 2:뉴스)
+
+          console.log(`글번호:${bNo}, 타입:${postType}, 보드코드:${bCode}`);
+
+          // 링크 분기 처리 로직 추가
+          if (postType == '2') {
+            // 1. 채용공고인 경우
+            detailLink = `/jobposting/${bNo}`;
+          } else {
+            // 2. 일반 게시글인 경우 (BoardCode로 구분)
+            if (bCode == 2 || bCode >= 21) {
+              // IT 뉴스 상세 페이지로 이동
+              detailLink = `/ITnews/${bNo}`;
+            } else {
+              // 그 외느느 블로그 상세 페이지로
+              detailLink = `/blog/detail/${bNo}`;
+            }
+          }
 
           // 썸네일이 없으면 기본 로고 이미지 사용
           if (!thumb || thumb.trim() === "") {
@@ -428,20 +450,20 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
           const html = `
-                    <article class="post-item" onclick="location.href='/blog/detail/${bNo}'" style="cursor:pointer;">
-                        <div class="post-main">
-                            <h2>${paidIcon}${bTitle}</h2>
-                            <p class="post-content">${desc}</p> 
-                            <div class="post-stats">
-                                <span><i class="fa-solid fa-heart"></i> ${lCount}</span>
-                                <span><i class="fa-solid fa-comment"></i> ${cCount}</span>
-                                <span><i class="fa-solid fa-eye"></i> ${vCount}</span> 
-                                <span>${bDate}</span> 
-                            </div>
-                            <div class="post-tags">${tagsHtml}</div>
-                        </div>
-                        <img src="${thumb}" class="post-thumb-img" alt="thumbnail" onerror="this.src='/images/logo.png'">
-                    </article>`;
+            <article class="post-item" onclick="location.href='${detailLink}'" style="cursor:pointer;">
+                <div class="post-main">
+                    <h2>${paidIcon}${bTitle}</h2>
+                    <p class="post-content">${desc || ''}</p> 
+                    <div class="post-stats">
+                        <span><i class="fa-solid fa-heart"></i> ${lCount}</span>
+                        <span><i class="fa-solid fa-comment"></i> ${cCount}</span>
+                        <span><i class="fa-solid fa-eye"></i> ${vCount}</span> 
+                        <span>${bDate}</span> 
+                    </div>
+                    <div class="post-tags">${tagsHtml}</div>
+                </div>
+                <img src="${thumb}" class="post-thumb-img" alt="thumbnail" onerror="this.src='/images/logo.png'">
+            </article>`;
 
           listWrap.insertAdjacentHTML("beforeend", html);
         });

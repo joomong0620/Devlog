@@ -270,7 +270,11 @@ public class ITnewsController {
 	    if (loginMember == null) return -1;
 	    
 	    paramMap.put("memberNo", loginMember.getMemberNo());
-	    paramMap.put("type", "1"); 
+	    
+	    // type이 안 넘어왔을 때만 '1'로 기본 설정 (방어 로직)
+	    if(!paramMap.containsKey("type")) {
+	    	paramMap.put("type", "1"); 
+	    }
 	    
 	    return itnewsService.toggleScrap(paramMap);
 	}

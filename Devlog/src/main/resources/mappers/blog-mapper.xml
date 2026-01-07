@@ -53,12 +53,10 @@
                     m.MEMBER_NICKNAME AS memberNickname,
                     m.MEMBER_EMAIL AS memberEmail,
                     
-                    /* [썸네일 조회] BOARD_IMG 테이블에서 0번 이미지 가져오기 */
                     (SELECT i.IMG_PATH || i.IMG_RENAME 
                      FROM BOARD_IMG i 
                      WHERE i.BOARD_NO = b.BOARD_NO AND i.IMG_ORDER = 0) AS thumbnailUrl,
                      
-                     /* 태그 문자열 조회 (LISTAGG) 사용 */
                     (SELECT LISTAGG(T.TAG_NAME, ',') WITHIN GROUP (ORDER BY BT.TAG_NO)
                      FROM BLOG_TAG BT
                      JOIN TAG T ON BT.TAG_NO = T.TAG_NO
@@ -96,7 +94,6 @@
         SELECT COUNT(*)
         FROM "BOARD" b
         JOIN "MEMBER" m ON (b.MEMBER_NO = m.MEMBER_NO)
-        /* [수정 1] LEFT JOIN */
         LEFT JOIN "BLOG" bl ON (b.BOARD_NO = bl.BOARD_NO)
         <if test="type == 'scrap'">
             JOIN "USER_SCRAP" us ON (b.BOARD_NO = us.TARGET_NO AND us.TYPE = '1')
@@ -123,86 +120,110 @@
     </select>
 
     <select id="selectMyBlogList" parameterType="map" resultType="com.devlog.project.board.blog.dto.BlogDTO">
-        SELECT * FROM (
-            SELECT ROWNUM AS RNUM, A.* FROM (
-                SELECT
-                    b.BOARD_NO AS boardNo,
-                    b.BOARD_TITLE AS boardTitle,
-                    DBMS_LOB.SUBSTR(b.BOARD_CONTENT, 600, 1) AS boardContent,
-                    b.BOARD_COUNT AS boardCount,
-                    TO_CHAR(b.B_CREATE_DATE, 'YYYY.MM.DD') AS bCreateDate,
-                    m.MEMBER_NICKNAME AS memberNickname,
-                    m.MEMBER_EMAIL AS memberEmail,
-                    
-                    /* 썸네일 */
-                    (SELECT i.IMG_PATH || i.IMG_RENAME 
-                     FROM BOARD_IMG i 
-                     WHERE i.BOARD_NO = b.BOARD_NO AND i.IMG_ORDER = 0) AS thumbnailUrl,
-                     
-                     /* 태그 문자열 조회 */
-                    (SELECT LISTAGG(T.TAG_NAME, ',') WITHIN GROUP (ORDER BY BT.TAG_NO)
-                     FROM BLOG_TAG BT
-                     JOIN TAG T ON BT.TAG_NO = T.TAG_NO
-                     WHERE BT.BOARD_NO = b.BOARD_NO) AS tagsStr,
-                     
-                    bl.IS_PAID AS isPaid,
-                    (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO AND c.COMMENT_DEL_FL = 'N') AS commentCount,
-                    (SELECT COUNT(*) FROM "BOARD_LIKE" l WHERE l.BOARD_NO = b.BOARD_NO) AS likeCount
-                FROM "BOARD" b
-                JOIN "MEMBER" m ON b.MEMBER_NO = m.MEMBER_NO
-                
-                /* [수정 1] IT뉴스는 BLOG 테이블이 없을 수 있으므로 LEFT JOIN 필수 */
-                LEFT JOIN "BLOG" bl ON b.BOARD_NO = bl.BOARD_NO
-                
-                <if test="type == 'scrap'">
-                    JOIN "USER_SCRAP" us ON (b.BOARD_NO = us.TARGET_NO AND us.TYPE = '1')
-                </if>
-                
-                WHERE b.BOARD_DEL_FL = 'N'
-                /* [수정 2] BLOG 테이블이 없으면(NULL) 임시저장이 아닌 것으로 간주 */
-                AND (bl.TEMP_FL IS NULL OR bl.TEMP_FL = 'N')
-
-                <choose>
-                    <when test="type == 'scrap'">
-                        <if test="loginMemberNo != null">AND us.MEMBER_NO = #{loginMemberNo}</if>
-                        <if test="loginMemberNo == null">AND 1 = 2</if>
-                        
-                        AND (
-                            b.BOARD_CODE = 1 
-                            OR b.BOARD_CODE = 2
-                            OR b.BOARD_CODE BETWEEN 21 AND 29
-                        )
-                    </when>
-                    
-                    <otherwise>
-                        AND b.BOARD_CODE = 1
-                        AND m.MEMBER_EMAIL = #{blogId}
-                    </otherwise>
-                </choose>
-
-                <if test="type == 'paid'"> AND bl.IS_PAID = 'Y' </if>
-
-                <if test="query != null and query != ''">
-                    AND (b.BOARD_TITLE LIKE '%' || #{query} || '%' OR b.BOARD_CONTENT LIKE '%' || #{query} || '%')
-                </if>
-
-                <if test="tag != null and tag != ''">
-                    AND b.BOARD_NO IN (
-                        SELECT BT.BOARD_NO FROM BLOG_TAG BT
-                        JOIN TAG T ON BT.TAG_NO = T.TAG_NO WHERE T.TAG_NAME = #{tag}
-                    )
-                </if>
-
-                <choose>
-                    <when test="sort == 'viewCount'">ORDER BY b.BOARD_COUNT DESC, b.BOARD_NO DESC</when>
-                    <when test="sort == 'likeCount'">ORDER BY likeCount DESC, b.BOARD_NO DESC</when>
-                    <when test="sort == 'commentCount'">ORDER BY commentCount DESC, b.BOARD_NO DESC</when>
-                    <otherwise>ORDER BY b.BOARD_NO DESC</otherwise>
-                </choose>
-            ) A
-        )
-        WHERE RNUM BETWEEN #{offset} + 1 AND #{offset} + #{limit}
-    </select>
+	    SELECT * FROM (
+	        SELECT ROWNUM AS RNUM, A.* FROM (
+	            
+	            <choose>
+	                <when test="type == 'scrap'">
+	                    SELECT 
+	                        US.TARGET_NO AS boardNo,
+	                        US.TYPE AS type,
+	                        
+	                        CASE 
+	                            WHEN US.TYPE = '1' THEN B.BOARD_TITLE 
+	                            WHEN US.TYPE = '2' THEN J.POSTING_TITLE 
+	                        END AS boardTitle,
+	                        
+	                        CASE 
+	                            WHEN US.TYPE = '1' THEN DBMS_LOB.SUBSTR(B.BOARD_CONTENT, 600, 1)
+	                            WHEN US.TYPE = '2' THEN '채용공고 입니다.' 
+	                        END AS boardContent,
+	                        
+	                        CASE 
+	                            WHEN US.TYPE = '1' THEN TO_CHAR(B.B_CREATE_DATE, 'YYYY.MM.DD')
+	                            WHEN US.TYPE = '2' THEN J.APPLY_END 
+	                        END AS bCreateDate,
+	                        
+	                        CASE WHEN US.TYPE = '1' THEN B.BOARD_COUNT ELSE 0 END AS boardCount,
+	                        CASE WHEN US.TYPE = '1' THEN (SELECT COUNT(*) FROM BOARD_LIKE L WHERE L.BOARD_NO = B.BOARD_NO) ELSE 0 END AS likeCount,
+	                        CASE WHEN US.TYPE = '1' THEN (SELECT COUNT(*) FROM "COMMENT" C WHERE C.BOARD_NO = B.BOARD_NO AND C.COMMENT_DEL_FL = 'N') ELSE 0 END AS commentCount,
+	                        
+	                        CASE 
+	                            WHEN US.TYPE = '1' THEN 
+	                                (SELECT I.IMG_PATH || I.IMG_RENAME FROM BOARD_IMG I WHERE I.BOARD_NO = B.BOARD_NO AND I.IMG_ORDER = 0)
+	                            WHEN US.TYPE = '2' THEN 
+	                                NULL
+	                        END AS thumbnailUrl,
+	
+	                        CASE WHEN US.TYPE = '1' THEN B.BOARD_CODE ELSE 0 END AS "boardCode",
+	                        
+	                        'N' AS isPaid,
+	                        NULL AS tagsStr
+	
+	                    FROM USER_SCRAP US
+	                    LEFT JOIN BOARD B ON (US.TARGET_NO = B.BOARD_NO AND US.TYPE = '1')
+	                    LEFT JOIN JOB_POSTING J ON (US.TARGET_NO = J.POSTING_NO AND US.TYPE = '2')
+	                    
+	                    WHERE US.MEMBER_NO = #{loginMemberNo}
+	                    
+	                    ORDER BY US.SCRAP_NO DESC
+	                </when>
+	
+	                <otherwise>
+	                    SELECT
+	                        b.BOARD_NO AS boardNo,
+	                        '1' AS type,
+	                        b.BOARD_TITLE AS boardTitle,
+	                        DBMS_LOB.SUBSTR(b.BOARD_CONTENT, 600, 1) AS boardContent,
+	                        b.BOARD_COUNT AS boardCount,
+	                        TO_CHAR(b.B_CREATE_DATE, 'YYYY.MM.DD') AS bCreateDate,
+	                        m.MEMBER_NICKNAME AS memberNickname,
+	                        m.MEMBER_EMAIL AS memberEmail,
+	                        b.BOARD_CODE AS boardCode,
+	                        
+	                        (SELECT i.IMG_PATH || i.IMG_RENAME 
+	                         FROM BOARD_IMG i 
+	                         WHERE i.BOARD_NO = b.BOARD_NO AND i.IMG_ORDER = 0) AS thumbnailUrl,
+	                         
+	                        (SELECT LISTAGG(T.TAG_NAME, ',') WITHIN GROUP (ORDER BY BT.TAG_NO)
+	                         FROM BLOG_TAG BT
+	                         JOIN TAG T ON BT.TAG_NO = T.TAG_NO
+	                         WHERE BT.BOARD_NO = b.BOARD_NO) AS tagsStr,
+	                         
+	                        bl.IS_PAID AS isPaid,
+	                        (SELECT COUNT(*) FROM "COMMENT" c WHERE c.BOARD_NO = b.BOARD_NO AND c.COMMENT_DEL_FL = 'N') AS commentCount,
+	                        (SELECT COUNT(*) FROM "BOARD_LIKE" l WHERE l.BOARD_NO = b.BOARD_NO) AS likeCount
+	                    FROM "BOARD" b
+	                    JOIN "MEMBER" m ON b.MEMBER_NO = m.MEMBER_NO
+	                    LEFT JOIN "BLOG" bl ON b.BOARD_NO = bl.BOARD_NO
+	                    
+	                    WHERE b.BOARD_DEL_FL = 'N'
+	                    AND (bl.TEMP_FL IS NULL OR bl.TEMP_FL = 'N')
+	                    AND b.BOARD_CODE = 1
+	                    AND m.MEMBER_EMAIL = #{blogId}
+	
+	                    <if test="type == 'paid'"> AND bl.IS_PAID = 'Y' </if>
+	                    <if test="query != null and query != ''">
+	                        AND (b.BOARD_TITLE LIKE '%' || #{query} || '%' OR b.BOARD_CONTENT LIKE '%' || #{query} || '%')
+	                    </if>
+	                    <if test="tag != null and tag != ''">
+	                        AND b.BOARD_NO IN (
+	                            SELECT BT.BOARD_NO FROM BLOG_TAG BT
+	                            JOIN TAG T ON BT.TAG_NO = T.TAG_NO WHERE T.TAG_NAME = #{tag}
+	                        )
+	                    </if>
+	
+	                    <choose>
+	                        <when test="sort == 'viewCount'">ORDER BY b.BOARD_COUNT DESC, b.BOARD_NO DESC</when>
+	                        <when test="sort == 'likeCount'">ORDER BY likeCount DESC, b.BOARD_NO DESC</when>
+	                        <otherwise>ORDER BY b.BOARD_NO DESC</otherwise>
+	                    </choose>
+	                </otherwise>
+	            </choose>
+	        ) A
+	    )
+	    WHERE RNUM BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+	</select>
 
     <select id="selectBlogDetail" parameterType="long" resultType="com.devlog.project.board.blog.dto.BlogDTO">
         SELECT
@@ -238,7 +259,6 @@
                 TO_CHAR(b.B_CREATE_DATE, 'YYYY.MM.DD') AS bCreateDate,
                 b.BOARD_COUNT AS boardCount,
                 
-                /* [수정] 여기도 프로필 이미지가 아니라 게시글 썸네일로 변경 */
                 (SELECT i.IMG_PATH || i.IMG_RENAME 
                  FROM BOARD_IMG i 
                  WHERE i.BOARD_NO = b.BOARD_NO AND i.IMG_ORDER = 0) AS thumbnailUrl,
@@ -484,12 +504,10 @@
                 m.MEMBER_NICKNAME AS memberNickname,
                 m.MEMBER_EMAIL AS memberEmail,
 
-                /* 썸네일 */
                 (SELECT i.IMG_PATH || i.IMG_RENAME
                  FROM BOARD_IMG i
                  WHERE i.BOARD_NO = b.BOARD_NO AND i.IMG_ORDER = 0) AS thumbnailUrl,
 
-                /* 태그 */
                 (SELECT LISTAGG(T.TAG_NAME, ',') WITHIN GROUP (ORDER BY BT.TAG_NO)
                  FROM BLOG_TAG BT
                  JOIN TAG T ON BT.TAG_NO = T.TAG_NO
