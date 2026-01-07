@@ -115,6 +115,11 @@ public class MemberController {
 	                    authentication.getAuthorities()
 	                );        
 	        
+	        // 탈퇴 회원 체크
+	        if ("Y".equals(response.getMemberDelFl())) {
+	        	SecurityContextHolder.clearContext();
+	            throw new BadCredentialsException("탈퇴한 회원입니다.");
+	        }	        
 	        
 	        System.out.println("##### 응답 DTO (MemberLoginResponseDTO): ");
 	        System.out.println(response);  
