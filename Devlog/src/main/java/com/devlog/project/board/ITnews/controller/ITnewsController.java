@@ -152,10 +152,27 @@ public class ITnewsController {
 
 	// IT뉴스 크롤링
 	@GetMapping("/ITnews/ITnews-crawler")
-	@ResponseBody
-	public void ITnewsCrawler() {
-		itnewsService.ITnewsCrawler();
+	public String ITnewsCrawler(
+			@SessionAttribute(value = "loginMember", required = false) MemberLoginResponseDTO loginMember,
+			RedirectAttributes ra) {
+		
+		
+		//  권한 체크 로직 수정 (로그인 안했거나 2번이 아니면)
+	    if(loginMember == null || loginMember.getMemberNo() != 2) {
+	        ra.addFlashAttribute("message", "접근 권한이 없습니다.");
+	        return "redirect:/ITnews"; // 뉴스 목록으로 튕겨내기
+	    }
 
+	    try {
+	        // 크롤링 실행
+	        itnewsService.ITnewsCrawler();
+	        ra.addFlashAttribute("message", "크롤링이 성공적으로 완료되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        ra.addFlashAttribute("message", "크롤링 중 오류가 발생했습니다.");
+	    }
+
+	    return "redirect:/ITnews"; 
 	}
 
 	// 좋아요 처리
