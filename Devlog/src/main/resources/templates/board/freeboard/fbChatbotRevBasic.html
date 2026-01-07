@@ -8,9 +8,10 @@
 </head>
 <body>
 
-    <p th:text="${session.loginMember}"></p>
+    <!-- <p th:text="${session.loginMember}"></p>
     <p th:text="${chatbotId}"></p>
-    <p th:text="${cbtProfileImg}"></p>
+    <p th:text="${chatbotType}"></p>    
+    <p th:text="${cbtProfileImg}"></p> -->
     <main>
         <!-- 헤더 -->
         <!-- <header class="main-header">header</header> -->
@@ -45,51 +46,8 @@
 
             <!-- Chat Box -->
             <div class="chat-area-wrapper">
+                <!-- JS에서 동적으로 화면만들어서 chat-box안에 채움 -->
                 <div class="chat-box" id="chatBox">
-                    <!-- ##### JS로 메시지 삽입 ###### -->
-
-                    <!-- ##### 더미 메시지 예시 ###### -->
-                    <!-- User bubble -->
-                    <!-- <div class="chat-row right">
-                        <div class="bubble user">
-                            text
-                            <div class="time">2025.12.08. 오전 12:22</div>
-                            <div class="name">유저칠</div>
-                        </div>
-                    </div> -->
-
-                    <!-- Bot bubble -->
-                    <!-- <div class="chat-row left">
-                        <img th:src="@{/images/board/freeboard/chatbot1.png}" class="bot-img" th:alt="기본챗봇이미지">
-                        <div>
-                            <div class="bubble bot">
-                                text<br>text
-                            </div>
-                            <div class="time">2025.12.08. 오전 12:22</div>
-                            <div class="name">DevLog 챗봇</div>
-                        </div>
-                    </div> -->
-
-                    <!-- User bubble -->
-                    <!-- <div class="chat-row right">
-                        <div class="bubble user">
-                            text<br>text<br>text
-                            <div class="time">2025.12.08. 오전 12:22</div>
-                            <div class="name">유저칠</div>
-                        </div>
-                    </div> -->
-
-                    <!-- Bot long bubble -->
-                    <!-- <div class="chat-row left">
-                        <img th:src="@{/images/board/freeboard/chatbot1.png}" class="bot-img" th:alt="기본챗봇이미지">
-                        <div>
-                            <div class="bubble bot big">
-                                text<br>text<br>text<br>text<br>text<br>text<br>text<br>
-                            </div>
-                            <div class="time">2025.12.08. 오전 12:22</div>
-                            <div class="name">DevLog 챗봇</div>
-                        </div>
-                    </div> -->
 
                 </div>
             
@@ -97,16 +55,21 @@
                 <div class="token-usage-info-area">
                     <div class="token-usage tu-row1">
                         
-                        <div><p class="token-info">무료</p></div>
-                        <div><p class="token-info"></p></div> 
+                        <div><p class="token-usage-info-area">무료</p></div>
+                        <!-- <div><p class="token-info"></p></div>  -->
                        
+                        <!-- <p class="token-info" id="tokenInfo">
+                        (500자 이내 질의/응답용)
+                        </p> -->
                         <p class="token-info" id="tokenInfo">
-                            서버 토큰: 0 | 클라이언트 토큰: 0
+                        (입력20/응답500 자 이내 단순 질의/응답용: 테스트용)
                         </p>
                     </div>
 
                     
                     <div class="token-usage tu-row2">
+                        <!-- 서버 usage 메타 데이터(token정보) 아래 token-info p-tag에 표시 영역 -->
+                        <!-- 서버 토큰 수: 53 토큰 (질문:13, 답변:40) -->                        
                         <div><p class="token-info"></p></div>
                     </div>
                 </div>
@@ -115,7 +78,8 @@
                 <div class="input-area">
                     <!-- <input type="text" id="chatInput" class="input-text" placeholder="여기에 내용을 입력"> -->
                     <textarea id="chatInput" class="input-textarea" placeholder="여기에 내용을 입력" 
-                            rows="3" cols="30" maxlength="4000"></textarea>
+                            rows="3" cols="30" maxlength="23"></textarea>
+                            <!-- rows="3" cols="30" maxlength="500"></textarea> -->
                     <button id="sendBtn" class="send-btn">
                         <img th:src="@{/images/board/freeboard/cb_send2.png}" >
                     </button>
@@ -142,6 +106,7 @@
         let beansAmount = /*[[${session.loginMember?.beansAmount}]]*/ null;
         
         let chatbotId = /*[[${chatbotId}]]*/ null; 
+        let chatbotType = /*[[${chatbotType}]]*/ null; 
         let cbtProfileImg = /*[[${cbtProfileImg}]]*/ null;
 
         // 명시적으로 전역 등록
@@ -150,6 +115,7 @@
         window.profileImg = profileImg;     
         window.beansAmount = beansAmount;     
         window.chatbotId = chatbotId;
+        window.chatbotType = chatbotType;
         window.cbtProfileImg = cbtProfileImg;                
         window.boardNo = /*[[${freeboard?.boardNo}]]*/ null;
         window.boardCode = /*[[${freeboard?.boardCode}]]*/ null;
