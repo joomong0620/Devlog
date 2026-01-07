@@ -105,24 +105,30 @@ function deletePost(boardNo) {
 
     // 3. 정확한 번호로 서버에 요청
     fetch(`/api/blog/delete/${boardNo}`, {
-        method: 'DELETE',
+        method: 'POST', 
         headers: {
             'Content-Type': 'application/json'
         }
     })
-        .then(response => {
-            if (response.ok) {
-                alert("게시글이 삭제되었습니다.");
-                location.href = "/blog/list"; // 목록으로 이동
-            } else {
-                // 서버에서 에러 메시지를 보냈다면 띄워줌
-                return response.text().then(text => alert("삭제 실패: " + text));
-            }
-        })
-        .catch(error => {
-            console.error("Delete Error:", error);
-            alert("오류가 발생했습니다.");
-        });
+    .then(async response => {
+        // 응답 본문(텍스트)을 먼저 가져옵니다.
+        const msg = await response.text();
+
+        // 3. HTTP 상태 코드로 성공/실패 판단 (response.ok는 200번대일 때 true)
+        if (response.ok) {
+            alert(msg); // "삭제되었습니다." 출력
+            location.href = "/blog/list";
+        } else {
+            // 4. 실패 시 (400, 500 등) - 백엔드에서 보낸 에러 메시지를 그대로 던짐
+            // 예: "이미 구매자가 존재하는 유료 게시글은 삭제할 수 없습니다."
+            throw new Error(msg);
+        }
+    })
+    .catch(error => {
+        console.error("Delete Error:", error);
+        // 5. 여기서 최종적으로 에러 메시지를 alert로 띄워줌
+        alert(error.message);
+    });
 }
 
 // 팔로우/언팔로우 토글 함수
@@ -203,7 +209,7 @@ function renderComments(comments) {
 function createCommentElement(data, isReply = false) {
     const el = document.createElement('div');
     el.className = `comment-item ${isReply ? 'reply' : ''}`;
-    
+
     // [중요] 전체 덩어리 ID: 'comment-item-숫자'
     el.id = `comment-item-${data.commentNo}`;
 
@@ -379,6 +385,21 @@ function enableEditMode(id) {
     // 입력창에 포커스
     const input = document.getElementById(`editInput-${id}`);
     if (input) input.focus();
+}
+
+/**
+ * 게시글 수정 전 유효성 검사 (유료글 발행 여부 체크)
+ * HTML 사용법: <button onclick="checkAndUpdate('${post.boardNo}', '${post.isPaid}', '${post.tempFl}')">수정</button>
+ */
+function checkAndUpdate(boardNo, isPaid, tempFl) {
+    // 1. 유료(Y)이고 임시저장이 아닌(N = 발행됨) 상태인지 확인
+    if (isPaid === 'Y' && tempFl === 'N') {
+        alert("이미 발행된 유료 게시글은 수정할 수 없습니다.");
+        return; // 이동 중단
+    }
+
+    // 2. 문제가 없으면 수정 페이지로 이동
+    location.href = `/blog/update/${boardNo}`;
 }
 
 // 게시글 수정 저장 api

@@ -40,6 +40,9 @@ public interface PayService {
 
 	// 구독 
 	int insertSubscription(PayDTO trade);
+	
+	// 게시글 구매자 수 확인
+	int countPostBuyers(Long boardNo);
 
 
 
