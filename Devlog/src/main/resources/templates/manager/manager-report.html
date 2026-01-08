@@ -18,13 +18,16 @@
 
     <main class="main">
       <h2>신고 관리</h2>
-
-      <div class="search-filter">
+      
+      <form th:action="@{/manager/dashboard/report}" method="get" class="search-filter">
 
         <div class="search-box">
           <label>통합 검색</label>
-          <input type="text" placeholder="여기에 입력하세요." />
-          <button>
+          <input type="text"
+                name="query"
+                placeholder="신고 내용 / 신고자 / 대상자"
+                th:value="${param.query}" />
+          <button type="submit">
             <img th:src="@{/images/manager/search.svg}" alt="search" />
           </button>
         </div>
@@ -32,20 +35,34 @@
         <div class="filter">
           <span>필터</span>
 
-          <select>
-            <option>선택</option>
-            <option>스팸/광고</option>
-            <option>욕설/비방</option>
+          <!-- 신고 사유 -->
+          <select name="reportType">
+            <option value="">전체</option>
+            <option th:each="type : ${reportTypes}"
+                    th:value="${type}"
+                    th:selected="${param.reportType == type}"
+                    th:text="${type}">
+            </option>
           </select>
 
-          <select>
-            <option>선택</option>
-            <option>처리전</option>
-            <option>처리완료</option>
-            <option>반려</option>
+          <!-- 처리 상태 -->
+          <select name="status">
+            <option value="">전체</option>
+            <option value="PENDING" th:selected="${param.status == 'PENDING'}">처리전</option>
+            <option value="RESOLVED" th:selected="${param.status == 'RESOLVED'}">처리완료</option>
+            <option value="REJECTED" th:selected="${param.status == 'REJECTED'}">반려</option>
           </select>
+
+          <!-- 대상 타입 -->
+          <select name="targetType">
+            <option value="">전체</option>
+            <option value="BOARD" th:selected="${param.targetType == 'BOARD'}">게시글</option>
+            <option value="MESSAGE" th:selected="${param.targetType == 'MESSAGE'}">메시지</option>
+          </select>
+
         </div>
-      </div>
+      </form>
+
 
       <!-- ===== 신고 목록 ===== -->
       <button class="complete-btn" onclick="confirmBatchResolve()">

@@ -36,4 +36,56 @@
 	  FROM BOARD
 	  WHERE BOARD_NO = #{boardNo}
 	</select>
+
+	<select id="searchForManager" resultType="ReportManagerDTO">
+	    SELECT
+	        r.report_id            AS reportId,
+	        r.target_id            AS targetId,
+	        r.message_no           AS messageNo,
+	        rc.report_type         AS reportType,
+	        r.target_type          AS targetType,
+	        r.content              AS reportReason,
+	        rm.member_nickname     AS reporterNickname,
+	        tm.member_nickname     AS targetNickname,
+	        r.created_at           AS reportDate,
+	        r.processed_at         AS processDate,
+	        r.status               AS status,
+	        m.message_content      AS messageContent
+	    FROM report r
+	        JOIN member rm ON r.reporter_no = rm.member_no
+	        JOIN member tm ON r.reported_no = tm.member_no
+	        JOIN report_code rc ON r.report_code = rc.report_code
+	        LEFT JOIN message m ON r.message_no = m.message_no
+	    WHERE 1 = 1
+	
+	    <!-- 통합 검색 -->
+	    <if test="query != null and query != ''">
+	        AND (
+	            r.content            LIKE '%' || #{query} || '%'
+	         OR rc.report_type       LIKE '%' || #{query} || '%'
+	         OR rm.member_nickname   LIKE '%' || #{query} || '%'
+	         OR tm.member_nickname   LIKE '%' || #{query} || '%'
+	        )
+	    </if>
+	
+	    <!-- 신고 유형 -->
+	    <if test="reportType != null and reportType != ''">
+	        AND rc.report_type = #{reportType}
+	    </if>
+	
+	    <!-- 처리 상태 -->
+	    <if test="status != null">
+	        AND r.status = #{status}
+	    </if>
+	
+	    <!-- 대상 타입 -->
+	    <if test="targetType != null">
+	        AND r.target_type = #{targetType}
+	    </if>
+	
+	    ORDER BY r.report_id DESC
+	</select>
+
+
+
 </mapper>
