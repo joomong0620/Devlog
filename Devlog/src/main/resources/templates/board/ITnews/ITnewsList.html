@@ -86,22 +86,23 @@
 
 
   <!--  페 이 지 네 이 션 !!!!!!! -->
-  <div class="pagination-area">
+<div class="pagination-area">
     <ul class="pagination">
-      <li th:if="${pagination.hasPreviousPage}">
-        <a th:href="@{/ITnews(cp=${pagination.prePage})}">&lt;</a>
-      </li>
+        <li th:if="${pagination.hasPreviousPage}">
+            <a th:href="@{/ITnews(cp=${pagination.prePage}, boardCode=${boardCode})}">&lt;</a>
+        </li>
 
-      <li th:each="p : ${pagination.navigatepageNums}">
-        <a th:href="@{/ITnews(cp=${p})}" th:text="${p}"
-          th:classappend="${p == pagination.pageNum} ? 'current' : ''">1</a>
-      </li>
+        <li th:each="p : ${pagination.navigatepageNums}">
+            <a th:href="@{/ITnews(cp=${p}, boardCode=${boardCode})}" 
+               th:text="${p}"
+               th:classappend="${p == pagination.pageNum} ? 'current' : ''">1</a>
+        </li>
 
-      <li th:if="${pagination.hasNextPage}">
-        <a th:href="@{/ITnews(cp=${pagination.nextPage})}">&gt;</a>
-      </li>
+        <li th:if="${pagination.hasNextPage}">
+            <a th:href="@{/ITnews(cp=${pagination.nextPage}, boardCode=${boardCode})}">&gt;</a>
+        </li>
     </ul>
-  </div>
+</div>
 
 
   <div th:replace="common/footer :: footer"></div>
