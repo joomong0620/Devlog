@@ -185,6 +185,13 @@ function openHelper() {
     }
 
     if (!url) return;
+    
+    // 부모(수정화면창) → 자식 팝업(챗봇 basic 팝업창)으로 전역 변수 전달하기 위함
+    window.globalData = {
+        boardNoGlobal: window.boardNo,
+        loginMemberNoGlobal: window.loginMemberNo
+        // more variables
+    };
 
     window.open(
         url,

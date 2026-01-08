@@ -11,9 +11,9 @@
 </head>
 
 <body>
-    <!-- <p th:text="${freeboard}" th:if="${freeboard != null}"></p>  -->  
+    <!-- <p th:text="${freeboard}" th:if="${freeboard != null}"></p>    -->
     <main>
-
+        
         <!-- 헤더 -->
         <!-- <header class="main-header">header</header> -->
         <!-- header.html (fragment) 추가 -->
@@ -21,12 +21,15 @@
         <!-- 또는 -->
         <div th:replace="common/header :: header"></div>
         <script th:src="@{/js/common/header.js}"></script>
-
+        
         <!-- 네비게이션 -->
         <nav class="main-nav"></nav>
         <!--  ###################################################### -->  
         
         <div class="top-space-bw-header"> </div>
+        
+        <!-- <p th:text="${freeboard}" th:if="${freeboard != null}"></p>    -->
+
         <!-- 상단 타이틀 바 -->
         <h2 class="title-main fw-800">자유게시판</h2>
         <div class="container">
@@ -123,6 +126,21 @@
 
     </main>
 
+    <script th:inline="javascript"> // freeboardDetail.js처럼 JS에서 사용할 전역 변수들을 선언~~
+
+        let loginMemberNo = /*[[${session.loginMember?.memberNo}]]*/ null; 
+        let memberNickname = /*[[${session.loginMember?.memberNickname}]]*/ null;
+        if(loginMemberNo === null) loginMemberNo = ""; // 들어가는 값이 없으면 대신 빈칸을 넣어준다 (아래 boardDetail.js, comment.js에서 ""로 받아서 처리)
+        
+        // 명시적으로 전역 등록
+        window.loginMemberNo = loginMemberNo;
+        window.memberNickname = memberNickname;        
+        window.boardNo = /*[[${freeboard?.boardNo}]]*/ null;
+        window.boardCode = /*[[${freeboard?.boardCode}]]*/ null;
+        window.boardTitle = /*[[${freeboard?.boardTitle}]]*/ null;
+        
+        console.log("window.boardNo = ", window.boardNo);
+    </script>    
 
     <!-- 알림창 띄우기 -->
     <script th:inline="javascript"> 

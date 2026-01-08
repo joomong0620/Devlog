@@ -48,7 +48,7 @@ public class ChatbotService {
     
 
     /////// [ 과금 작업 draft ] : 토큰 프론트에서 대강계산(4ch/token) + DB에 대이터삽입X
-    public Map<String,Object> sendMessage(String sessionId, String message){
+    public Map<String,Object> sendMessage(Long sessionId, String message){
         ChatResponse response = chatModel.call(
                 new Prompt(List.of(new UserMessage(message)))
         );
@@ -68,9 +68,9 @@ public class ChatbotService {
         log.info("토큰 사용량 - Prompt: {}, Completion: {}, Total: {}, AccumulatedTokens: {}", 
                 promptTokens, completionTokens, totalTokens, accumulatedTokens);
         
-        int calcBeansTotal = cbtTokenUsageService.calculateBeans(totalTokens);
-        int accumulated_usedBeans = cbtTokenUsageService.calculateBeans(totalTokens);
-        log.info("토큰2Beans - Total: {}, accumulated_usedBeans: {}", 	calcBeansTotal, accumulated_usedBeans);   
+        int currentTurnBeans = cbtTokenUsageService.calculateBeans(totalTokens);
+        int accumulatedUsedBeans = cbtTokenUsageService.calculateBeans((int) accumulatedTokens);
+        log.info("토큰2Beans - 현재턴콩: {}, 누적콩: {}", currentTurnBeans, accumulatedUsedBeans);   
         
         
         return Map.of(
@@ -80,7 +80,7 @@ public class ChatbotService {
 				              "completion_tokens", completionTokens, 
 				              "total_tokens", totalTokens, 
 				              "accumulated_tokens", accumulatedTokens, 
-				              "accumulated_usedBeans", accumulated_usedBeans
+				              "accumulated_usedBeans", accumulatedUsedBeans
 	            		  		)
 	              	);     
     }
@@ -98,16 +98,15 @@ public class ChatbotService {
 	 * @param loginMember
 	 * @return 챗봇응답 및 토큰사용info
 	 */
-	public Map<String, Object> sendMessageTokenInfo(String sessionId, String userMessage,
-			MemberLoginResponseDTO loginMember) {
+	public Map<String, Object> sendMessageTokenInfo(Long cbSessionId, String cbSessionType, 
+			String userMessage,	MemberLoginResponseDTO loginMember) {
 		
         log.info("챗봇 요청 - 세션ID: {}, 회원번호: {}, 메시지: {}", 
-                sessionId, loginMember != null ? loginMember.getMemberNo() : "비회원", userMessage);
+        		cbSessionId, loginMember != null ? loginMember.getMemberNo() : "비회원", userMessage);
         
         try {
             // 시스템 프롬프트 생성 (BASIC/KONG 타입별 차이)
-            //String systemPrompt = createSystemPrompt(session.getCbSessionType()); // prompt engineering
-            String systemPrompt = createSystemPrompt("BASIC"); // 테스트용, 현재는 모두 BASIC으로
+            String systemPrompt = createSystemPrompt(cbSessionType); // prompt engineering; cbSessionType= "BASIC" or "KONG"
         	
         	// OpenAI API 호출
             Prompt prompt = new Prompt(systemPrompt + "\n\n사용자 질문: " + userMessage); // ChatbotService 에서
@@ -123,61 +122,55 @@ public class ChatbotService {
             int totalTokens = usage != null ? Math.toIntExact(usage.getTotalTokens()) : 0;
             
             /////////////////////////////////////////
-            long accumulatedTokens = cbtTokenUsageService.accumulate(sessionId,	totalTokens);
+            // 세션별 누적 토큰 계산
+            long accumulatedTokens = cbtTokenUsageService.accumulate(cbSessionId,	totalTokens);
             log.info("토큰 사용량 - Prompt: {}, Completion: {}, Total: {}, AccumulatedTokens: {}", 
                     promptTokens, completionTokens, totalTokens, accumulatedTokens);
+            //  현재 턴 토큰 -> 커피콩
+            int currentTurnBeans = cbtTokenUsageService.calculateBeans(totalTokens);
             
-            int calcBeansTotal = cbtTokenUsageService.calculateBeans(totalTokens);
-            int accumulated_usedBeans = cbtTokenUsageService.calculateBeans(totalTokens);
-            log.info("토큰2Beans - Total: {}, accumulated_usedBeans: {}", 	calcBeansTotal, accumulated_usedBeans);               
+            // 누적 토큰 -> 누적 커피콩
+            int accumulatedUsedBeans = cbtTokenUsageService.calculateBeans((int) accumulatedTokens);
+            
+            log.info("=== 토큰 사용량 상세 ===");
+            log.info("현재 턴 - Prompt: {}, Completion: {}, Total: {}", 
+                    promptTokens, completionTokens, totalTokens);
+            log.info("누적 - AccumulatedTokens: {}", accumulatedTokens);
+            log.info("커피콩 - 현재턴: {}, 누적: {}", currentTurnBeans, accumulatedUsedBeans);
+            log.info("=====================");            
             
             // 토큰 사용량 DB 저장 (로그인한 회원만, 어차피 비회원은 chatbot 못쓴다 b/c 글작성, 글수정이 원천봉쇄되어 있으므로) 
 			// 아래 모두 ChatbotService에서 
             if(loginMember != null) {
-                // 세션ID를 숫자로 변환 (실제로는 CB_SESSION 테이블에서 가져와야 함)
-                Long cbSessionId = parseCbSessionId(sessionId);
-				
-//                // 사용한 토큰(과금할 커피콩)에 대한 정보 저장 
-//                // => 사용 커피콩(BeanSwe) 계산은 이 메소드 안에서 수행 (500토큰당 1커피콩:실제, 5토큰당 1커피콩:테스트용)
-//                //tokenUsageService.saveTokenUsage( 
-//                CbtTokenUsage tokenUsage = cbtTokenUsageService.saveTokenUsage( // CB_TOKEN_USAGE 에 삽입	
-//                    userMessage,
-//                    aiAnswer,
-//                    promptTokens,
-//                    completionTokens,
-//                    "gpt-4o-mini",  // 모델명
-//                    loginMember.getMemberNo(),
-//                    cbSessionId
-//                );
-//                
-                
-				// 회원의 현재 잔여콩 확인: (MemberLoginResponseDTO에 업데이트 된 BeansAmount값 읽어오기)
-                int currentBeans = cbtTokenUsageService.getRemainingBeans(
-                    loginMember.getMemberNo(), 
-                    loginMember.getBeansAmount() != null ? loginMember.getBeansAmount() : 0
+                // 사용한 토큰(과금할 커피콩)에 대한 정보 저장 
+                // => 사용 커피콩(BeanSwe) 계산은 이 메소드 안에서 수행 (500토큰당 1커피콩:실제, 5토큰당 1커피콩:테스트용)
+                CbtTokenUsage tokenUsage = cbtTokenUsageService.saveTokenUsage( // CB_TOKEN_USAGE 에 삽입	
+                    userMessage,
+                    aiAnswer,
+                    promptTokens,
+                    completionTokens,
+                    "gpt-4o-mini",  // 모델명
+                    loginMember.getMemberNo(),
+                    cbSessionId
                 );
-                log.info("회원 {} 잔여 커피콩: {}", loginMember.getMemberNo(), currentBeans);
-				
-				// [추가] 여기에 사용한 커피콩을 현재 유저의 커피콩에서 빼는 로직 필요.				
-				if (currentBeans < accumulated_usedBeans){ // 커피콩을 다 사용한 경우
-									// //===>  회원의 현재 잔여 커피콩 계산
-					// 누적 사용커피콩 += 현재사용 커피콩 
-					// 이때 차감커피콩 = 현재커피콩 - 누적 사용커피콩 > 0이면 계속 진행하면서 사용커피콩은 계속 누적으로 관리
-					// (case1) 만약 차감커피콩 < 0 이면, 사용중지하고 커피콩 충전후 사용하라는 경고창 보여주고, 
-					// 현 세션 종료하고 ==> CB_SESSION 테이블에 현 세션 정보 데이터 입력, 
-					//               ==> COFFEE_BEANS_TRADE에 콩사용 내역기록
-					//               ==> Member BeansAmount 업데이트 
-					log.info("회원 {} 현재 콩잔액 = {}, 누적 사용 콩= {} ", loginMember.getMemberNo(), currentBeans, accumulated_usedBeans);
-					
-				} else { // 아직 커피콩이 남아 있는경우
-					// (case2) 사용자가 정상종료(팝어창닫기)하면
-					// 세션 종료하고 ==> CB_SESSION 테이블에 현 세션 정보 데이터 입력, 
-					//               ==> COFFEE_BEANS_TRADE에 콩사용 내역기록
-					//               ==> Member BeansAmount 업데이트 	
-					log.info("회원 {} 현재 콩잔액 = {}, 누적 사용 콩= {} ", loginMember.getMemberNo(), currentBeans, accumulated_usedBeans);
-					log.info("최종 콩 잔액 = {} (현재콩 잔액 -  누적사용콩)", currentBeans - accumulated_usedBeans);
-				}
-							
+                
+                
+                // 회원의 현재 잔여콩 확인
+                int currentBeans = loginMember.getBeansAmount() != null ? loginMember.getBeansAmount() : 0;
+                int remainingBeans = currentBeans - accumulatedUsedBeans;
+                
+                log.info("회원 {} - 보유콩: {}, 누적사용콩: {}, 잔여콩: {}", 
+                        loginMember.getMemberNo(), currentBeans, accumulatedUsedBeans, remainingBeans);
+                
+                if (remainingBeans < 0) {
+                    log.warn("회원 {} 커피콩 부족! 현재: {}, 사용: {}, 부족: {}", 
+                            loginMember.getMemberNo(), currentBeans, accumulatedUsedBeans, Math.abs(remainingBeans));
+                } else {
+                    log.info("회원 {} 커피콩 충분 - 잔여: {} 콩", 
+                            loginMember.getMemberNo(), remainingBeans);
+                }				
+                
+                
             }
             
             // 응답 생성
@@ -188,7 +181,7 @@ public class ChatbotService {
                 , "completion_tokens", completionTokens
                 , "total_tokens", totalTokens
                 , "accumulated_tokens", accumulatedTokens
-                , "accumulated_usedBeans", accumulated_usedBeans
+                , "accumulated_usedBeans", accumulatedUsedBeans // 누적 커피콩
             ));
             
             return result;
@@ -202,21 +195,6 @@ public class ChatbotService {
         }
 	}
 	
-    /**
-     * 세션ID 문자열을 Long으로 변환
-     * 실제로는 CB_SESSION 테이블에서 조회해야 함
-     * @param sessionId
-     * @return CB_SESSION_ID
-     */
-    private Long parseCbSessionId(String sessionId) {
-        try {
-            // "session2" -> 2
-            return Long.parseLong(sessionId.replaceAll("[^0-9]", ""));
-        } catch (Exception e) {
-            log.warn("세션ID 파싱 실패, 기본값 1 사용");
-            return 1L;
-        }
-    }
 
 
 	/** 
@@ -232,15 +210,14 @@ public class ChatbotService {
         
         int totalTokens = cbtTokenUsageService.getTotalTokensByMember(loginMember.getMemberNo());
         int totalBeans = cbtTokenUsageService.getTotalBeansByMember(loginMember.getMemberNo());
-        int remainingBeans = cbtTokenUsageService.getRemainingBeans(
-            loginMember.getMemberNo(), 
-            loginMember.getBeansAmount() != null ? loginMember.getBeansAmount() : 0
-        );
+        int remainingBeans = loginMember.getBeansAmount() != null ? loginMember.getBeansAmount() : 0;
+        
+        
         
         Map<String, Object> result = new HashMap<>();
         result.put("totalTokens", totalTokens);
         result.put("totalBeans", totalBeans);
-        result.put("remainingBeans", remainingBeans);
+        result.put("remainingBeans", remainingBeans); // 중복 차감 없음!
         
         return result;
 	}	
@@ -264,7 +241,7 @@ public class ChatbotService {
         } else {
             // KONG 타입: 제한 없음
             return "당신은 DevLog 자유게시판의 프리미엄 AI 어시스턴트입니다. " +
-                   "사용자의 질문에 친절하고 상세하게 답변해주세요. " +
+                   "사용자의 질문에 친절하고 정확하게 답변해주세요. " +
                    "필요한 경우 자세한 설명과 예시를 포함하여 답변할 수 있습니다.";
         }
     }    

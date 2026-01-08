@@ -25,6 +25,13 @@ public class CbtTokenUsageService {
     //private static final int TOKENS_PER_BEAN = 500;
     private static final int TOKENS_PER_BEAN = 5; // 테스트용
     
+    
+    /**
+     * 세션별 누적 토큰 (메모리 캐시)
+     */
+    private final Map<Long, Long> accumulatedTokenMap = new ConcurrentHashMap<>();
+        
+    
     /**
      * 토큰 사용 기록 저장
      * @param promptText 사용자 질문
@@ -81,7 +88,6 @@ public class CbtTokenUsageService {
      * @param tokens 토큰 수
      * @return 커피콩 포인트
      */
-    //private int calculateBeans(int tokens) {
     public int calculateBeans(int tokens) {
         return (int) Math.ceil((double) tokens / TOKENS_PER_BEAN);
     }
@@ -141,20 +147,36 @@ public class CbtTokenUsageService {
     /**
      * 세션별 누적 토큰 (메모리 캐시)
      */
-    private final Map<String, Long> accumulatedTokenMap =
+    private final Map<String, Long> accumulatedTokenMap_draft =
             new ConcurrentHashMap<>();
-
+    
     /**
      * 세션별 누적 토큰 증가
      */
-    public long accumulate(String sessionId, long totalTokens) {
-        return accumulatedTokenMap.merge(
+    public long accumulate_draft(String sessionId, long totalTokens) {
+        return accumulatedTokenMap_draft.merge(
                 sessionId,
                 totalTokens,
                 Long::sum
         );
     }
 
+    
+    
+    /**
+     * 세션별 누적 토큰 증가
+     */
+    public long accumulate(Long sessionId, long totalTokens) {
+        long accumulated = accumulatedTokenMap.merge(
+                sessionId,
+                totalTokens,
+                Long::sum
+        );
+        
+        log.debug("세션 {} 토큰 누적: +{} → 총 {}", sessionId, totalTokens, accumulated);
+        return accumulated;
+    }    
+    
     /**
      * 현재 누적 토큰 조회 (선택)
      */
@@ -162,13 +184,33 @@ public class CbtTokenUsageService {
         return accumulatedTokenMap.getOrDefault(sessionId, 0L);
     }
 
+    
     /**
-     * 세션 종료 시 메모리 정리
+     * 세션 종료 시 메모리 정리 (매우 중요!)
      */
-    public void clearSession(String sessionId) {
-        accumulatedTokenMap.remove(sessionId);
+    public void clearSession(Long sessionId) {
+        Long removed = accumulatedTokenMap.remove(sessionId);
+        if(removed != null) {
+            log.info("세션 {} 메모리 정리 완료 - 누적 토큰: {}", sessionId, removed);
+        } else {
+            log.warn("세션 {} 메모리에 데이터 없음", sessionId);
+        }
+    }
+    
+    /**
+     * 모든 세션 메모리 정리 (관리자 도구용)
+     */
+    public void clearAllSessions() {
+        int size = accumulatedTokenMap.size();
+        accumulatedTokenMap.clear();
+        log.info("모든 세션 메모리 정리 완료 - {} 개 세션", size);
+    }
+    
+    /**
+     * 현재 메모리에 있는 세션 수 확인 (디버깅용)
+     */
+    public int getActiveSessionCount() {
+        return accumulatedTokenMap.size();
     }    
-    
-    
 	
 }
