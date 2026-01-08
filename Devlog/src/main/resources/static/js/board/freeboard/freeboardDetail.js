@@ -196,3 +196,17 @@ function scrollToHashIfExists() {
     target.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 }
+
+const reportBtn = document.getElementById("reportBtn");
+// 좋아요 버튼이 클릭 되었을 때
+reportBtn.addEventListener("click", (e) => {
+  // 로그인 X
+  if (!loginMemberNo || loginMemberNo === "") {
+    alert("로그인 후 이용해주세요.");
+    location.href  = "/board/freeboard";
+    return;
+  }
+
+
+
+})

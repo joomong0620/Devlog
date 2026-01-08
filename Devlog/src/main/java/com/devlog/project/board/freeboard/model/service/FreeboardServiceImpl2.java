@@ -304,6 +304,11 @@ public class FreeboardServiceImpl2 implements FreeboardService2 {
 	public int freeboardDelete(Long boardNo) {
 		// 
 		return mapper.freeboardDelete(boardNo);
+	}
+
+	@Override
+	public int setBoardNoDelFl(Long boardNo) {
+		return mapper.freeboardDelete(boardNo);
 	}   
     
 }

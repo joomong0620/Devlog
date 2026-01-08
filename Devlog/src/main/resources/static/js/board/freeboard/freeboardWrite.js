@@ -101,8 +101,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+
     const form = document.querySelector("form");
-    form.addEventListener("submit", (e) => {
+    //form.addEventListener("submit", (e) => {
+    const submitBtn = document.getElementById('submitBtn'); //###LKSIURI
+    submitBtn.addEventListener("click", (e) => {  //###LKSIURI
         e.preventDefault(); // 기본 submit 막기
 
         //  등록 확인 알림
@@ -130,6 +133,9 @@ document.addEventListener("DOMContentLoaded", () => {
         /**  FormData 생성 **/
         const formData = new FormData(form);
 
+         formData.append("boardTitle", title); // ###LKSIURI
+         formData.append("boardContent", content); // ###LKSIURI
+
         // 기존 images 제거 (중복 방지)
         formData.delete("images");
 
@@ -139,7 +145,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         /** 서버 전송 **/
-        fetch(form.action, {
+        //fetch(form.action, {
+        fetch('/board2/freeboard/insert', { //###LKSIURI
             method: "POST",
             body: formData
         })
@@ -148,7 +155,8 @@ document.addEventListener("DOMContentLoaded", () => {
             alert(data.message); // 알림창 메세지
 
             if (data.success && data.redirectUrl) {
-                window.location.href = data.redirectUrl;
+                //window.location.href = data.redirectUrl;
+                location.href = data.redirectUrl; // JSON을 JS 객체로 // ###LKSIURI
             }
         })
         .catch(err => {

@@ -45,4 +45,10 @@ public interface FreeboardService2 {
 	int freeboardDelete(Long boardNo); 
 	
 	
+	/** 게시글 삭제, monkey-patch
+	 * @param boardNo
+	 * @return 성공한 행의 갯수
+	 */
+	int setBoardNoDelFl(Long boardNo); 	
+	
 }

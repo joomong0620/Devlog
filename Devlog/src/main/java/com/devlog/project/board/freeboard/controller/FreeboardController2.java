@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -194,7 +195,6 @@ public class FreeboardController2 {
 	}
 
 	// [E] 게시글 삭제 (GetMapping())
-	
 	@GetMapping("/freeboard/{boardNo}/delete") 
 	public String boardDelete(
 			@PathVariable("boardNo") Long boardNo 
@@ -228,6 +228,50 @@ public class FreeboardController2 {
 		
 		return path;
 		
-	}	
+	}
+	
+	// [F] 게시글 삭제 (PostMapping())
+	// /board2/freeboard/20/update/deletePOST
+	@PostMapping("/freeboard/{boardNo}/update/deletePOST") // "/board2/freeboard/15" + "/deletePOST"
+	@ResponseBody
+	public Map<String, Object> deletePOST(@RequestBody Map<String, Object> data) {
+	    // data.get("oldBoardNo")
+		Long oldBoardNo = (Long) data.get("oldBoardNo");
+		// data.get("insertBoardNo")
+		// Long insertBoardNo = (Long) data.get("insertBoardNo");
+	    // data.get("existingImgNos")
+		
+		log.info("받은 데이터 : {}", data );
+		
+		// 1. 게시글 삭제 서비스 호출 (해당 게시글 boardDelFl을 'Y'로 세팅)
+		int res = service.setBoardNoDelFl(oldBoardNo);
+		
+		log.info("처리결과 res : {}", data );
+		// 2. data.get("existingImgNos"): oldBoardNo 게시글의 이미지 작업은 future work
+
+		
+		// 3. 결과에 따라 message, path 설정
+		String message = null;
+		String redirectUrl = null;
+		Map<String, Object> result = new HashMap<>();		
+		if(res > 0) { // 게시글 삭제 성공 시
+			message = "게시글이 삭제되었습니다";
+			//redirectUrl = "/board/freeboard/" + insertBoardNo + "?cp=" + cp; //  boardCode, boardNo -> 
+			
+	        result.put("success", true);
+	        result.put("message", message);
+	        //result.put("redirectUrl", redirectUrl);					
+			
+		} else { // 실패 시
+			message = "게시글 수정 실패. 잠시후 다시 시도해 주세요.";
+			//redirectUrl = "/board2/freeboard/" + oldBoardNo + "/update"+ "?cp=" + cp; 
+			
+	        result.put("success", false);
+	        result.put("message", message);
+	        //result.put("redirectUrl", redirectUrl);					
+		}		
+		
+		return result;
+	}
 	
 }
