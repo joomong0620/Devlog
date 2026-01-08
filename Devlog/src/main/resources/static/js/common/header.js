@@ -18,6 +18,12 @@ logout?.addEventListener("click", () => {
   window.location.href = "/member/logout";
 });
 
+// 사이드바 로그아웃
+const sideLogout = document.getElementById("sidebar-logout");
+sideLogout?.addEventListener("click", () => {
+  window.location.href = "/member/logout";
+});
+
 // 프로필
 const profile = document.getElementById("profile");
 profile?.addEventListener("click", () => {

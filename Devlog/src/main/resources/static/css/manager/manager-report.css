@@ -44,7 +44,7 @@ body {
 /* 레이아웃 */
 .layout {
   display: flex;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 85px);
   overflow: hidden;
 }
 
@@ -128,8 +128,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  height: calc(100vh - 80px);
-  overflow-y: auto;
 }
 
 
@@ -205,7 +203,6 @@ body {
   border-collapse: collapse;
   background: #fff;
   border-radius: 10px;
-  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -245,16 +242,6 @@ body {
 .report-table tbody tr:hover {
   background-color: #f6f4fa;
   cursor: pointer;
-}
-
-.status-active {
-  color: #2e7d32;
-  font-weight: 600;
-}
-
-.status-blocked {
-  color: #c62828;
-  font-weight: 600;
 }
 
 .status-wrapper {
@@ -488,4 +475,66 @@ body {
   max-height: 200px;
   padding: 14px 16px;
   opacity: 1;
+}
+
+/* 선택 처리 버튼 */
+.complete-btn {
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #b986cf;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(107, 92, 255, 0.25);
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+  width: 100px;
+}
+
+.complete-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(107, 92, 255, 0.35);
+}
+
+.complete-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(107, 92, 255, 0.2);
+}
+
+.complete-btn:disabled {
+  background: #e0e0e0;
+  color: #999;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.move-btn.disabled {
+  background: #ddd;
+  color: #888;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.row-check--disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.row-check--disabled:hover {
+  cursor: not-allowed;
+}
+
+.table-scroll-wrapper {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.report-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f8f6fa;
+  z-index: 10;
 }

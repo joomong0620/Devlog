@@ -84,7 +84,7 @@
                 </button>
               </li>
               <li><img th:src="@{/images/common/settings.svg}" alt="settings" /> Settings</li>
-              <li><img th:src="@{/images/common/logout.svg}" alt="logout" /> Logout</li>
+              <li id="sidebar-logout"><img th:src="@{/images/common/logout.svg}" alt="logout"/> Logout</li>
             </ul>
           </nav>
         </aside>
@@ -225,7 +225,7 @@
 
           <img th:src="${session.loginMember.profileImg != null 
                         ? session.loginMember.profileImg 
-                        : '/images/common/d1.png'}" alt="profile" />
+                        : '/images/user.png'}" alt="profile" />
 
           <span th:text="${session.loginMember.memberNickname}">
             My
