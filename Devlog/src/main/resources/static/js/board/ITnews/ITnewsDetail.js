@@ -2,10 +2,10 @@ const boardLike = document.getElementById("boardLike");
 // 좋아요 버튼이 클릭 되었을 때
 boardLike.addEventListener("click", (e) => {
   // 로그인 X
-  if (!loginMemberNo || loginMemberNo === "") {
-    alert("로그인 후 이용해주세요.");
-    return;
-  }
+  if (!isAdmin && (!loginMemberNo || loginMemberNo === 0)) {
+      alert("로그인 후 이용해주세요.");
+      return;
+    }
 
   let check; // 기존에 좋아요 X(빈하트) : 0, 기존에 좋아요 O(꽉찬하트) : 1
 
@@ -105,7 +105,7 @@ if (updateBtn != null) {
   const scrapIcon = document.getElementById("scrapIcon");
   scrapIcon.addEventListener("click", (e) => {
   // 로그인 X
-  if (!loginMemberNo || loginMemberNo === "") {
+if (!isAdmin && (!loginMemberNo || loginMemberNo === 0)) {
     alert("로그인 후 이용해주세요.");
     return;
   }
@@ -141,8 +141,7 @@ if (updateBtn != null) {
 
 function openReportModal(targetMemberNo, targetNo) {
 
-
-    if (!loginMemberNo || loginMemberNo === "") {
+if (!isAdmin && (!loginMemberNo || loginMemberNo === 0)) {
     alert("로그인 후 이용해주세요.");
     return;
   }
