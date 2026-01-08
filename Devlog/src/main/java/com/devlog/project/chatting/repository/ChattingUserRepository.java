@@ -122,6 +122,15 @@ public interface ChattingUserRepository extends JpaRepository<ChattingUser, Chat
 		""")
 	List<MentionDTO> findByUser(Long roomNo, String keyword, Long memberNo);
 
+
+	
+	@Query("""
+			select count(cu)
+			from ChattingUser cu
+			where cu.chattingRoom.roomNo = :roomNo
+			""")
+	Long countUsers(Long roomNo);
+
 	
 	
 
