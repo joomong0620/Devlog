@@ -111,7 +111,7 @@ public class ReportServiceImpl implements ReportService {
 							.targetType(req.getTargetType())
 							.content(req.getReportReason())
 							.targetId(req.getTargetNo())
-							.messageContent(message.getMessageContent())
+							.messageNo(req.getTargetNo())
 							.reporter(member)
 							.reported(targetMember)
 							.reportCode(reportCode)

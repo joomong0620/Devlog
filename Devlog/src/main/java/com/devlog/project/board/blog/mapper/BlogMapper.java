@@ -75,6 +75,12 @@ public interface BlogMapper {
     int updateBlog(BlogDTO blogDTO);
     int deleteBlogTags(Long boardNo);
     
+    // [추가] 특정 게시글의 구매 횟수 조회 (삭제 방지용)
+    int countPostPurchases(Long boardNo);
+    
+    // [추가] 구독자가 조회한 횟수 조회 (삭제 방지용)
+    int countSubscriberViews(Long boardNo);
+    
     // 실시간 알림
 	Long selectReceiverNo(Long boardNo);
 	String selectBoardTitle(Long boardNo);

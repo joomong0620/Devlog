@@ -89,6 +89,14 @@
         AND b.BOARD_DEL_FL = 'N'
         AND bl.TEMP_FL = 'N'
     </select>
+    
+    <select id="countPostPurchases" parameterType="long" resultType="_int">
+        SELECT COUNT(*)
+        FROM COFFEE_BEANS_TRADE
+        WHERE CONTENT_TYPE = 'POST'
+          AND CONTENT_ID = #{boardNo}
+    </select>
+
 
     <select id="countMyBlogList" parameterType="map" resultType="_int">
         SELECT COUNT(*)
@@ -462,6 +470,15 @@
         SELECT COUNT(*) 
         FROM "SUBSCRIBE" 
         WHERE CREATOR_ID = #{memberNo} 
+    </select>
+    
+    <select id="countSubscriberViews" parameterType="long" resultType="_int">
+        SELECT COUNT(*)
+        FROM VIEW_LOG V
+        JOIN BOARD B ON V.BOARD_NO = B.BOARD_NO
+        JOIN "MEMBER" M ON B.MEMBER_NO = M.MEMBER_NO
+        JOIN "SUBSCRIBE" S ON (S.CREATOR_ID = M.MEMBER_NO AND S.SUBSCRIBER_ID = V.MEMBER_NO)
+        WHERE V.BOARD_NO = #{boardNo}
     </select>
 
     <select id="checkSubscribeStatus" parameterType="map" resultType="int">

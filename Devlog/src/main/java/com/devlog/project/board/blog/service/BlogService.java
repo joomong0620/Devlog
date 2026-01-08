@@ -71,4 +71,6 @@ public interface BlogService {
 	// 게시글 좋아요 확인
 	boolean isBoardLiked(Long boardNo, Long memberNo);
 	
+	
+	
 }

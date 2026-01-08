@@ -5,6 +5,7 @@ const modalMessageContent = document.getElementById("modalMessageContent");
 let currentTargetUrl = null;
 let currentTargetType = null;
 let currentReportId = null;
+let currentMessageNo = null;
 
 // 모달 내부 필요한 요소들
 const modalReportNo = document.getElementById("modalReportNo");
@@ -65,12 +66,11 @@ function openModal(row) {
     moveButton.textContent = "신고된 메시지 확인";
     modalMessageContent.textContent =
       messageContent || "신고된 메시지 내용이 없습니다.";
-<<<<<<< HEAD
 
-    modalMessageContent.classList.remove("open");
-=======
     document.getElementById("deleteMessageBtn").style.display = "inline-block";
->>>>>>> 8d7a4c5 (Feat.)
+
+    document.getElementById("deleteMessageBtn").style.display = "inline-block";
+
   }
 
   modal.style.display = "flex";
@@ -110,6 +110,7 @@ moveButton.addEventListener("click", function () {
     return;
   }
 
+  
   // 채팅 신고
   modalMessageContent.classList.toggle("open");
 });

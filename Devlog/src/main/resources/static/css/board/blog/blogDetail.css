@@ -839,3 +839,21 @@ body {
     resize: none;
     margin-bottom: 20px;
 }
+
+/* stats 내부의 신고 버튼 스타일 */
+.report-btn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--gray-color);
+    transition: color 0.2s;
+}
+
+.report-btn:hover {
+    color: #e74c3c; /* 경고색(빨강) */
+}
+
+.report-btn i {
+    font-size: 0.9rem;
+}

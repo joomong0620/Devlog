@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const bThumb = item.thumbnail_url || '/images/logo.png'; // 썸네일 없으면 기본 로고
             const bDate = item.activity_date || '';
             const bAuthor = item.member_nickname || '익명';
-            const bCount = item.board_Count || 0;
+            const bCount = item.board_count || 0;
             const isPaidVal = item.is_paid || 'N';
 
             // 링크 설정 (임시저장은 수정 페이지, 나머지는 상세 페이지)
