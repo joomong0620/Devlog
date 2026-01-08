@@ -9,7 +9,7 @@ public interface ManagerReportService {
 
     List<ReportManagerDTO> getReportList();
 
-    void updateReportStatus(Long reportId, ReportStatus status);
+    void updateReportStatuses(List<Long> reportIds, ReportStatus status);
     
     // 처리 상태 변경하기
     void syncResolvedReports();
