@@ -13,27 +13,30 @@ import com.devlog.project.report.model.entity.Report;
 
 public interface ManagerReportRepository extends JpaRepository<Report, Long> {
 
-    @Query("""
-		select new com.devlog.project.manager.model.dto.ReportManagerDTO(
-		    r.reportId,
-		    r.targetId,
-		    rc.reportType,
-		    r.targetType,
-		    r.content,
-		    reporter.memberNickname,
-		    reported.memberNickname,
-		    r.createdAt,
-		    r.processedAt,
-		    r.status,
-		    r.messageContent
-		)
-        from Report r
-        join r.reportCode rc
-        join r.reporter reporter
-        join r.reported reported
-        order by r.createdAt desc
-    """)
-    List<ReportManagerDTO> findAllForManager();
+	@Query("""
+		    select new com.devlog.project.manager.model.dto.ReportManagerDTO(
+		        r.reportId,
+		        r.targetId,
+		        r.messageNo,
+		        rc.reportType,
+		        r.targetType,
+		        r.content,
+		        reporter.memberNickname,
+		        reported.memberNickname,
+		        r.createdAt,
+		        r.processedAt,
+		        r.status,
+		        msg.messageContent
+		    )
+		    from Report r
+		    join r.reportCode rc
+		    join r.reporter reporter
+		    join r.reported reported
+		    left join r.message msg
+		    order by r.createdAt desc
+		""")
+		List<ReportManagerDTO> findAllForManager();
+
     
     @Query("""
     	 select r

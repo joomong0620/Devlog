@@ -416,7 +416,7 @@ deleteBtn.addEventListener('click', e => {
 
 
 /* 그룹 채팅방 추가 함수 */
-async function createGroup(){
+async function  createGroup(){
     
     try{
 
@@ -1211,8 +1211,8 @@ document.addEventListener("click", async e=> {
     if (!pin) return;
 
     const data = {
-        memberNo : myNo,
-        roomNo : currentRoomNo
+        memberNo : Number(myNo),
+        roomNo : Number(currentRoomNo)
     };
 
     const resp = await fetch('/devtalk/pinUpdate', {
@@ -1289,7 +1289,12 @@ function bindMessageDeleteEvents() {
     };
 }
 
+let profileCardBound = false;
+
 function bindProfileCardEvents() {
+
+    if(profileCardBound) return;
+    profileCardBound = true;
 
     document.addEventListener('click', async e => {
 
@@ -1302,7 +1307,6 @@ function bindProfileCardEvents() {
         const profileCard = messageItem.querySelector('.profile-card');
         const memberNo = messageItem.dataset.memberNo;
 
-        // 다른 카드 닫기
         document.querySelectorAll('.profile-card').forEach(card => {
             if(card !== profileCard) card.classList.add('display-none');
         });
@@ -1316,17 +1320,17 @@ function bindProfileCardEvents() {
         profileCard.classList.toggle('display-none');
     });
 
-    // 카드 외부 클릭 시 닫기
     document.addEventListener('click', () => {
         document.querySelectorAll('.profile-card')
             .forEach(card => card.classList.add('display-none'));
     });
 
-    // 카드 내부 클릭 막기
     document.addEventListener('click', e => {
         if(e.target.closest('.profile-card')) e.stopPropagation();
     });
 }
+
+
 
 
 function openProfile(data, card) {
@@ -2007,6 +2011,10 @@ function createOtherMessage(msg) {
     img.className = 'profile-img';
     img.src = msg.profile_img ?? '/images/logo.png';
     li.appendChild(img);
+
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'profile-card flex-col display-none'
+    li.appendChild(cardDiv);
 
     const content = document.createElement('div');
     content.className = 'message-content flex-col gap-12';

@@ -428,7 +428,7 @@ public class BlogController {
 	}
 
 	// 게시글 수정 화면으로 이동하는 메서드
-	@GetMapping("/blog/update/{boardNo}")
+	@GetMapping("/blog/edit/{boardNo}")
 	public String blogEdit(@PathVariable Long boardNo, Model model) {
 
 		// 1. 로그인 체크
@@ -450,13 +450,6 @@ public class BlogController {
 		if (!post.getMemberEmail().equals(loginEmail)) {
 			return "redirect:/blog/detail/" + boardNo;
 		}
-		
-		// 유료 & 발행된 글이면 수정 진입 차단!
-		if ("Y".equals(post.getIsPaid()) && "N".equals(post.getTempFl())) {
-	        // 자바스크립트로 "수정할 수 없습니다" 띄우고 싶다면 조금 복잡해지니,
-	        // 일단은 상세페이지로 강제 리다이렉트 시킵니다.
-	        return "redirect:/blog/detail/" + boardNo;
-	    }
 
 		// 5. 모델에 데이터 담기 (이게 있어야 화면에 글 내용이 채워짐)
 		System.out.println("수정 화면 진입 - 글 번호: " + post.getBoardNo());
@@ -492,7 +485,7 @@ public class BlogController {
 	}
 
 	// 게시글 삭제 API
-	@PostMapping("/api/blog/delete/{boardNo}")
+	@DeleteMapping("/api/blog/delete/{boardNo}")
 	@ResponseBody
 	public ResponseEntity<String> deletePost(@PathVariable Long boardNo) {
 
@@ -506,17 +499,9 @@ public class BlogController {
 		try {
 			blogService.deletePost(boardNo);
 			return ResponseEntity.ok("삭제되었습니다.");
-			
-		} catch (IllegalStateException e) {
-	        // [수정 1] 서비스에서 보낸 "구매자가 있어 삭제 불가" 메시지를 그대로 전달
-	        // 400 Bad Request 상태코드와 함께 메시지(e.getMessage())를 보냄
-	        return ResponseEntity.status(400).body(e.getMessage());
-	        
-	    } catch (Exception e) {
-	        // [수정 2] 그 외 진짜 서버 에러일 때만 "삭제 실패" 전달
-	        e.printStackTrace();
-	        return ResponseEntity.status(500).body("삭제 실패: 서버 오류가 발생했습니다.");
-	    }
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body("삭제 실패");
+		}
 	}
 
 	// 헬퍼 메서드 (반복해서 쓰는거 이걸로 씀)

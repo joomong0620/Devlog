@@ -108,7 +108,7 @@ public class ChatRestController {
 			@SessionAttribute("loginMember") MemberLoginResponseDTO loginMember
 			) throws IOException {
 		
-		// log.info("파라미터 확인 group : {}", group);
+		log.info("파라미터 확인 group : {}", group);
 		
 		Long loginMemberNo = loginMember.getMemberNo();
 		

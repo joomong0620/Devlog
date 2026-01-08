@@ -45,6 +45,11 @@ public class ManagerReportServiceImpl implements ManagerReportService {
                 dto.setTargetUrl(
                     resolveBoardUrl(boardCode, boardNo)
                 );
+                
+            } else if (dto.getTargetType() == ReportTargetEnums.MESSAGE) {
+
+                // 메시지 신고는 URL 이동 없음
+                dto.setTargetUrl(null);
             }
         });
 

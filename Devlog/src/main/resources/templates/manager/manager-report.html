@@ -111,6 +111,7 @@
           <tr th:each="report : ${reportList}"
               th:data-report-no="${report.reportId}"
               th:data-target-id="${report.targetId}"
+              th:data-message-no="${report.messageNo}"
               th:data-target-type="${report.targetType}"
               th:data-target-url="${report.targetUrl}"
               th:data-report-type="${report.reportType}"
@@ -201,6 +202,11 @@
       <div class="chat-preview" id="modalMessageContent"></div>
       <div class="modal-footer">
         <button class="move-btn" id="moveButton">해당 게시글 이동</button>
+
+        <!-- 채팅 신고일 때만 노출 -->
+        <button class="delete-btn" id="deleteMessageBtn" style="display:none;">
+          메시지 삭제
+        </button>
       </div>
 
       <p class="modal-notice">

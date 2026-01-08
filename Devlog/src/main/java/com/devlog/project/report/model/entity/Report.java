@@ -68,9 +68,13 @@ public class Report {
 	private Long targetId;
 
 
-	// 신고된 메시지 내용
-	@Column(name = "MESSAGE_CONTENT", length = 4000)
-	private String messageContent;
+	// 신고된 메세지 번호
+	@Column(name = "MESSAGE_NO")
+	private Long messageNo;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "MESSAGE_NO", insertable = false, updatable = false)
+	private com.devlog.project.chatting.entity.Message message;
 
 
 	@Column(name = "CREATED_AT", nullable = false, updatable = false)

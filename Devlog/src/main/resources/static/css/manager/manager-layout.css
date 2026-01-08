@@ -127,6 +127,7 @@ body {
 /* 메인 공통 */
 .main {
   flex: 1;
+  padding: 40px 50px;
   display: flex;
   flex-direction: column;
   overflow: hidden;

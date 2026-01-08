@@ -354,12 +354,6 @@ public class PayServiceImpl implements PayService {
 	        }
 	        System.out.println("=== 구독 자동 갱신 프로세스 종료 ===");
 	    }
-	    
-	    // 게시글 구매자 수 카운트
-	    @Override
-	    public int countPostBuyers(Long boardNo) {
-	        return paymapper.countPostBuyers(boardNo);
-	    }
 	
 }
 

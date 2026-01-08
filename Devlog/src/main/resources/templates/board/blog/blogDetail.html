@@ -45,10 +45,8 @@
                     <div class="meta-right-group">
                         <div class="author-actions"
                             th:if="${loginUser != null and loginUser.memberEmail == post.memberEmail}">
-                            <button type="button" th:if="${isOwner}"
-                                th:onclick="checkAndUpdate([[${post.boardNo}]], [[${post.isPaid}]], [[${post.tempFl}]])">
-                                수정
-                            </button>
+                            <button class="btn-text"
+                                th:onclick="|location.href='@{/blog/edit/{no}(no=${post.boardNo})}'|">수정</button>
                             <span class="divider">|</span>
                             <button class="btn-text delete" th:onclick="|deletePost(${post.boardNo})|">삭제</button>
                         </div>
