@@ -65,7 +65,7 @@ public class FreeboardController2 {
 			) throws IllegalStateException, IOException {
 
 		log.info("[ FreeboardController ] freeboard =  {}", freeboard); 
-		log.info("[ FreeboardController ] images.size() =  {}", images.size()); 
+		//log.info("[ FreeboardController ] images.size() =  {}", images.size()); // images.size() null 방어필요
 		
 		MemberLoginResponseDTO loginMember = (MemberLoginResponseDTO) session.getAttribute("loginMember");
 		log.info("loginMember from session.getAttribute(): {}", loginMember); 
@@ -236,9 +236,13 @@ public class FreeboardController2 {
 	@ResponseBody
 	public Map<String, Object> deletePOST(@RequestBody Map<String, Object> data) {
 	    // data.get("oldBoardNo")
-		Long oldBoardNo = (Long) data.get("oldBoardNo");
-		// data.get("insertBoardNo")
-		// Long insertBoardNo = (Long) data.get("insertBoardNo");
+		//Long oldBoardNo = (Long) data.get("oldBoardNo");
+		//Long oldBoardNo = (Long) data.get("oldBoardNo");
+		Long oldBoardNo =  ((Number) data.get("oldBoardNo")).longValue(); 
+		//Long oldBoardNo = Long.valueOf( data.get("oldBoardNo"));
+		// data.get("insertedBoardNo")
+		//Long insertedBoardNo = (Long) data.get("insertedBoardNo");
+		Long insertedBoardNo = ((Number) data.get("insertedBoardNo")).longValue(); 
 	    // data.get("existingImgNos")
 		
 		log.info("받은 데이터 : {}", data );
@@ -256,19 +260,19 @@ public class FreeboardController2 {
 		Map<String, Object> result = new HashMap<>();		
 		if(res > 0) { // 게시글 삭제 성공 시
 			message = "게시글이 삭제되었습니다";
-			//redirectUrl = "/board/freeboard/" + insertBoardNo + "?cp=" + cp; //  boardCode, boardNo -> 
+			redirectUrl = "/board/freeboard/" + insertedBoardNo;  
 			
 	        result.put("success", true);
 	        result.put("message", message);
-	        //result.put("redirectUrl", redirectUrl);					
+	        result.put("redirectUrl", redirectUrl);					
 			
 		} else { // 실패 시
 			message = "게시글 수정 실패. 잠시후 다시 시도해 주세요.";
-			//redirectUrl = "/board2/freeboard/" + oldBoardNo + "/update"+ "?cp=" + cp; 
+			redirectUrl = "/board2/freeboard/" + oldBoardNo + "/update"; 
 			
 	        result.put("success", false);
 	        result.put("message", message);
-	        //result.put("redirectUrl", redirectUrl);					
+	        result.put("redirectUrl", redirectUrl);					
 		}		
 		
 		return result;

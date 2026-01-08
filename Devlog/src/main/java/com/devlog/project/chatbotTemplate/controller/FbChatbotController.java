@@ -170,19 +170,34 @@ public class FbChatbotController {
             @RequestBody Map<String, Object> request,
             @SessionAttribute(name = "loginMember", required = false) MemberLoginResponseDTO loginMember) {
         
-        if(loginMember == null) {
-            return ResponseEntity.status(401).body(Map.of(
-                "success", false,
-                "message", "로그인이 필요합니다."
-            ));
-        }
+        log.info("=== updateBeansAmount 호출됨 ===");
+        log.info("요청 데이터: {}", request);
+        log.info("로그인 회원: {}", loginMember);
+        
+        // 로그인 체크 완화 - request에 memberNo가 있으면 진행
+        // beforeunload에서는 세션이 이미 만료될 수 있음       
+//        if(loginMember == null) {
+//            return ResponseEntity.status(401).body(Map.of(
+//                "success", false,
+//                "message", "로그인이 필요합니다."
+//            ));
+//        }
         
         try {
             Long memberNo = Long.valueOf(request.get("loginMemberNo").toString());
             Integer updatedBeansAmount = Integer.valueOf(request.get("updatedBeansAmount").toString());
             
-            // 로그인한 회원과 요청한 회원이 일치하는지 확인
-            if(!loginMember.getMemberNo().equals(memberNo)) {
+//            // 로그인한 회원과 요청한 회원이 일치하는지 확인
+//            if(!loginMember.getMemberNo().equals(memberNo)) {
+//                return ResponseEntity.status(403).body(Map.of(
+//                    "success", false,
+//                    "message", "권한이 없습니다."
+//                ));
+//            }
+            
+            // 로그인한 회원과 요청한 회원이 일치하는지 확인 (세션이 있을 때만)
+            if(loginMember != null && !loginMember.getMemberNo().equals(memberNo)) {
+                log.warn("권한 불일치 - 로그인: {}, 요청: {}", loginMember.getMemberNo(), memberNo);
                 return ResponseEntity.status(403).body(Map.of(
                     "success", false,
                     "message", "권한이 없습니다."
@@ -191,6 +206,7 @@ public class FbChatbotController {
             
             // 음수 체크
             if(updatedBeansAmount < 0) {
+                log.warn("음수 잔액 시도: {}", updatedBeansAmount);
                 return ResponseEntity.status(400).body(Map.of(
                     "success", false,
                     "message", "잔액이 음수일 수 없습니다."
@@ -201,21 +217,27 @@ public class FbChatbotController {
             Member member = memberRepository.findById(memberNo)
                 .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
             
-            // Member Entity에 업데이트 메서
-            member.updateBeansAmount(updatedBeansAmount);
-            memberRepository.save(member);
+            log.info("업데이트 전 - 회원 {} 커피콩: {}", memberNo, member.getBeansAmount());
             
-            log.info("회원 {} 커피콩 잔액 업데이트 완료: {} 포인트", memberNo, updatedBeansAmount);
+            // Member Entity에 업데이트 메서드 호출
+            member.updateBeansAmount(updatedBeansAmount);
+            Member savedMember = memberRepository.save(member);
+            
+            log.info("✅ 업데이트 후 - 회원 {} 커피콩: {} → {}", 
+                    memberNo, member.getBeansAmount(), savedMember.getBeansAmount());
             
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
             result.put("message", "커피콩 잔액이 업데이트되었습니다.");
             result.put("updatedBeansAmount", updatedBeansAmount);
+            result.put("beforeAmount", member.getBeansAmount());
+            result.put("afterAmount", savedMember.getBeansAmount());
             
             return ResponseEntity.ok(result);
             
         } catch (Exception e) {
             log.error("커피콩 잔액 업데이트 실패", e);
+            log.error("Stack trace:", e);
             return ResponseEntity.status(500).body(Map.of(
                 "success", false,
                 "message", "커피콩 잔액 업데이트 중 오류가 발생했습니다: " + e.getMessage()

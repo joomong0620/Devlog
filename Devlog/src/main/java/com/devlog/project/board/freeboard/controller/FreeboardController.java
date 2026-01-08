@@ -65,7 +65,8 @@ public class FreeboardController {
 	// 게시글 상세조회
 	@GetMapping("/freeboard/{boardNo}")
 	public String selectFreeboardDetail( 
-			@PathVariable("boardNo") int boardNo
+			//@PathVariable("boardNo") int boardNo
+			@PathVariable("boardNo") Long boardNo
 			, Model model 
 			, RedirectAttributes ra 
 			, @SessionAttribute(value = "loginMember", required=false) MemberLoginResponseDTO loginMember

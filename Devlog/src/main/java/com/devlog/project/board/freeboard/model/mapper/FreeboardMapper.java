@@ -27,7 +27,7 @@ public interface FreeboardMapper {
 	public Freeboard selectFreeboardDetail(Map<String, Object> map);	
 
 	// 상세 게시글 조회수 증가(BOARD_COUNT = READ_COUNT)
-	public int updateBoardCount(int boardNo);
+	public int updateBoardCount(Long boardNo);
 	
 	// 상세 게시글 좋아요 여부 확인
 	public int boardLikeCheck(Map<String, Object> map);

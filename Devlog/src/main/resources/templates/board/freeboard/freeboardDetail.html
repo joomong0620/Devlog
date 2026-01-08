@@ -70,15 +70,13 @@
             
                     <!-- 신고 버튼 -->
                     <div class="report-box">
-                    <th:block th:if="${session.loginMember != null 
-                                    and (session.loginMember.memberNo == freeboard.memberNo 
-                                    or session.loginMember.role == 'ROLE_ADMIN')}"></th:block>
-                        <div  class="report-btn" id="reportBtn"
-                                th:onclick="|openReportModal(${freeboard.memberNo}, ${freeboard.boardNo})|">
-                            <div>게시글신고</div>
-                            <img th:src="@{/images/board/freeboard/report_icon.png}" class="report-img" alt="#">
-                        </div>
-                    </th:block>
+                        <th:block th:if="${session.loginMember != null}">          
+                            <div  class="report-btn" id="reportBtn"
+                                    th:onclick="|openReportModal(${freeboard.memberNo}, ${freeboard.boardNo})|">
+                                <div>게시글신고</div>
+                                <img th:src="@{/images/board/freeboard/report_icon.png}" class="report-img" alt="#">
+                            </div>
+                        </th:block>
                     </div>
             
 

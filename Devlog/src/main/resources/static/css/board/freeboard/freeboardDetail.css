@@ -150,13 +150,22 @@ body {
     align-items: center; 
 }
 
-.heart-like {
+/* .heart-like {
     text-align: center;
     width: 25px;
     height: 25px;
     padding: 7px 0px 7px 15px;
-}
+} */
 
+.heart-like {
+    margin-top:5px;
+    margin-left:15px;
+    text-align: center;
+    width: 25px;
+    height: 25px;
+    padding: 0;  /* 기존 padding 제거해서 정확한 중앙 정렬 */
+    display: block;
+}
 
 /* .heart {
     font-size: 24px;

@@ -70,7 +70,8 @@ public class FreeboardServiceImpl implements FreeboardService {
 
 	// 조회수 증가
 	@Override
-	public int updateBoardCount(int boardNo) {
+	//public int updateBoardCount(int boardNo) {
+	public int updateBoardCount(Long boardNo) {
 		return mapper.updateBoardCount(boardNo);
 	}	
 	

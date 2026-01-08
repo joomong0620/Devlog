@@ -167,6 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log("수정대신에 insert 성공"); // ###LKSIURI-monkeyPatch
                 console.log("data: ", data)
                 //location.href = data.redirectUrl; //  ###LKSIURI-monkeyPatch
+                console.log("insert 반환 결과 data.redirectUrl = ", data.redirectUrl); // 예1) '/board/freeboard/62', inserted된 글로
+                const insertedBoardNo = parseInt(data.redirectUrl.split("/")[3]);
 
                 /////// monkey-patch by YYP, 2026-01-08
                 // update -> insert + old delete으로 moneky-patch
@@ -179,13 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 // ajax 주소: location.pathname = "/board/freeboard/27"  ==> location.pathname.split('/') ==> [  "", "board", "freeboard", "27" ]
                 // -- 0) DELETE-POST 새주소(delPOSTaddr) 생성:
                 // 예시: /board/freeboard/27 ==> "/board/freeboard/15" , 여기서 oldBoardNo = 15
-                const oldBoardNo = window.boardNo;
-                const pathArr = location.pathname.split('/');
-                pathArr[3] = "board2";
+                const oldBoardNo = parseInt(window.boardNo);
+                const pathArr = location.pathname.split('/'); // 
+                //pathArr[1] = "board2"; // 불필요. 원래 location.pathname = "/board2/freeboard/{oldBoardNo}/update"
                 pathArr[3] = oldBoardNo; // 15
                 const delPOSTaddr = pathArr.join('/') + "/deletePOST"; //  "/board2/freeboard/15" + "/deletePOST"
-                                                                        //  /board2/freeboard/20/update/deletePOST
-                console.log("delPOSTaddr", delPOSTaddr);
+                                                                        //  /board2/freeboard/20/update/deletePOST                                                   
+                console.log("delPOSTaddr", delPOSTaddr); // 예1) /board2/freeboard/61/update/deletePOST
                 //  -- 1) body에 전달할 데이터 구성:  
                 // const formDataDEL = new FormData(form);
                 // formDataDEL.append( // 기존 이미지  PK + 순서를 추후 콘트롤러에서의 업데이트 위해(나중에...) 담아준다
@@ -199,8 +201,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 //
                 // body에 넣을 JS 객체로 구성
                 const requestBodyData = {
-                oldBoardNo: oldBoardNo,
-                existingImgNos: existingImgNos
+                    oldBoardNo: oldBoardNo,
+                    insertedBoardNo: insertedBoardNo,
+                    existingImgNos: existingImgNos
                 };
 
                 fetch(delPOSTaddr, { // ###LKSIURI-monkeyPatch ==> 콘트롤러 작성해라.
@@ -212,14 +215,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .then(res => res.json())
                 .then(dataDel => {
-                     if (dataDel.success) { // data 구성은 "update" POST 콘트롤러 참여해라
-
+                    console.log("dataDel", dataDel); 
+                    if (dataDel.success) { // data 구성은 "update" POST 콘트롤러 참여해라
+                        console.log("dataDel.redirectUrl", dataDel.redirectUrl); // // 예1) '/board/freeboard/62'
 
                         /////// [B] 이제 location.href로 redirection.
                         console.log("수정대신에 insert 성공!!"); // ###LKSIURI-monkeyPatch
                         //alert(data.message); // 기존 "수정 성공"메시지 알림창에 출력
-                        
-                        location.href = data.redirectUrl; //  ###LKSIURI-monkeyPatch
+                        console.log("data.redirectUrl", data.redirectUrl); // // 예1) '/board/freeboard/62', inserted된 글로
+                        location.href = data.redirectUrl;   //  ###LKSIURI-monkeyPatch; 
+                                                            //   data.redirectUrl == dataDel.redirectUrl
                     } else {
                         console.log("기존 게시글 삭제처리 실패!!"); 
                     }

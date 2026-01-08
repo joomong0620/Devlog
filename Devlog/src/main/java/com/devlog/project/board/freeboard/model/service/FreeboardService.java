@@ -34,7 +34,8 @@ public interface FreeboardService {
 	 * @param boardNo
 	 * @return count
 	 */
-	int updateBoardCount(int boardNo);
+	//int updateBoardCount(int boardNo);
+	int updateBoardCount(Long boardNo);
 
 	
 	/** 좋아요 여부 확인

@@ -73,75 +73,76 @@ public class FreeboardServiceImpl2 implements FreeboardService2 {
 			// 실제로 업로드된 파일의 정보를 기록할 List
 			List<BoardImgDB> uploadList = new ArrayList<BoardImgDB>();
 			
-			log.info("[ FreeboardServiceImpl ] images.size() =  {}", images.size()); 
-			
-			for(int i=0; i<images.size(); i++) { // 이미지 파일 있으나 없으나, images.size()=5가 기본 ==> devlog는 추가한 것만큼만 js에서 동적으로 만듦 (즉, 모두 images.get(i).getSize() > 0)
-				log.info("[ FreeboardServiceImpl ] images.get({}).getSize() =  {}", i, images.get(i).getSize()); 
-				// i번째 요소에 업로드한 파일이 있다면
-				if (images.get(i).getSize() > 0) { // 업로드한 이미지 있다.
-					// img에 파일 정보를 담아서 uploadList에 추가
-					BoardImgDB img = new BoardImgDB();
-					
-					img.setImgPath(webPath); // 웹 접근 경로
-					
-					// 파일 원본명
-					String fileName = images.get(i).getOriginalFilename(); // 파일 원본명 from 리스트
-					log.info("[ FreeboardServiceImpl ] 원본 파일명 fileName =  {}", fileName); 
-					
-					// 파일 변경명 img에 세팅
-					img.setImgRename(Util.fileRename(fileName));
-					
-					// 파일 원본명 img에 세팅
-					img.setImgOrig(fileName);
-					
-					// 다른 필요한 값들 img에 세팅
-					img.setImgOrder(i); 	 // 이미지 순서
-					img.setBoardNo(boardNo); // 게시글 번호
-					
-					uploadList.add(img);
-					
-				}
+			if (images != null && images.size() > 0) {	// null-방어
+				log.info("[ FreeboardServiceImpl ] images.size() =  {}", images.size()); 
 				
-			} // 분류 for문 종료 
-			log.info("[ FreeboardServiceImpl ] uploadList.size() =  {}", uploadList.size()); 
-			
-			// 분류 작업 후 uploadList가 비어있지 않은 경우
-			// == 업로드한 파일이 존재
-			if(!uploadList.isEmpty()) {
-				
-				// BOARD_IMG 테이블에 insert 하기
-				int result = mapper.insertImageList(uploadList); // 이것까지 성공해야 commit by @Transactional()
-				// result == 성공한 행의 개수
-				//
-				// 삽입된 행의 갯수(result)와 uploadList의 개수(uploadList.size())가 같다면
-				// == 전체 insert 성공
-				if (result == uploadList.size()) { // 전체 성공 or 부분 성공/전체 실패
-					
-					for (int i=0; i<uploadList.size(); i++) {
-						// 이미지 순서
-						int index = uploadList.get(i).getImgOrder(); //
+				for(int i=0; i<images.size(); i++) { // 이미지 파일 있으나 없으나, images.size()=5가 기본 ==> devlog는 추가한 것만큼만 js에서 동적으로 만듦 (즉, 모두 images.get(i).getSize() > 0)
+					log.info("[ FreeboardServiceImpl ] images.get({}).getSize() =  {}", i, images.get(i).getSize()); 
+					// i번째 요소에 업로드한 파일이 있다면
+					if (images.get(i).getSize() > 0) { // 업로드한 이미지 있다.
+						// img에 파일 정보를 담아서 uploadList에 추가
+						BoardImgDB img = new BoardImgDB();
 						
-						// 변경명
-						String rename = uploadList.get(i).getImgRename();
-						images.get(index).transferTo(new File(filePath + rename));  // index에 해당하는 images[index]만 서버로 옮겨준다(서버에 저장한다)
+						img.setImgPath(webPath); // 웹 접근 경로
 						
+						// 파일 원본명
+						String fileName = images.get(i).getOriginalFilename(); // 파일 원본명 from 리스트
+						log.info("[ FreeboardServiceImpl ] 원본 파일명 fileName =  {}", fileName); 
+						
+						// 파일 변경명 img에 세팅
+						img.setImgRename(Util.fileRename(fileName));
+						
+						// 파일 원본명 img에 세팅
+						img.setImgOrig(fileName);
+						
+						// 다른 필요한 값들 img에 세팅
+						img.setImgOrder(i); 	 // 이미지 순서
+						img.setBoardNo(boardNo); // 게시글 번호
+						
+						uploadList.add(img);
 						
 					}
 					
+				} // 분류 for문 종료 
+				log.info("[ FreeboardServiceImpl ] uploadList.size() =  {}", uploadList.size()); 
+				
+				// 분류 작업 후 uploadList가 비어있지 않은 경우
+				// == 업로드한 파일이 존재
+				if(!uploadList.isEmpty()) {
 					
-					
-				} else { // 일부 또는 전체 insert 실패
-					// * 웹 서비스 수행 중 1개라도 실패하면 전체 실패 *
-					// -> rollback 필요 (but, @Transactional rollback은 exception이 발생해야만 rollback진행
-					// @Transactional (rollbackFor = Exception.class)
-					// -> 예외가 발생해야만 롤백한다.
-					// -> 사용자 정의 예외 (강제)생성 by "throw"
-					throw new FileUploadException(); // 강제 예외 발생 시키는 구문 -> 이제 @Transactional에서 rollback한다.
+					// BOARD_IMG 테이블에 insert 하기
+					int result = mapper.insertImageList(uploadList); // 이것까지 성공해야 commit by @Transactional()
+					// result == 성공한 행의 개수
+					//
+					// 삽입된 행의 갯수(result)와 uploadList의 개수(uploadList.size())가 같다면
+					// == 전체 insert 성공
+					if (result == uploadList.size()) { // 전체 성공 or 부분 성공/전체 실패
+						
+						for (int i=0; i<uploadList.size(); i++) {
+							// 이미지 순서
+							int index = uploadList.get(i).getImgOrder(); //
+							
+							// 변경명
+							String rename = uploadList.get(i).getImgRename();
+							images.get(index).transferTo(new File(filePath + rename));  // index에 해당하는 images[index]만 서버로 옮겨준다(서버에 저장한다)
+							
+							
+						}
+						
+						
+						
+					} else { // 일부 또는 전체 insert 실패
+						// * 웹 서비스 수행 중 1개라도 실패하면 전체 실패 *
+						// -> rollback 필요 (but, @Transactional rollback은 exception이 발생해야만 rollback진행
+						// @Transactional (rollbackFor = Exception.class)
+						// -> 예외가 발생해야만 롤백한다.
+						// -> 사용자 정의 예외 (강제)생성 by "throw"
+						throw new FileUploadException(); // 강제 예외 발생 시키는 구문 -> 이제 @Transactional에서 rollback한다.
+						
+					}
 					
 				}
-				
-			}
-			
+			}//
 		}
 
 		//return 0;
@@ -202,7 +203,7 @@ public class FreeboardServiceImpl2 implements FreeboardService2 {
             // 2. 기존 이미지 처리
             List<Long> keepImgNos = new ArrayList<>();
             
-            if (existingImgNos != null && !existingImgNos.isEmpty()) {
+            if (existingImgNos != null && !existingImgNos.isEmpty()) { //null-방어
                 // JSON 파싱: "[88,89,90]" -> List<Long>
                 keepImgNos = parseExistingImgNos(existingImgNos);
                 
@@ -226,7 +227,7 @@ public class FreeboardServiceImpl2 implements FreeboardService2 {
             }
             
             // 3. 새 이미지 추가
-            if (images != null && !images.isEmpty()) {
+            if (images != null && !images.isEmpty()) { // null-방어
                 
                 // 새 이미지의 시작 순서 = 기존 이미지 개수
                 int startOrder = keepImgNos.size();

@@ -1,6 +1,7 @@
 package com.devlog.project.board.freeboard.model.dto;
 
 
+import java.util.ArrayList;
 import java.util.List; 
 
 import lombok.Getter;
@@ -37,5 +38,19 @@ public class Freeboard {
 
 	// 댓글 목록
 	private List<CommentDB> commentList;
+	
+	// null 방어, 2026/01/09
+	public void setImageList(List<BoardImgDB> imageList) {
+	    this.imageList = (imageList == null)
+	        ? new ArrayList <>()
+	        : imageList;
+	}	
+	
+	//
+	public void setCommnetList(List<CommentDB> commentList) {
+	    this.commentList = (commentList == null)
+	        ? new ArrayList <>()
+	        : commentList;
+	}		
 }
 

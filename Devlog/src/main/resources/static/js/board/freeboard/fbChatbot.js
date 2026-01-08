@@ -200,7 +200,7 @@ function startChatbotSession() {
 
 /**
  * 챗봇 세션 종료
- * CRITICAL: 순서가 중요 - DB 업데이트가 완료될 때까지 기다려야 함
+ * fetch with keepalive 사용 - beforeunload에서도 확실히 전송됨
  */
 function endChatbotSession() {
     if(!currentSessionId) return;
@@ -214,7 +214,7 @@ function endChatbotSession() {
         
         // 최종 잔여 커피콩 계산 (매우 중요!)
         const initialBeans = window.beansAmount || 0;
-        const finalBeansAmount = Math.max(0, initialBeans - accumulated_usedBeans); // 음수 방지
+        const finalBeansAmount = Math.max(0, initialBeans - accumulated_usedBeans);
 
         console.log("=== 챗봇 세션 종료 정보 ===");
         console.log("초기 커피콩:", initialBeans);
@@ -222,52 +222,61 @@ function endChatbotSession() {
         console.log("최종 잔여 커피콩:", finalBeansAmount);
         console.log("========================");
 
-
-        // 아무 질문도 안 했으면 (accumulated_usedBeans === 0) 업데이트 안 함
+        // 아무 질문도 안 했으면 업데이트 안 함
         if(accumulated_usedBeans > 0) {
-            // 1. Member 테이블 beansAmount 업데이트
-            const updateBeansBlob = new Blob([JSON.stringify({
-                loginMemberNo: window.loginMemberNo,
-                updatedBeansAmount: finalBeansAmount  // 최종 계산된 값 사용!
-            })], { type: 'application/json' });
             
-            navigator.sendBeacon('/api/chatbot/freeboard/updateBeansAmount', updateBeansBlob);
+            // fetch with keepalive 사용 (sendBeacon 대신)
+            // keepalive: true -> 페이지가 닫혀도 요청 완료까지 유지
+            fetch('/api/chatbot/freeboard/updateBeansAmount', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    loginMemberNo: window.loginMemberNo,
+                    updatedBeansAmount: finalBeansAmount
+                }),
+                keepalive: true  // 페이지 종료 후에도 요청 유지
+            })
+            .then(response => {
+                if(response.ok) {
+                    console.log(" Member 테이블 업데이트 성공");
+                } else {
+                    console.error(" Member 테이블 업데이트 실패:", response.status);
+                }
+            })
+            .catch(err => {
+                console.error("Member 테이블 업데이트 오류:", err);
+            });
             
-            console.log(" Member 테이블 업데이트 전송:", {
+            console.log("Member 테이블 업데이트 요청 전송:", {
                 loginMemberNo: window.loginMemberNo,
                 updatedBeansAmount: finalBeansAmount
             });
             
-            // //==>실제 devlog 프로젝트에서
-            // // 2. COFFEE_BEANS_TRADE 결제 내역 삽입
-            // const paymentBlob = new Blob([JSON.stringify({
-            //     contentType: "CHATBOT",
-            //     contentId: currentSessionId,
-            //     price: accumulated_usedBeans
-            // })], { type: 'application/json' });
-            
-            // navigator.sendBeacon('/payment/trade', paymentBlob);
-            
-            // console.log(" COFFEE_BEANS_TRADE 삽입 전송:", {
-            //     contentType: "CHATBOT",
-            //     contentId: currentSessionId,
-            //     price: accumulated_usedBeans
-            // });
         } else {
             console.log(" 커피콩 사용 없음 - DB 업데이트 생략");
         }
-
-
     }
     
-    // 3. 세션 종료  (항상 실행)
-    const sessionEndUrl = `/api/chatbot/session/end/${currentSessionId}`;
-    const sessionEndBlob = new Blob([JSON.stringify({})], { type: 'application/json' });
-    navigator.sendBeacon(sessionEndUrl, sessionEndBlob);
-    
-    console.log("챗봇 세션 종료:", currentSessionId);
+    // 3. 세션 종료 (항상 실행)
+    fetch(`/api/chatbot/session/end/${currentSessionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({}),
+        keepalive: true  //  이것도 keepalive 사용
+    })
+    .then(response => {
+        if(response.ok) {
+            console.log(" 챗봇 세션 종료 성공:", currentSessionId);
+        }
+    })
+    .catch(err => {
+        console.error("세션 종료 오류:", err);
+    });
 }
-
 
 // /////////// 유틸
 function tokenCalc(text) {
