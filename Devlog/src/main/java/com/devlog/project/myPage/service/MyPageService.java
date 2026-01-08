@@ -13,6 +13,8 @@ public interface MyPageService {
     // 프로필 이미지 수정
     void updateProfileImage(String email, String imageUrl);
     
+    // 닉네임 중복 검사
+    int checkNicknameDup(String nickname);
     
     // 구독료 설정
 	void setSubscribePrice(Map<String, Object> paramMap);

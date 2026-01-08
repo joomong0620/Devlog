@@ -53,7 +53,7 @@ public class MyPageController {
         return "myPage/pwCheck"; // templates/myPage/pwCheck.html
     }
 
-    // 3. [수정] 프로필 설정 페이지 (내 정보 가져오기)
+    // 3. 프로필 설정 페이지 (내 정보 가져오기)
     @GetMapping("/myPage/settings")
     public String mySettings(Model  model) {
         
@@ -95,6 +95,13 @@ public class MyPageController {
     	
     	String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return myPageService.updateMemberInfo(email, dto);
+    }
+
+    // [API] 닉네임 중복 확인
+    @GetMapping("/api/myPage/check/nickname")
+    @ResponseBody
+    public int checkNickname(@RequestParam("nickname") String nickname) {
+        return myPageService.checkNicknameDup(nickname);
     }
     
     // [API] 프로필 이미지 변경 (MemberService -> MyPageService로 교체)

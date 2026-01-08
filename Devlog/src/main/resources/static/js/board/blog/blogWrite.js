@@ -7,7 +7,7 @@ const editor = new toastui.Editor({
     // 마크다운 대신 '위지윅' 모드로 시작 (수정 시 보기 편함)
     initialEditType: 'wysiwyg', 
     previewStyle: 'vertical',
-    placeholder: '내용을 입력하세요.',
+    placeholder: '내용을 입력하세요. 오른쪽 하단에 Markdown 탭을 클릭해 더욱 편하게 작성하실 수 있습니다.',
     // 수정 모드일 때 기존 내용 불러오기
     initialValue: document.getElementById('initialContent').value || '',
     hooks: {
@@ -26,7 +26,8 @@ const editor = new toastui.Editor({
                 return response.text(); // 서버가 반환한 URL (String) 받기
             })
             .then(url => {
-                callback(url, '이미지'); 
+                const encodedUrl = encodeURI(url);
+                callback(encodedUrl, '이미지'); 
             })
             .catch(error => {
                 console.error('이미지 업로드 실패:', error);

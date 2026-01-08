@@ -56,12 +56,21 @@ public class MyPageServiceImpl implements MyPageService {
 
 		return result;
 	}
-
+	
+	// 프로필 사진 변경
 	@Override
 	@Transactional
 	public void updateProfileImage(String email, String imageUrl) {
-		// [변경] MyPageMapper 사용
+		
 		myPageMapper.updateProfileImage(email, imageUrl);
+	}
+	
+	// 기존 코드 하단에 추가
+	@Override
+	@Transactional(readOnly = true)
+	public int checkNicknameDup(String nickname) {
+	    // 0: 사용 가능, 1: 중복됨
+	    return memberRepository.existsByMemberNickname(nickname) ? 1 : 0;
 	}
 
 	// 구독 금액 설정
