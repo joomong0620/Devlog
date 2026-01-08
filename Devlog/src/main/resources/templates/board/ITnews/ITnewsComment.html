@@ -11,7 +11,8 @@
         th:classappend="${comment.parentCommentNo != 0} ? 'reply'" th:data-comment-id="${comment.commentNo}">
 
         <p class="comment-writer">
-          <img class="comment-profile" th:src="${comment.profileImg ?: '/images/user.png'}">
+          <img class="comment-profile" 
+          th:src="${comment.profileImg != null and comment.profileImg != '' ? comment.profileImg : '/images/common/d1.png}">
           <span class="comment-nickname" th:text="${comment.memberNickname}">닉네임</span>
           <span class="comment-date" th:text="${comment.commentCreateDate}">작성일</span>
         </p>

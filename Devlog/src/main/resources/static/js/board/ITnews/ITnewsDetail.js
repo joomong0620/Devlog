@@ -140,6 +140,12 @@ if (updateBtn != null) {
 })
 
 function openReportModal(targetMemberNo, targetNo) {
+
+
+    if (!loginMemberNo || loginMemberNo === "") {
+    alert("로그인 후 이용해주세요.");
+    return;
+  }
   //<--------------------------- 함수 호출 시 타겟 회원 번호 넣어서 호출
 
   fetch(`/report/modal?memberNo=${targetMemberNo}`) //<------------------------------------------- 타켓 대상 회원 번호 넣어주셔야 합니다.

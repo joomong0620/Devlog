@@ -58,6 +58,9 @@
 
 }
 
+
+
+
 .form-inline button:hover {
   background-color: #BD83CE;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -75,6 +78,7 @@
   width: 26px;
   height: 26px;
 }
+
 
 /* 목록 리스트 */
 .news-list {
