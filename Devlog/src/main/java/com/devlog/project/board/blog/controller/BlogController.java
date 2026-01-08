@@ -48,6 +48,9 @@ public class BlogController {
 
 		Map<String, Object> result = blogService.getBlogList(pageable.getPageNumber(), pageable.getPageSize(), "id");
 		model.addAttribute("blogList", result.get("content"));
+		// 마지막 페이지 여부 넘기기 (희준 추가)
+		model.addAttribute("isLast", result.get("last"));
+		
 		return "board/blog/blogList";
 	}
 
@@ -476,8 +479,11 @@ public class BlogController {
 		try {
 			blogService.updateBlog(blogDTO);
 			return ResponseEntity.ok("수정 성공");
+			
 		} catch (AccessDeniedException e) {
-			return ResponseEntity.status(403).body("수정 권한이 없습니다.");
+            // "유료 게시글은 수정할 수 없습니다" 메시지를 그대로 전달
+            return ResponseEntity.status(403).body(e.getMessage());
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.internalServerError().body("수정 중 오류 발생");
@@ -499,6 +505,11 @@ public class BlogController {
 		try {
 			blogService.deletePost(boardNo);
 			return ResponseEntity.ok("삭제되었습니다.");
+			
+		} catch (IllegalStateException e) {
+            // [추가] "구매자가 존재하는..." 메시지를 클라이언트로 반환 (400 Bad Request)
+            return ResponseEntity.status(400).body(e.getMessage());
+			
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body("삭제 실패");
 		}
@@ -531,6 +542,8 @@ public class BlogController {
 
 	    model.addAttribute("blogList", result.get("content"));
 	    model.addAttribute("keyword", keyword);
+	    // 마지막 페이지 여부 넘기기 (희준 추가)
+	    model.addAttribute("isLast", result.get("last"));
 
 	    return "board/blog/blogList"; // 기존 화면에서 로직만 조금 변경하면 된다..
 	}

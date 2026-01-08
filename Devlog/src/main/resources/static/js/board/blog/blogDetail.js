@@ -413,6 +413,39 @@ function closeAllModals() {
     document.querySelectorAll('.modal-box').forEach(box => box.classList.add('hidden'));
 }
 
+// 신고
+function openBlogReportModal(targetMemberNo, boardNo) {
+    const loginUserId = document.getElementById("loginUserId").value;
+    
+    if (!loginUserId) {
+        alert("로그인 후 이용해주세요.");
+        return;
+    }
+
+    // 팀원이 만든 공통 함수 호출 (report.js)
+    // fetch 요청을 통해 모달 HTML을 가져옴
+    fetch(`/report/modal?memberNo=${targetMemberNo}`)
+        .then((res) => res.text())
+        .then((html) => {
+            const root = document.getElementById("modal-root");
+            root.innerHTML = html;
+            
+            const modal = root.querySelector("#reportModal");
+            modal.classList.remove("display-none"); // 모달 보이기
+
+            // ★ 중요: 백엔드로 보낼 때 "BOARD" 타입임을 명시
+            modal.dataset.targetType = "BOARD"; 
+            modal.dataset.targetNo = boardNo;
+            modal.dataset.targetMemberNo = targetMemberNo;
+            
+            // 팀원 코드에 있는 이벤트 바인딩 함수 (닫기 버튼, 제출 버튼 등 활성화)
+            if (typeof bindReportModalEvents === "function") {
+                bindReportModalEvents();
+            }
+        })
+        .catch(err => console.error("신고 모달 로드 실패:", err));
+}
+
 /**
  * 구매 확정 처리 (서버의 PayController로 요청 전송)
  */

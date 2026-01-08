@@ -209,6 +209,29 @@ public class BlogServiceImpl implements BlogService {
     // [추가] 게시글 삭제
     @Override
     public void deletePost(Long boardNo) {
+    	// 1. 게시글 정보 조회 (유료 여부 확인용)
+        BlogDTO post = blogMapper.selectBlogDetail(boardNo);
+        
+        if (post == null) {
+             throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+        }
+
+     // [삭제 불가 로직] 2. 유료 게시글이고, 소비자가 있는지 확인
+        if ("Y".equals(post.getIsPaid())) {
+            
+            // 2-1. 직접 구매자 확인
+            int purchaseCount = blogMapper.countPostPurchases(boardNo);
+            
+            // 2-2. 구독자 조회 확인 (구독으로 읽은 사람)
+            int subViewCount = blogMapper.countSubscriberViews(boardNo);
+            
+            if (purchaseCount > 0 || subViewCount > 0) {
+                // 소비자가 1명이라도 있으면 삭제 불가
+                throw new IllegalStateException("이미 구매하거나 구독자가 열람한 유료 게시글은 삭제할 수 없습니다.");
+            }
+        }
+
+        // 3. 삭제 진행
         blogMapper.deleteBoard(boardNo);
     }
 
@@ -476,6 +499,16 @@ public class BlogServiceImpl implements BlogService {
         if (!existPost.getMemberEmail().equals(blogDTO.getMemberEmail())) {
             throw new AccessDeniedException("본인의 글만 수정할 수 있습니다.");
         }
+        
+        // [수정 불가 로직] 3. 유료 게시글은 내용 수정 불가
+        // DB에 저장된 값이 'Y'인지 확인
+        if ("Y".equals(existPost.getIsPaid())) {
+            throw new AccessDeniedException("유료로 발행된 게시글은 수정할 수 없습니다.");
+        }
+        
+        
+        
+        
         System.out.println("썸네일 url : " + blogDTO.getThumbnailUrl());
         // 썸네일 처리
         if (blogDTO.getThumbnailUrl() != null && !blogDTO.getThumbnailUrl().isEmpty()) {
@@ -492,21 +525,7 @@ public class BlogServiceImpl implements BlogService {
         blogMapper.deleteBlogTags(blogDTO.getBoardNo());
 
         // 5-2. 새 태그 등록 (Write 로직과 동일)
-        if (blogDTO.getTagList() != null && !blogDTO.getTagList().isEmpty()) {
-            for (String tagName : blogDTO.getTagList()) {
-                // 태그가 없으면 생성 (MERGE INTO)
-                blogMapper.insertTag(tagName);
-                
-                // 태그 번호 조회
-                Long tagNo = blogMapper.selectTagNoByName(tagName);
-
-                // 연결 테이블(BLOG_TAG)에 등록
-                Map<String, Object> tagParams = new HashMap<>();
-                tagParams.put("boardNo", blogDTO.getBoardNo());
-                tagParams.put("tagNo", tagNo);
-                blogMapper.insertBlogTag(tagParams);
-            }
-        }
+        processTags(blogDTO);
     }
     
     // [헬퍼] 썸네일 저장을 위한 내부 메서드 (BOARD_IMG 테이블 사용)
