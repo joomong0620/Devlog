@@ -3,7 +3,11 @@
 <body>
 <header class="header" th:fragment="header">
   <div class="left-area">
-    <img th:src="@{/images/manager/devlog.svg}" class="logo" />
+      <a th:href="@{/}">
+        <img th:src="@{/images/manager/devlog.svg}"
+            alt="Devlog logo"
+            class="logo"/>
+      </a>
     <span class="welcome"
       th:text="|${session.loginMember != null 
         ? session.loginMember.memberNickname 
