@@ -178,6 +178,13 @@ function openHelper() {
 
     if (!url) return;
 
+    // // 부모(수정화면창) → 자식 팝업(챗봇 basic 팝업창)으로 전역 변수 전달하기 위함
+    // window.globalData = {
+    //     boardNo: window.boardNo,
+    //     loginMemberNo: window.loginMemberNo
+    //     // more variables
+    // };  
+
     window.open(
         url,
         //"helper", // 창이름 (같은이름의 창존재-> 기존 창 재사용, 없으면 새 창 생성)

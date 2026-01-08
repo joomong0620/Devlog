@@ -11,7 +11,9 @@
     <!-- <p th:text="${session.loginMember}"></p>
     <p th:text="${chatbotId}"></p>
     <p th:text="${chatbotType}"></p>    
-    <p th:text="${cbtProfileImg}"></p> -->
+    <p th:text="${cbtProfileImg}"></p>
+    <p th:text="${freeboard}"></p> -->
+
     <main>
         <!-- 헤더 -->
         <!-- <header class="main-header">header</header> -->
@@ -121,6 +123,7 @@
         window.boardCode = /*[[${freeboard?.boardCode}]]*/ null;
         window.boardTitle = /*[[${freeboard?.boardTitle}]]*/ null;
         
+        console.log("window.boardNo = ", window.boardNo);
     </script>
 
     <!-- fbChatbot.js 추가 -->

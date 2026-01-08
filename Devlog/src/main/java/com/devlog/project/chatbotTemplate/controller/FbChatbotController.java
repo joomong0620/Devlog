@@ -6,9 +6,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.devlog.project.chatbotTemplate.dto.CbSession;
+import com.devlog.project.chatbotTemplate.service.CbSessionService;
 import com.devlog.project.chatbotTemplate.service.CbtTokenUsageService;
 import com.devlog.project.chatbotTemplate.service.ChatbotService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
+import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.repository.MemberRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +27,18 @@ import java.util.Map;
 public class FbChatbotController {
 
     private final ChatbotService chatService;
+    private final CbSessionService cbSessionService;
+    private final MemberRepository memberRepository;
     
-    public FbChatbotController(ChatbotService chatService){ this.chatService = chatService; }
+    public FbChatbotController(
+    		ChatbotService chatService
+    		, CbSessionService cbSessionService
+    		, MemberRepository memberRepository
+    		){ 
+		    	this.chatService = chatService; 
+		    	this.cbSessionService = cbSessionService;
+		    	this.memberRepository = memberRepository;
+    	}
 
 
     @GetMapping("page") // chatbotTemplate pop-up window
@@ -65,31 +79,50 @@ public class FbChatbotController {
     // [ 과금 작업 using meta-data ] : 토큰 백엔트에서 제대로(openAI meta data 이용) + DB에 대이터삽입O
     /**
      * 챗봇 메시지 처리 (토큰 사용량 기록 포함)
-     * @param sessionId 세션ID
+     * @param sessionId 세션ID (DB의 CB_SESSION_ID)
      * @param userMessage 사용자 메시지
+     * @param loginMember 로그인 회원
      * @param session HTTP 세션
      * @return 챗봇 응답
      */
-    @PostMapping("/{sessionId}")
+    //@PostMapping("/{sessionId}")
+    @PostMapping("/{sessionId:\\d+}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> chat(
-    		@PathVariable  String sessionId, 
+    		@PathVariable Long sessionId,
     		@RequestBody String userMessage,
-    		@SessionAttribute(name = "loginMember", required = false) MemberLoginResponseDTO loginMember, // 로그인시 Session에 저장된 loginMember 가져오기
-    		HttpSession session 
+    		@SessionAttribute(name = "loginMember", required = false) MemberLoginResponseDTO loginMember // 로그인시 Session에 저장된 loginMember 가져오기
     		){
     	
         log.info("챗봇 요청 - 세션ID: {}, 회원번호: {}, 메시지: {}", 
                 sessionId, loginMember != null ? loginMember.getMemberNo() : "비회원", userMessage);
     	
         Map<String, Object> result = new HashMap<>(); // 챗봇의 응답을 담는 객체
+        
         try {
         	
-        	// OpenAI API 서비스 호출: [ 과금 작업 draft ]
-        	// result = chatService.sendMessage(String sessionId, String message)
+            // 세션 검증
+            CbSession session = cbSessionService.getCbSession(sessionId);
+            if(session == null) {
+                return ResponseEntity.status(400).body(Map.of(
+                    "error", "유효하지 않은 세션입니다."
+                ));
+            }        	
+            
+            log.info("현 챗봇 세션 정보: cbSession 객체 = {}", session);
+            
+            String cbSessionType = session.getCbSessionType();
+            
+            // 커피콩 챗봇인 경우 로그인 체크
+            // CbSessionService.startCbSession()에서  cbSessionType 챗봇 유형 (BASIC, KONG), cbBoardType 게시글 유형 (INSERT, UPDATE)
+            //  에 대한 정보를 CB_SESSION 테이블에 삽입
+            if("KONG".equals(cbSessionType) && loginMember == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "error", "커피콩 챗봇은 로그인이 필요합니다."
+                ));
+            }            
         	
-        	// OpenAI API 서비스 호출:  [ 과금 작업, meta-data ]
-        	result = chatService.sendMessageTokenInfo(sessionId, userMessage, loginMember);
+        	result = chatService.sendMessageTokenInfo(sessionId, cbSessionType, userMessage, loginMember);
         	
         } catch (Exception e) {
             log.error("챗봇 처리 중 오류 발생", e);
@@ -117,6 +150,7 @@ public class FbChatbotController {
             return ResponseEntity.status(401).body(Map.of("error", "로그인이 필요합니다."));
         }
         
+        
         Map<String, Object> result = new HashMap<>(); 
         result = chatService.getUsagebyMember(loginMember);
         
@@ -125,17 +159,68 @@ public class FbChatbotController {
     }
     
     
-    
-    
-      // 일단 이건 지금 쓰지말자
-//    @PostMapping("/lastAnswer")
-//    @ResponseBody
-//    public Map<String,Object> lastAnswer(@RequestBody Map<String,String> payload){
-//        String sessionId = payload.get("sessionId");
-//        String question = payload.get("lastQuestion");
-//        String answer = payload.get("lastAiAnswer");
-//        return chatService.sendLastAnswer(sessionId, question, answer);
-//    }
+    /**
+     * 챗봇 사용 후 회원의 커피콩 잔액 업데이트
+     * @param request {loginMemberNo, updatedBeansAmount}
+     * @return 업데이트 결과
+     */
+    @PostMapping("/updateBeansAmount")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateBeansAmount(
+            @RequestBody Map<String, Object> request,
+            @SessionAttribute(name = "loginMember", required = false) MemberLoginResponseDTO loginMember) {
         
+        if(loginMember == null) {
+            return ResponseEntity.status(401).body(Map.of(
+                "success", false,
+                "message", "로그인이 필요합니다."
+            ));
+        }
         
+        try {
+            Long memberNo = Long.valueOf(request.get("loginMemberNo").toString());
+            Integer updatedBeansAmount = Integer.valueOf(request.get("updatedBeansAmount").toString());
+            
+            // 로그인한 회원과 요청한 회원이 일치하는지 확인
+            if(!loginMember.getMemberNo().equals(memberNo)) {
+                return ResponseEntity.status(403).body(Map.of(
+                    "success", false,
+                    "message", "권한이 없습니다."
+                ));
+            }
+            
+            // 음수 체크
+            if(updatedBeansAmount < 0) {
+                return ResponseEntity.status(400).body(Map.of(
+                    "success", false,
+                    "message", "잔액이 음수일 수 없습니다."
+                ));
+            }
+            
+            // JPA로 Member 조회 및 업데이트
+            Member member = memberRepository.findById(memberNo)
+                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+            
+            // Member Entity에 업데이트 메서
+            member.updateBeansAmount(updatedBeansAmount);
+            memberRepository.save(member);
+            
+            log.info("회원 {} 커피콩 잔액 업데이트 완료: {} 포인트", memberNo, updatedBeansAmount);
+            
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", true);
+            result.put("message", "커피콩 잔액이 업데이트되었습니다.");
+            result.put("updatedBeansAmount", updatedBeansAmount);
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            log.error("커피콩 잔액 업데이트 실패", e);
+            return ResponseEntity.status(500).body(Map.of(
+                "success", false,
+                "message", "커피콩 잔액 업데이트 중 오류가 발생했습니다: " + e.getMessage()
+            ));
+        }
+    }    
+    
 }
