@@ -104,11 +104,14 @@
             </p>
           </div>
 
-          <img th:src="${news.imgPath != null and news.imgPath.startsWith('http')
-              ? news.imgPath
-              : (news.imgPath != null and news.imgRename != null
-                  ? news.imgPath + news.imgRename
-                  : '/images/common/devlog.svg')}"
+          <div class="news-thumb">
+            <img th:src="${
+                news.imgPath != null and news.imgPath.startsWith('http')
+                  ? news.imgPath
+                  : (news.imgPath != null and news.imgRename != null
+                      ? news.imgPath + news.imgRename
+                      : '/images/common/devlog.svg')
+              }"
               alt="뉴스 썸네일">
           </div>
         </div>
