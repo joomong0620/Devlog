@@ -635,6 +635,18 @@ public class ChattingServiceImpl implements ChattingService {
 		
 	}
 
+	
+	// 채팅방 유저 수 조회
+	@Override
+	public Long countParticipant(Long roomNo) {
+		
+		Long count = chattingUserRepository.countUsers(roomNo);
+		
+		System.out.println("현재 참여 인원 수 확인 ");
+		
+		return count;
+	}
+
 
 
 }

@@ -69,6 +69,10 @@ public interface ChattingService {
 	
 	// 고정 여부 변경
 	void pinUpdate(Map<String, Object> paramMap);
+	
+	
+	// 채팅방 참여 유저 변경
+	Long countParticipant(Long roomNo);
 
 	
 	

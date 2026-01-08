@@ -89,7 +89,7 @@
                             <li th:each="fwl : ${followList}">
                                 <label class="follow-item flex">
                                     <div class="flex gap-12 left">
-                                        <img class="profile-img" th:src="${fwl.profileImg} ?: @{/images/logo.png}">
+                                        <img class="profile-img" th:src="${fwl.profileImg} ?: @{/images/user.png}">
                                         <span class="name" th:text="${fwl.memberNickname}">회원 닉네임</span>
                                     </div>
                                     <input type="checkbox" name="invite" th:data-member-no ="${fwl.memberNo}">
@@ -124,7 +124,7 @@
                     <li th:each="crl : ${chatList}" th:data-room-no = ${crl.chattingRoomNo} class="room-item flex gap-12">
                         <div class="room-img">
                             <!-- 프로필 이미지 -->
-                            <img th:src="${crl.roomImg} ?: @{/images/logo.png}">
+                            <img th:src="${crl.roomImg} ?: @{/images/user.png}">
 
                         </div> 
 
@@ -227,7 +227,7 @@
 
                                         <!-- 유저 프로필 이미지 -->
                                         <img class="profile-img"
-                                            th:src="${fl.profileImg} ?: @{/images/logo.png}">
+                                            th:src="${fl.profileImg} ?: @{/images/user.png}">
 
                                         <span class="user-name" th:text="${fl.memberNickname}">멤버 닉네임</span>
                                     </div>
@@ -312,7 +312,7 @@
                                 <div>
                                     <!-- 메시지 작성자 프로필 -->
                                     <img  class="profile-img"
-                                        th:src="${item.profilePath != null ? item.profilePath : '/images/logo.png'}">
+                                        th:src="${item.profilePath != null ? item.profilePath : '/images/user.png'}">
                                 </div>
 
                                 <div class="flex-col gap-8">
@@ -354,7 +354,7 @@
                                 <!-- 멤버 아이템 -->                                
                                 <li th:each="user : ${roomInfo.users}" class="member-item flex gap-12" th:data-chatuser-no="${user.memberNo}">
                                     <img class="profile-img"
-                                        th:src="${user.profileImage != null ? user.profileImage : '/images/logo.png'}">
+                                        th:src="${user.profileImage != null ? user.profileImage : '/images/user.png'}">
                                     <span class="fw-600" th:text="${user.nickname}">회원 이름</span>
 
                                     <!-- 방장 표시 (왕관 아이콘) -->
@@ -400,7 +400,7 @@
                                 th:if="${!msg.mine and msg.type != 'SYSTEM'}"
                                 th:src="${msg.senderProfile != null 
                                     ? msg.senderProfile 
-                                    : '/images/logo.png'}">
+                                    : '/images/user.png'}">
 
 
                             <!-- 유저 프로필 카드 -->
