@@ -46,6 +46,11 @@ public class ManagerController {
         return "manager/manager-home";
     }
     
+    @GetMapping("/dashboard/customer")
+    public String adminCustomerDashboard() {
+        return "manager/manager-customer";
+    }
+    
     // 신고 목록 조히
     @GetMapping("/dashboard/report")
     public String reportList(Model model) {
@@ -55,10 +60,7 @@ public class ManagerController {
         List<ReportManagerDTO> reportList =
             managerReportService.getReportList();
 
-        model.addAttribute(
-            "reportList",
-            managerReportService.getReportList()
-        );
+        model.addAttribute("reportList", reportList);
         return "manager/manager-report";
     }
 
@@ -66,28 +68,38 @@ public class ManagerController {
     // 신고 처리 - 삭제
     @PostMapping("/dashboard/report/resolve")
     @ResponseBody
-    public void resolveReport(@RequestBody Map<String, Long> body) {
+    public void resolveReports(@RequestBody Map<String, Object> body) {
 
-        Long reportId = body.get("reportId");
+        List<Long> reportIds =
+            ((List<?>) body.get("reportIds"))
+                .stream()
+                .map(id -> Long.valueOf(id.toString()))
+                .toList();
 
-        managerReportService.updateReportStatus(
-            reportId,
-            ReportStatus.RESOLVED
+        ReportStatus status = ReportStatus.valueOf(
+            body.get("status").toString()
         );
+
+        managerReportService.updateReportStatuses(reportIds, status);
     }
     
     // 신고 반려
     @PostMapping("/dashboard/report/reject")
     @ResponseBody
-    public void rejectReport(@RequestBody Map<String, Long> body) {
+    public void rejectReports(@RequestBody Map<String, Object> body) {
 
-        Long reportId = body.get("reportId");
+        List<Long> reportIds =
+            ((List<?>) body.get("reportIds"))
+                .stream()
+                .map(id -> Long.valueOf(id.toString()))
+                .toList();
 
-        managerReportService.updateReportStatus(
-            reportId,
+        managerReportService.updateReportStatuses(
+            reportIds,
             ReportStatus.REJECTED
         );
     }
+
     
     // 결제 관리
     @GetMapping("/dashboard/pay")
