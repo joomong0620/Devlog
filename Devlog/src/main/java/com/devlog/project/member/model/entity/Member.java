@@ -179,11 +179,46 @@ public class Member {
 		}		
 	}
 	
-	// 회원 정보 수정 메소드
+	// 회원 정보 수정 메소드: 닉네임 & 전화번호
 	public void updateMemberInfo(String memberNickname, String memberTel) {
 		this.memberNickname = memberNickname; // 필드값 세팅 -> 업데이트
 		this.memberTel = memberTel;
 	}    
     
+	
+	// 회원 정보 수정 메소드 (회원 커피콩 잔액 수정)
+	/**
+	 * 커피콩 잔액 업데이트
+	 * @param newAmount 새로운 커피콩 잔액
+	 */
+	public void updateBeansAmount(Integer newAmount) {
+	    if(newAmount < 0) {
+	        throw new IllegalArgumentException("커피콩 잔액은 음수일 수 없습니다.");
+	    }
+	    this.beansAmount = newAmount;
+	}
+	
+	/**
+	 * 커피콩 차감
+	 * @param amount 차감할 커피콩 수
+	 */
+	public void deductBeans(Integer amount) {
+	    if(this.beansAmount < amount) {
+	        throw new IllegalStateException("커피콩 잔액이 부족합니다.");
+	    }
+	    this.beansAmount -= amount;
+	}
+	
+	/**
+	 * 커피콩 충전
+	 * @param amount 충전할 커피콩 수
+	 */
+	public void chargeBeans(Integer amount) {
+	    if(amount <= 0) {
+	        throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
+	    }
+	    this.beansAmount += amount;
+	}
+	
 }
 

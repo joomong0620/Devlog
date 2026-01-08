@@ -24,7 +24,8 @@ public class ChatbotController {
     @PostMapping("/{sessionId}")
     @ResponseBody
     //public Map<String,Object> chat(@PathVariable("sessionId")  String sessionId, @RequestBody String message){
-    public Map<String,Object> chat(@PathVariable  String sessionId, @RequestBody String message){
+    //public Map<String,Object> chat(@PathVariable  String sessionId, @RequestBody String message){
+    public Map<String,Object> chat(@PathVariable  Long sessionId, @RequestBody String message){
         return chatService.sendMessage(sessionId, message);
     }
 
