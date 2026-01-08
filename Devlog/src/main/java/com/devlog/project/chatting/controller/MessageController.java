@@ -104,6 +104,20 @@ public class MessageController {
 	    if (viewers != null) {
 	        viewers.remove(req.getMemberNo());
 	    }
+	    
+	    Long count = chatService.countParticipant(req.getRoomNo());
+	    
+	    Map<String, Object> respMap = new HashMap<>();
+	    
+	    respMap.put("type", "LEAVE");
+	    
+	    respMap.put("count", count);
+	    
+	    templete.convertAndSend(
+	    		"/topic/room/" + req.getRoomNo(), respMap
+	    		);
+	    
+	    
 	}
 	
 	// 

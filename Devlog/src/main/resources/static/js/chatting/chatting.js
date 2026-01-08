@@ -338,7 +338,7 @@ document.getElementById('room-create-btn').addEventListener('click', async e => 
 
         showChatRoomUI();
 
-        await loadChatRoom(result)
+        await loadChatRoom(result);
         
     }
 
@@ -740,6 +740,8 @@ function bindChatUIEvents() {
             chatOverlay.classList.remove('active');
 
             try{
+
+                
                 const resp = await fetch('/devtalk/roomExit?roomNo=' + Number(currentRoomNo))
 
                 if(!resp.ok) return ;
@@ -1710,6 +1712,14 @@ function bindChatSendInputEvents(chatRoomNo) {
     })
 }
 
+function updateUserCount(msg) {
+    console.log('확인');
+    
+    const memberCountSpan = document.querySelector('.member-counting');
+
+    memberCountSpan.innerText = msg.count;
+}
+
 
 
 // 메세지 수신기
@@ -1724,6 +1734,12 @@ function onMessageReceived(payload) {
         console.log('LastReadNo num:', Number(msg.LastReadNo));
 
         updateUnreadChange(msg);
+        return;
+    }
+
+    if(msg.type =='LEAVE') {
+        console.log(msg ,'확인');
+        updateUserCount(msg);
         return;
     }
 
@@ -2009,7 +2025,7 @@ function createOtherMessage(msg) {
     // 프로필 이미지
     const img = document.createElement('img');
     img.className = 'profile-img';
-    img.src = msg.profile_img ?? '/images/logo.png';
+    img.src = msg.profile_img ?? '/images/user.png';
     li.appendChild(img);
 
     const cardDiv = document.createElement('div');

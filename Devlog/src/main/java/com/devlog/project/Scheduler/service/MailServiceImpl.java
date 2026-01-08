@@ -18,7 +18,7 @@ public class MailServiceImpl implements MailService {
 	private final JavaMailSender mailSender;
 
 	private String BASE_URL = "https://nonfluent-synchronistically-melba.ngrok-free.dev";
-	// ngrok http 8880
+	// ngrok http 8880			https://nonfluent-synchronistically-melba.ngrok-free.dev 
 
 	@Override
 	public void sendHot3Mail(String to, List<Hot3DTO> hotList) {

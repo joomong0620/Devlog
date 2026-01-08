@@ -1035,8 +1035,8 @@ input[name='msgSearch'] {
 .del-check {
     position: absolute;
     z-index: 1001;
-    width: 40%;
-    height: 15%;
+    width: 405px;
+    height: 130px;
     border: 1px solid #E0CAFF;
 
     border-radius: 10px;
