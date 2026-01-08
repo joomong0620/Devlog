@@ -68,6 +68,8 @@ public class SecurityConfig {
 	                "/member/signUp-debug",
 	                "/member/signUpTest",
 	                "/error",
+	                "/api/search/**",
+	                "/search/blog/**",
 	                
 	                "/devtalk/**",
 					"/ws-chat/**",

@@ -46,7 +46,6 @@ public class ManagerReportServiceImpl implements ManagerReportService {
                 dto.setTargetUrl(null);
             }
         });
-
         return list;
     }
 
@@ -73,9 +72,6 @@ public class ManagerReportServiceImpl implements ManagerReportService {
             report.setProcessedAt(LocalDateTime.now());
         }
     }
-
-
-
 
     /**
      * 게시판 코드에서 게시글 URL 변환
@@ -110,5 +106,61 @@ public class ManagerReportServiceImpl implements ManagerReportService {
         }
         reportRepository.flush();
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReportManagerDTO> getReportList(
+        String query,
+        String reportType,
+        ReportStatus status,
+        ReportTargetEnums targetType) {
+        List<ReportManagerDTO> list;
+        if (isSearchMode(query, reportType, status, targetType)) {
+
+            list = managerReportMapper.searchForManager(
+                query,
+                reportType,
+                status,
+                targetType
+            );
+
+        } else {
+            list = reportRepository.findAllForManager();
+        }
+        list.forEach(dto -> {
+            if (dto.getTargetType() == ReportTargetEnums.BOARD) {
+                int boardCode =
+                    managerReportMapper.selectBoardCode(dto.getTargetId());
+                dto.setTargetUrl(resolveBoardUrl(boardCode, dto.getTargetId()));
+            }
+        });
+
+        return list;
+    }
+    
+    private boolean isSearchMode(
+    	    String query,
+    	    String reportType,
+    	    ReportStatus status,
+    	    ReportTargetEnums targetType
+    	) {
+    	    if (query != null && !query.trim().isEmpty()) {
+    	        return true;
+    	    }
+    	    if (reportType != null && !reportType.trim().isEmpty()) {
+    	        return true;
+    	    }
+    	    if (status != null) {
+    	        return true;
+    	    }
+    	    if (targetType != null) {
+    	        return true;
+    	    }
+    	    return false;
+    	}
+
+
+
 }
 
