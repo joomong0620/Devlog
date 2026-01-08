@@ -117,8 +117,7 @@
 
     const boardTitle = /*[[${news?.boardTitle}]]*/ "";
 
-
-    const isAdmin = /*[[${session.loginMember?.memberAdmin?.name() == 'Y'}]]*/ false;
+    const isAdmin = /*[[${session.loginMember?.memberAdmin?.toString() == 'Y'}]]*/ false;
   </script>
 
   <div id="modal-root"></div>
