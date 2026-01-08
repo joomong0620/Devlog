@@ -3,29 +3,28 @@ document.addEventListener("DOMContentLoaded", function () {
   const rawData = window.jobPostingData || [];
 
   const events = rawData.map((job) => {
-    // 시작일(applyStart)을 우선적으로 사용
-    let dateStr =
-      job.applyStart && job.applyStart.includes(".")
-        ? job.applyStart
-        : job.applyEnd;
+    // 1. 날짜 데이터 정제 (하이픈 형식이든 점 형식이든 추출)
+    const getCleanDate = (str) => {
+      if (!str) return null;
+      const match = str.match(/\d{4}[\.\-]\d{2}[\.\-]\d{2}/);
+      return match ? match[0].replace(/\./g, "-") : null;
+    };
 
-    // 만약 시작일도 없고 마감일도 이상하면 오늘 날짜
-    if (!dateStr || !dateStr.includes(".")) {
-      dateStr = new Date().toISOString().slice(0, 10);
-    }
+    const startDate = getCleanDate(job.applyStart);
+    const endDate = getCleanDate(job.applyEnd);
 
-    // 점(.)을 하이픈(-)으로 변경
-    const finalDate = dateStr.replace(/\./g, "-");
+    // 2. 날짜 결정 우선순위:
+    // 시작일이 있으면 시작일로, 없으면 마감일로, 둘 다 없으면 오늘로.
+    let finalDate =
+      startDate || endDate || new Date().toISOString().slice(0, 10);
 
     return {
       title: job.postingTitle,
       start: finalDate,
-
       extendedProps: {
         jobId: job.postingNo,
       },
-
-      // 마감일이 있으면 보라색, 없으면 핑크색
+      // 클래스 구분: 마감일 텍스트에 '채용시'가 들어있으면 핑크
       className:
         job.applyEnd && job.applyEnd.includes("채용시")
           ? "event-pink"

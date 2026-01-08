@@ -19,7 +19,7 @@ import com.devlog.project.manager.model.dto.ReportManagerDTO;
 import com.devlog.project.manager.model.service.ManagerReportService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.report.enums.ReportStatus;
-
+import com.devlog.project.report.enums.ReportTargetEnums;
 import com.devlog.project.pay.dto.PayDTO;
 import com.devlog.project.pay.service.PayService;
 
@@ -53,16 +53,28 @@ public class ManagerController {
     
     // 신고 목록 조히
     @GetMapping("/dashboard/report")
-    public String reportList(Model model) {
+    public String reportList(
+        @RequestParam(required = false) String query,
+        @RequestParam(required = false) String reportType,
+        @RequestParam(required = false) ReportStatus status,
+        @RequestParam(required = false) ReportTargetEnums targetType,
+        Model model
+    ) {
 
         managerReportService.syncResolvedReports();
 
         List<ReportManagerDTO> reportList =
-            managerReportService.getReportList();
+            managerReportService.getReportList(query, reportType, status, targetType);
 
         model.addAttribute("reportList", reportList);
+        model.addAttribute("reportTypes", List.of(
+            "스팸 / 광고", "욕설 / 비방 / 혐오", "음란 / 선정적 내용", "개인정보 노출",
+            "불법 정보", "폭력적 / 잔혹한 내용", "기타 커뮤니티 규칙 위반"
+        ));
+
         return "manager/manager-report";
     }
+
 
     
     // 신고 처리 - 삭제
