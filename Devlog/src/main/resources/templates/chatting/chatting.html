@@ -88,7 +88,7 @@
                         <ul class="follow-list flex-col gap-12 chatFollowList" id="chatFollowList">
                             <li th:each="fwl : ${followList}">
                                 <label class="follow-item flex">
-                                    <div class="flex gap-12">
+                                    <div class="flex gap-12 left">
                                         <img class="profile-img" th:src="${fwl.profileImg} ?: @{/images/logo.png}">
                                         <span class="name" th:text="${fwl.memberNickname}">회원 닉네임</span>
                                     </div>

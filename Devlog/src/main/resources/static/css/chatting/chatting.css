@@ -122,7 +122,6 @@ input[type="search"]::-webkit-search-cancel-button {
     height: 100%;
     align-items: center;
     justify-content: center;
-    margin-left: 25%;
 }
 
 .room-list {
@@ -280,14 +279,50 @@ input[name="memberName"] {
 
 }
 
-
 .follow-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.follow-item .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;              /* 핵심 */
+}
+
+.profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;           /* 크기 고정 */
+}
+
+.name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;         /* 닉네임 길어도 체크박스 안 밀림 */
+}
+
+.follow-item input[type="checkbox"] {
+    flex-shrink: 0;
+}
+
+
+/* .follow-item {
     justify-content: space-around;
 }
 
 .follow-item > div {
     align-items: center;
-}
+} */
+
 
 .user-item {
     border: 1px solid #868686;
