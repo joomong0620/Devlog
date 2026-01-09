@@ -393,4 +393,42 @@ h2 {
 .success { color: #4CAF50; }
 .error { color: #FF5252; }
 
+/* 닉네임 입력창 + 버튼 가로 배치 */
+.nickname-area {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
 
+.nickname-area input {
+    flex-grow: 1; /* 남은 공간 다 차지 */
+}
+
+/* 중복 확인 버튼 스타일 */
+.check-btn {
+    white-space: nowrap; /* 줄바꿈 방지 */
+    background-color: #f1f3f5;
+    color: #57106c;
+    border: 1px solid #e5c2f1;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    height: 100%; /* 인풋창과 높이 맞춤 */
+}
+
+.check-btn:hover {
+    background-color: #e5c2f1;
+    color: #fff;
+}
+
+/* 메세지 스타일 (기존에 있으면 생략 가능) */
+.form-msg {
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 500;
+}
+.form-msg.success { color: #2ecc71; } /* 초록색 */
+.form-msg.error { color: #e74c3c; }   /* 빨간색 */
