@@ -345,10 +345,14 @@ public class MemberController {
 	public MemberProfileDTO selectProfile(
 			Long memberNo
 			) {
+		MemberProfileDTO resp = profileService.selectProfile(memberNo);
+		
+		if(resp.getProfileImg() == null) {
+			resp.setProfileImg("/images/logo.png");
+		}
 		
 		
-		
-		return profileService.selectProfile(memberNo);
+		return resp;
 	}
 		
 	

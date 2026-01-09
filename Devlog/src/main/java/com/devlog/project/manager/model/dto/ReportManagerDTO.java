@@ -19,6 +19,7 @@ public class ReportManagerDTO {
     private Long reportId;
     private Long targetId;
     private String reportType;
+    private Long messageNo;
     
     private ReportTargetEnums targetType;
     private String reportReason;
@@ -36,6 +37,7 @@ public class ReportManagerDTO {
     public ReportManagerDTO(
     	    Long reportId,
     	    Long targetId,
+    	    Long messageNo,
     	    String reportType,
     	    ReportTargetEnums targetType,
     	    String reportReason,
@@ -46,16 +48,18 @@ public class ReportManagerDTO {
     	    ReportStatus status,
     	    String messageContent
     	) {
-        this.reportId = reportId;
-        this.targetId = targetId;
-        this.reportType = reportType;
-        this.targetType = targetType;
-        this.reportReason = reportReason;
-        this.reporterNickname = reporterNickname;
-        this.targetNickname = targetNickname;
-        this.reportDate = reportDate;
-        this.processDate = processDate;
-        this.status = status;
-        this.messageContent = messageContent;
-    }
+    	    this.reportId = reportId;
+    	    this.targetId = targetId;
+    	    this.messageNo = messageNo;
+    	    this.reportType = reportType;
+    	    this.targetType = targetType;
+    	    this.reportReason = reportReason;
+    	    this.reporterNickname = reporterNickname;
+    	    this.targetNickname = targetNickname;
+    	    this.reportDate = reportDate;
+    	    this.processDate = processDate;
+    	    this.status = status;
+    	    this.messageContent = messageContent;
+    	}
+
 }

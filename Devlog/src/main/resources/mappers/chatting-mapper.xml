@@ -22,7 +22,7 @@
 														JOIN CHATTING_USER U2 ON M2.MEMBER_NO = U2.MEMBER_NO
 														WHERE U2.CHATTING_ROOM_NO = CR.CHATTING_ROOM_NO
 														AND U2.MEMBER_NO != ${memberNo})
-					ELSE CR.ROOM_IMG
+					ELSE NVL(CR.ROOM_IMG, '/images/logo.png')
 				END AS "roomImg",
 				
 				CASE

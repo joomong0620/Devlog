@@ -26,55 +26,51 @@ public class ManagerReportServiceImpl implements ManagerReportService {
     @Transactional
     public List<ReportManagerDTO> getReportList() {
 
-        // DB에서 신고 목록 조회
         List<ReportManagerDTO> list = reportRepository.findAllForManager();
 
         list.forEach(dto -> {
 
-            // 게시글 신고인 경우만 처리
+            // 게시글 신고인 경우만 이동 URL 제공
             if (dto.getTargetType() == ReportTargetEnums.BOARD) {
 
                 Long boardNo = dto.getTargetId();
 
-                // 게시글 삭제 여부 조회
-                int isDeleted = managerReportMapper.isBoardDeleted(boardNo);
-
-                // 게시글 이동 URL 생성
                 int boardCode = managerReportMapper.selectBoardCode(boardNo);
 
                 dto.setTargetUrl(
                     resolveBoardUrl(boardCode, boardNo)
                 );
+
+            } else {
+                // 메시지 신고는 직접 확인. 이동 URL 없음
+                dto.setTargetUrl(null);
             }
         });
-
         return list;
     }
 
 
     @Override
     @Transactional
-    public void updateReportStatus(Long reportId, ReportStatus status) {
+    public void updateReportStatuses(List<Long> reportIds, ReportStatus status) {
 
-        Report report = reportRepository.findById(reportId)
-            .orElseThrow(() -> new IllegalArgumentException("신고 내역 없음"));
+        for (Long reportId : reportIds) {
 
-        if (report.getStatus() != ReportStatus.PENDING) {
-            return;
+            Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new IllegalArgumentException("신고 내역 없음"));
+
+            if (report.getStatus() != ReportStatus.PENDING) continue;
+
+            // 게시글 신고 + 처리완료일 때만 삭제
+            if (status == ReportStatus.RESOLVED
+                && report.getTargetType() == ReportTargetEnums.BOARD) {
+
+                managerReportMapper.deleteBoard(report.getTargetId());
+            }
+
+            report.setStatus(status);
+            report.setProcessedAt(LocalDateTime.now());
         }
-
-        if (report.getTargetType() == ReportTargetEnums.BOARD
-            && status == ReportStatus.RESOLVED) {
-
-            Long boardNo = report.getTargetId();
-            managerReportMapper.deleteBoard(boardNo);
-        }
-
-        report.setStatus(status);
-        report.setProcessedAt(LocalDateTime.now());
-        
-        reportRepository.save(report);
-        reportRepository.flush();
     }
 
     /**
@@ -108,6 +104,63 @@ public class ManagerReportServiceImpl implements ManagerReportService {
                 report.setProcessedAt(LocalDateTime.now());
             }
         }
+        reportRepository.flush();
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReportManagerDTO> getReportList(
+        String query,
+        String reportType,
+        ReportStatus status,
+        ReportTargetEnums targetType) {
+        List<ReportManagerDTO> list;
+        if (isSearchMode(query, reportType, status, targetType)) {
+
+            list = managerReportMapper.searchForManager(
+                query,
+                reportType,
+                status,
+                targetType
+            );
+
+        } else {
+            list = reportRepository.findAllForManager();
+        }
+        list.forEach(dto -> {
+            if (dto.getTargetType() == ReportTargetEnums.BOARD) {
+                int boardCode =
+                    managerReportMapper.selectBoardCode(dto.getTargetId());
+                dto.setTargetUrl(resolveBoardUrl(boardCode, dto.getTargetId()));
+            }
+        });
+
+        return list;
+    }
+    
+    private boolean isSearchMode(
+    	    String query,
+    	    String reportType,
+    	    ReportStatus status,
+    	    ReportTargetEnums targetType
+    	) {
+    	    if (query != null && !query.trim().isEmpty()) {
+    	        return true;
+    	    }
+    	    if (reportType != null && !reportType.trim().isEmpty()) {
+    	        return true;
+    	    }
+    	    if (status != null) {
+    	        return true;
+    	    }
+    	    if (targetType != null) {
+    	        return true;
+    	    }
+    	    return false;
+    	}
+
+
+
 }
 

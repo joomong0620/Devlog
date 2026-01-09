@@ -338,7 +338,7 @@ document.getElementById('room-create-btn').addEventListener('click', async e => 
 
         showChatRoomUI();
 
-        await loadChatRoom(result)
+        await loadChatRoom(result);
         
     }
 
@@ -416,7 +416,7 @@ deleteBtn.addEventListener('click', e => {
 
 
 /* 그룹 채팅방 추가 함수 */
-async function createGroup(){
+async function  createGroup(){
     
     try{
 
@@ -740,6 +740,8 @@ function bindChatUIEvents() {
             chatOverlay.classList.remove('active');
 
             try{
+
+                
                 const resp = await fetch('/devtalk/roomExit?roomNo=' + Number(currentRoomNo))
 
                 if(!resp.ok) return ;
@@ -1211,8 +1213,8 @@ document.addEventListener("click", async e=> {
     if (!pin) return;
 
     const data = {
-        memberNo : myNo,
-        roomNo : currentRoomNo
+        memberNo : Number(myNo),
+        roomNo : Number(currentRoomNo)
     };
 
     const resp = await fetch('/devtalk/pinUpdate', {
@@ -1289,7 +1291,12 @@ function bindMessageDeleteEvents() {
     };
 }
 
+let profileCardBound = false;
+
 function bindProfileCardEvents() {
+
+    if(profileCardBound) return;
+    profileCardBound = true;
 
     document.addEventListener('click', async e => {
 
@@ -1302,7 +1309,6 @@ function bindProfileCardEvents() {
         const profileCard = messageItem.querySelector('.profile-card');
         const memberNo = messageItem.dataset.memberNo;
 
-        // 다른 카드 닫기
         document.querySelectorAll('.profile-card').forEach(card => {
             if(card !== profileCard) card.classList.add('display-none');
         });
@@ -1316,17 +1322,17 @@ function bindProfileCardEvents() {
         profileCard.classList.toggle('display-none');
     });
 
-    // 카드 외부 클릭 시 닫기
     document.addEventListener('click', () => {
         document.querySelectorAll('.profile-card')
             .forEach(card => card.classList.add('display-none'));
     });
 
-    // 카드 내부 클릭 막기
     document.addEventListener('click', e => {
         if(e.target.closest('.profile-card')) e.stopPropagation();
     });
 }
+
+
 
 
 function openProfile(data, card) {
@@ -1706,6 +1712,14 @@ function bindChatSendInputEvents(chatRoomNo) {
     })
 }
 
+function updateUserCount(msg) {
+    console.log('확인');
+    
+    const memberCountSpan = document.querySelector('.member-counting');
+
+    memberCountSpan.innerText = msg.count;
+}
+
 
 
 // 메세지 수신기
@@ -1720,6 +1734,12 @@ function onMessageReceived(payload) {
         console.log('LastReadNo num:', Number(msg.LastReadNo));
 
         updateUnreadChange(msg);
+        return;
+    }
+
+    if(msg.type =='LEAVE') {
+        console.log(msg ,'확인');
+        updateUserCount(msg);
         return;
     }
 
@@ -2005,8 +2025,12 @@ function createOtherMessage(msg) {
     // 프로필 이미지
     const img = document.createElement('img');
     img.className = 'profile-img';
-    img.src = msg.profile_img ?? '/images/logo.png';
+    img.src = msg.profile_img ?? '/images/user.png';
     li.appendChild(img);
+
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'profile-card flex-col display-none'
+    li.appendChild(cardDiv);
 
     const content = document.createElement('div');
     content.className = 'message-content flex-col gap-12';

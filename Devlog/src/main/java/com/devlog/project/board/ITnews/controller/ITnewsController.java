@@ -158,10 +158,10 @@ public class ITnewsController {
 		
 		
 		//  권한 체크 로직 수정 (로그인 안했거나 2번이 아니면)
-	    if(loginMember == null || loginMember.getMemberNo() != 2) {
-	        ra.addFlashAttribute("message", "접근 권한이 없습니다.");
-	        return "redirect:/ITnews"; // 뉴스 목록으로 튕겨내기
-	    }
+		if (loginMember == null || !String.valueOf(loginMember.getMemberAdmin()).equals("Y")) {
+		    ra.addFlashAttribute("message", "접근 권한이 없습니다.");
+		    return "redirect:/ITnews";
+		}
 
 	    try {
 	        // 크롤링 실행

@@ -63,9 +63,11 @@
           <div th:if="${session.loginMember == null}">
             <h4>DevLog에서는 이런 걸 할 수 있어요</h4>
             <ul class="guest-guide">
-              <li>📝 오늘의 개발 기록을 남겨요</li>
-              <li>💬 다른 개발자들과 생각을 나눠요</li>
-              <li>⭐ 마음에 드는 기록을 저장해요</li>
+              <li>📝 개발 기록부터 일상까지, 나만의 성장 히스토리</li>
+              <li>💬 DevTalk · 다른 개발자와의 소통</li>
+              <li>⭐ 유용한 글은 스크랩! 나만의 아카이브</li>
+              <li>🏆 활동량에 따른 레벨 증가 시스템</li>
+              <li>💎 유료 멤버십만의 특별한 게시물도 놓치지 마세요!</li>
             </ul>
           </div>
 
@@ -77,7 +79,7 @@
     <section class="latest-feed">
       <div class="section-header">
         <h2 class="section-title">최신 피드</h2>
-        <a th:href="@{/board/list}" class="more-link">더보기 &gt;</a>
+        <a th:href="@{/blog/list}" class="more-link">더보기 &gt;</a>
       </div>
 
       <div class="post-grid" id="latestFeedGrid">
@@ -103,9 +105,14 @@
           </div>
 
           <div class="news-thumb">
-            <img th:src="${news.imgPath.startsWith('http') ? 
-                news.imgPath : 
-                (news.imgRename != null ? news.imgPath + news.imgRename : '/images/common/devlog.svg')}" alt="뉴스 썸네일">
+            <img th:src="${
+                news.imgPath != null and news.imgPath.startsWith('http')
+                  ? news.imgPath
+                  : (news.imgPath != null and news.imgRename != null
+                      ? news.imgPath + news.imgRename
+                      : '/images/common/devlog.svg')
+              }"
+              alt="뉴스 썸네일">
           </div>
         </div>
       </div>

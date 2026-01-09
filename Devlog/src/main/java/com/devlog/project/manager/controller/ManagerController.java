@@ -19,7 +19,7 @@ import com.devlog.project.manager.model.dto.ReportManagerDTO;
 import com.devlog.project.manager.model.service.ManagerReportService;
 import com.devlog.project.member.model.dto.MemberLoginResponseDTO;
 import com.devlog.project.report.enums.ReportStatus;
-
+import com.devlog.project.report.enums.ReportTargetEnums;
 import com.devlog.project.pay.dto.PayDTO;
 import com.devlog.project.pay.service.PayService;
 
@@ -46,48 +46,72 @@ public class ManagerController {
         return "manager/manager-home";
     }
     
+    @GetMapping("/dashboard/customer")
+    public String adminCustomerDashboard() {
+        return "manager/manager-customer";
+    }
+    
     // 신고 목록 조히
     @GetMapping("/dashboard/report")
-    public String reportList(Model model) {
+    public String reportList(
+        @RequestParam(required = false) String query,
+        @RequestParam(required = false) String reportType,
+        @RequestParam(required = false) ReportStatus status,
+        @RequestParam(required = false) ReportTargetEnums targetType,
+        Model model
+    ) {
 
         managerReportService.syncResolvedReports();
 
         List<ReportManagerDTO> reportList =
-            managerReportService.getReportList();
+            managerReportService.getReportList(query, reportType, status, targetType);
 
-        model.addAttribute(
-            "reportList",
-            managerReportService.getReportList()
-        );
+        model.addAttribute("reportList", reportList);
+        model.addAttribute("reportTypes", List.of(
+            "스팸 / 광고", "욕설 / 비방 / 혐오", "음란 / 선정적 내용", "개인정보 노출",
+            "불법 정보", "폭력적 / 잔혹한 내용", "기타 커뮤니티 규칙 위반"
+        ));
+
         return "manager/manager-report";
     }
+
 
     
     // 신고 처리 - 삭제
     @PostMapping("/dashboard/report/resolve")
     @ResponseBody
-    public void resolveReport(@RequestBody Map<String, Long> body) {
+    public void resolveReports(@RequestBody Map<String, Object> body) {
 
-        Long reportId = body.get("reportId");
+        List<Long> reportIds =
+            ((List<?>) body.get("reportIds"))
+                .stream()
+                .map(id -> Long.valueOf(id.toString()))
+                .toList();
 
-        managerReportService.updateReportStatus(
-            reportId,
-            ReportStatus.RESOLVED
+        ReportStatus status = ReportStatus.valueOf(
+            body.get("status").toString()
         );
+
+        managerReportService.updateReportStatuses(reportIds, status);
     }
     
     // 신고 반려
     @PostMapping("/dashboard/report/reject")
     @ResponseBody
-    public void rejectReport(@RequestBody Map<String, Long> body) {
+    public void rejectReports(@RequestBody Map<String, Object> body) {
 
-        Long reportId = body.get("reportId");
+        List<Long> reportIds =
+            ((List<?>) body.get("reportIds"))
+                .stream()
+                .map(id -> Long.valueOf(id.toString()))
+                .toList();
 
-        managerReportService.updateReportStatus(
-            reportId,
+        managerReportService.updateReportStatuses(
+            reportIds,
             ReportStatus.REJECTED
         );
     }
+
     
     // 결제 관리
     @GetMapping("/dashboard/pay")

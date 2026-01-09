@@ -60,7 +60,7 @@ function renderLatestFeed(posts) {
         <div class="post-info">
           <div class="post-top">
             <div class="likes">
-              <img src="/images/common/heart.svg">
+              <img src="/images/common/like.png">
               <span>${post.like_count ?? 0}</span>
             </div>
             <span class="writer">Writer. ${

@@ -37,10 +37,13 @@ function selectCommentList() {
         commentWriter.classList.add("comment-writer");
         const profileImage = document.createElement("img");
         profileImage.classList.add("comment-profile");
-        profileImage.setAttribute(
-          "src",
-          comment.profileImg || "/images/common/devlog.png"
-        );
+        // 프로필 이미지가 없거나 빈 값일 경우 기본 이미지 설정
+        let imagePath = comment.profileImg;
+        if (imagePath == null || imagePath == "") {
+            imagePath = "/images/user.png"; // 기본 프로필 이미지 경로
+        }
+
+        profileImage.setAttribute("src", imagePath);
         const memberNickname = document.createElement("span");
         memberNickname.classList.add("comment-nickname");
         memberNickname.innerText = comment.memberNickname;

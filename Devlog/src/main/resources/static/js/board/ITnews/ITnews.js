@@ -1,27 +1,18 @@
 console.log("ITnews.js loaded");
 
-// HTML 요소 선택
 const filterButtons = document.querySelectorAll(".filter-btn");
-const newsItems = document.querySelectorAll(".news-item"); // historyRows 대신 news-item
 
 filterButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-        const type = btn.dataset.type;
-        location.href = "/ITnews?boardCode=" + type;
+        // 버튼에 설정된 data-type (21, 22 등) 가져오기
+        const boardCode = btn.dataset.type;
+        
+        // 이동할 때 항상 1페이지(cp=1)로 가도록 설정
+        if (boardCode === "0") {
+            location.href = "/ITnews?cp=1";
+        } else {
+            location.href = "/ITnews?cp=1&boardCode=" + boardCode;
+        }
     });
 });
 
-
-// 버튼 활성화 표시
-filterButtons.forEach(b => b.classList.remove("active"));
-btn.classList.add("active");
-
-// 필터링 로직
-newsItems.forEach(item => {
-    // "all" 버튼이 있거나, 데이터 타입이 일치하면 보여줌
-    if (type === "all" || item.dataset.type === type) {
-        item.style.display = "";
-    } else {
-        item.style.display = "none";
-    }
-});

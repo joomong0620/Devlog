@@ -11,55 +11,11 @@
 
 <body>
 
-  <!-- 헤더 -->
-  <header class="header">
-    <div class="left-area">
-      <img th:src="@{/images/manager/devlog.svg}" alt="Devlog logo" class="logo" />
-      <span class="welcome"
-            th:text="|${session.loginMember != null 
-                        ? session.loginMember.memberNickname 
-                        : '관리자'}님, 돌아오신 것을 환영합니다.|">
-        소연님, 돌아오신 것을 환영합니다.
-      </span>
-    </div>
+  <div th:replace="manager/common/manager-header :: header"></div>
+    <div class="layout">
 
-    <div class="dashboard-info">
-      Devlog<br />
-      <span>Manager Dashboard</span>
-    </div>
-  </header>
-
-  <div class="layout">
-
-    <!-- 사이드 바-->
-    <aside class="sidebar">
-      <nav class="menu">
-        <h4>Management</h4>
-        <ul>
-          <li>
-            <img th:src="@{/images/manager/home.svg}" alt="home" />
-            <span>Home</span>
-          </li>
-          <li class="active">
-            <img th:src="@{/images/manager/customer.svg}" alt="customers" />
-            <span>Customers</span>
-          </li>
-          <li>
-            <img th:src="@{/images/manager/report.svg}" alt="report" />
-            <span>Report</span>
-          </li>
-          <li>
-            <img th:src="@{/images/manager/pay.svg}" alt="pay" />
-            <span>Pay</span>
-          </li>
-        </ul>
-      </nav>
-
-      <div class="logout" th:onclick="|location.href='@{/member/logout}'|">
-        <img th:src="@{/images/common/logout.svg}" alt="logout" />
-        <span>Logout</span>
-      </div>
-    </aside>
+      <!-- 사이드바 -->
+      <div th:replace="manager/common/manager-sidebar :: sidebar('member')"></div>
 
     <main class="main scrollable">
       <h2>회원 관리</h2>

@@ -5,10 +5,13 @@ const scrollTopBtn = document.getElementById('scrollTopBtn');
 const loader = document.getElementById('loader');
 const filterButtons = document.querySelectorAll('.filter-btn');
 
+// [수정] HTML에서 초기 상태값 읽어오기
+const initialIsLastInput = document.getElementById('initialIsLast');
+let isLastPage = initialIsLastInput ? (initialIsLastInput.value === 'true') : false;
+
 let currentPage = 1;
 let currentSort = 'id';
 let isLoading = false;
-let isLastPage = false;
 
 // [삭제됨] cleanContent 함수는 이제 필요 없습니다! (백엔드 DTO가 summary를 줌)
 
@@ -87,7 +90,11 @@ function fetchPosts(isReset = false) {
         loader.style.display = 'block';
     }
 
-    if (isLastPage) return;
+    if (isLastPage) {
+        loader.style.display = 'none'; // 마지막 페이지면 로더 숨김
+        return;
+    }
+    
     isLoading = true;
 
     const url = `/api/blog/list?page=${currentPage}&size=12&sort=${currentSort},desc`;

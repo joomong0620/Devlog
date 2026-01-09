@@ -21,8 +21,8 @@ public class MailScheduler {
 	
 	
 	
-	@Scheduled(cron = "0 0 20 * * 7")  // 30초마다 실행
-	// @Scheduled(cron = "*/30 * * * * *")
+	//@Scheduled(cron = "0 0 20 * * 7")  // 30초마다 실행
+	//@Scheduled(cron = "*/30 * * * * *")
 	public void Hot3BoardMail() {
 		
 		 	System.out.println("🔥 Hot3 스케줄러 실행됨");

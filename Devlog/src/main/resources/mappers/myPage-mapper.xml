@@ -113,24 +113,54 @@
     
 	<!-- 구매 내역 조회 -->
     <select id="selectPurchasedPosts" resultMap="ActivityMap">
-        SELECT 
-            B.BOARD_NO,
-            B.BOARD_TITLE,
-            B.BOARD_CONTENT,
-            B.BOARD_COUNT,
-            NVL(IMG.IMG_PATH || IMG.IMG_RENAME, NULL) AS THUMBNAIL,
-            TO_CHAR(H.REG_DATE, 'YYYY.MM.DD') AS ACTIVITY_DATE,
-            'BLOG' AS CATEGORY,
-            M.MEMBER_NICKNAME,
-            M.MEMBER_EMAIL,
-            'Y' AS IS_PAID
-        FROM COFFEE_BEANS_HISTORY H
-        JOIN BOARD B ON H.TRADE_NO = B.BOARD_NO
-        JOIN "MEMBER" M ON B.MEMBER_NO = M.MEMBER_NO
-        LEFT JOIN BOARD_IMG IMG ON B.BOARD_NO = IMG.BOARD_NO AND IMG.IMG_ORDER = 0
-        WHERE H.MEMBER_NO = #{memberNo}
-          AND H.PAY_AMOUNT &lt; 0 
-        ORDER BY H.REG_DATE DESC
+        SELECT * FROM (
+            -- 1. [직접 구매]
+            SELECT 
+                B.BOARD_NO,
+                B.BOARD_TITLE,
+                DBMS_LOB.SUBSTR(B.BOARD_CONTENT, 600, 1) AS BOARD_CONTENT, /* [수정] CLOB -> String 변환 */
+                B.BOARD_COUNT,
+                NVL(IMG.IMG_PATH || IMG.IMG_RENAME, NULL) AS THUMBNAIL,
+                TO_CHAR(H.REG_DATE, 'YYYY.MM.DD') AS ACTIVITY_DATE,
+                'BLOG' AS CATEGORY,
+                M.MEMBER_NICKNAME,
+                M.MEMBER_EMAIL,
+                'Y' AS IS_PAID,
+                H.REG_DATE AS SORT_DATE
+            FROM COFFEE_BEANS_HISTORY H
+            JOIN COFFEE_BEANS_TRADE T ON H.TRADE_NO = T.TRADE_NO
+            JOIN BOARD B ON T.CONTENT_ID = B.BOARD_NO
+            JOIN "MEMBER" M ON B.MEMBER_NO = M.MEMBER_NO
+            LEFT JOIN BOARD_IMG IMG ON B.BOARD_NO = IMG.BOARD_NO AND IMG.IMG_ORDER = 0
+            WHERE H.MEMBER_NO = #{memberNo}
+              AND H.PAY_AMOUNT &lt; 0 
+              AND T.CONTENT_TYPE = 'POST'
+
+            UNION
+
+            -- 2. [구독 권한]
+            SELECT 
+                B.BOARD_NO,
+                B.BOARD_TITLE,
+                DBMS_LOB.SUBSTR(B.BOARD_CONTENT, 600, 1) AS BOARD_CONTENT, /* [수정] CLOB -> String 변환 */
+                B.BOARD_COUNT,
+                NVL(IMG.IMG_PATH || IMG.IMG_RENAME, NULL) AS THUMBNAIL,
+                TO_CHAR(B.B_CREATE_DATE, 'YYYY.MM.DD') AS ACTIVITY_DATE,
+                'BLOG' AS CATEGORY,
+                M.MEMBER_NICKNAME,
+                M.MEMBER_EMAIL,
+                'Y' AS IS_PAID,
+                B.B_CREATE_DATE AS SORT_DATE
+            FROM SUBSCRIBE S
+            JOIN BOARD B ON S.CREATOR_ID = B.MEMBER_NO 
+            JOIN BLOG BL ON B.BOARD_NO = BL.BOARD_NO
+            JOIN "MEMBER" M ON B.MEMBER_NO = M.MEMBER_NO
+            LEFT JOIN BOARD_IMG IMG ON B.BOARD_NO = IMG.BOARD_NO AND IMG.IMG_ORDER = 0
+            WHERE S.SUBSCRIBER_ID = #{memberNo}
+              AND BL.IS_PAID = 'Y'
+              AND B.BOARD_DEL_FL = 'N'
+        )
+        ORDER BY SORT_DATE DESC
     </select>
 	
 	<!-- 최근 본 게시물 로그 db저장 -->

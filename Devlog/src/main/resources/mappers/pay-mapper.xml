@@ -262,23 +262,15 @@
 	        SYSDATE
 	    )
 	</insert>
-	
 	<!-- 구독 30일 -->
 	<select id="selectExpiringSubscriptions" resultType="PayDTO">
-	    SELECT 
-	        SUBSCRIBER_ID AS buyerNo,
-	        CREATOR_ID AS sellerNo,
-	        PRICE AS price
-	    FROM "SUBSCRIBE"
-	    WHERE TRUNC(START_AT + 30) = TRUNC(SYSDATE)
-	</select>
-	
-	<!-- 구매 내역 -->
-	<select id="countPostBuyers" parameterType="long" resultType="_int">
-	    SELECT COUNT(*)
-	    FROM COFFEE_BEANS_TRADE
-	    WHERE CONTENT_ID = #{boardNo}
-	      AND CONTENT_TYPE = 'POST'
-	</select>
+    SELECT 
+        SUBSCRIBER_ID AS buyerNo,
+        CREATOR_ID AS sellerNo,
+        PRICE AS price
+    FROM "SUBSCRIBE"
+    WHERE TRUNC(START_AT + 30) = TRUNC(SYSDATE)
+</select>
+
 		
 </mapper>
