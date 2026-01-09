@@ -1,5 +1,6 @@
 package com.devlog.project.Scheduler.service;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,27 +22,30 @@ public class MailServiceImpl implements MailService {
 	// ngrok http 8880			https://nonfluent-synchronistically-melba.ngrok-free.dev 
 
 	@Override
-	public void sendHot3Mail(String to, List<Hot3DTO> hotList) {
+	public void sendHot3Mail(List<String> members, List<Hot3DTO> hotList) {
 
 		try {
-
-			// 실제 이메일 객체 생성
-			MimeMessage message = mailSender.createMimeMessage();
-
-			// 첨부파일 + 한글 인코딩 + HTML 지원 세팅
-			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-			helper.setTo(to);
-			helper.setFrom("kyusik0207@gmail.com", "Devlog");
-			helper.setSubject("🔥 Devlog 인기 게시글 TOP 3");
-
-
-			// 게시글 목록을 HTML 뉴스레터로 변환
-			String html = buildHot3Html(hotList);
-
-			helper.setText(html, true);
-
-			mailSender.send(message);
+			
+			for (String member : members) {
+				
+				// 실제 이메일 객체 생성
+				MimeMessage message = mailSender.createMimeMessage();
+				
+				// 첨부파일 + 한글 인코딩 + HTML 지원 세팅
+				MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+				
+				helper.setTo(member);
+				helper.setFrom("kyusik0207@gmail.com", "Devlog"); // 발신자 이름을 Devlog로 변경
+				helper.setSubject("🔥 Devlog 인기 게시글 TOP 3"); // 메일 타이틀
+				
+				
+				// 게시글 목록을 HTML 뉴스레터로 변환
+				String html = buildHot3Html(hotList);
+				
+				helper.setText(html, true);
+				
+				mailSender.send(message);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
