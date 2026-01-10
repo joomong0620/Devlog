@@ -25,7 +25,7 @@ public class MailScheduler {
 	
 	
 	
-	@Scheduled(cron = "0 0 20 * * 7")  // 30초마다 실행
+	//@Scheduled(cron = "0 0 20 * * 7")  // 30초마다 실행
 	//@Scheduled(cron = "*/30 * * * * *")
 	public void Hot3BoardMail() {
 		
