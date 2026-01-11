@@ -1,6 +1,8 @@
 package com.devlog.project.member.controller;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -130,27 +132,47 @@ public class MemberController {
 	        
 	        // ===== [추가] 하루 1회 로그인 경험치 지급 (쿠키 기반) =====
 	        String today = LocalDate.now().toString();
+	        String cookieName = "EXP_" + today;
+	        Long memberNo = response.getMemberNo();
 
-	        Cookie dailyExpCookie = null;
+	        Cookie target = null;
+
 	        if (request.getCookies() != null) {
 	            for (Cookie c : request.getCookies()) {
-	                if ("DAILY_EXP_GAIN".equals(c.getName())) {
-	                    dailyExpCookie = c;
+	                if (cookieName.equals(c.getName())) {
+	                    target = c;
 	                    break;
 	                }
 	            }
 	        }
 
-	        if (dailyExpCookie == null || !today.equals(dailyExpCookie.getValue())) {
-	            // 경험치 지급
-	            memberService.increaseExp(response.getMemberNo(), 50);
+	        boolean canGain = false;
 
-	            // 쿠키 저장
-	            Cookie expCookie = new Cookie("DAILY_EXP_GAIN", today);
-	            expCookie.setPath("/");
-	            expCookie.setMaxAge(60 * 60 * 24);
-	            resp.addCookie(expCookie);
+	        if (target == null) {
+	            target = new Cookie(cookieName, "|" + memberNo + "|");
+	            canGain = true;
+	        } else {
+	            String value = target.getValue();
+	            if (!value.contains("|" + memberNo + "|")) {
+	                target.setValue(value + memberNo + "|");
+	                canGain = true;
+	            }
 	        }
+
+	        if (canGain) {
+	            memberService.increaseExp(memberNo, 50);
+
+	            // 자정 만료
+	            LocalDateTime now = LocalDateTime.now();
+	            LocalDateTime nextMidnight = now.toLocalDate().plusDays(1).atStartOfDay();
+	            int secondsUntilMidnight = (int) Duration.between(now, nextMidnight).getSeconds();
+
+	            target.setPath("/");
+	            target.setMaxAge(secondsUntilMidnight);
+	            resp.addCookie(target);
+	        }
+	        
+	        System.out.println("경험치 이후 ");
 	        // ==================================================
 	        
 	        // 세션 고정 공격 방지 + 이전 사용자 정보 제거
