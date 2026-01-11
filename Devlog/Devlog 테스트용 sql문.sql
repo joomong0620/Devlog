@@ -37,7 +37,7 @@ END;
 /
 
 
-
+DROP TABLE VIEW_LOG; -- MEMBER, BOARD, LEVELS
 DROP TABLE "USER_BEN";
 DROP TABLE "COFFEE_BEANS_HISTORY";
 DROP TABLE "MESSAGE_IMG";
@@ -2002,7 +2002,7 @@ INSERT INTO MEMBER VALUES (
   '김도현','NullMaster','0101000001','웹백엔드 개발자 1년차',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  1000,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2010,7 +2010,7 @@ INSERT INTO MEMBER  VALUES (
   '이서연','버그헌터','0101000002','프론트엔드 개발자 6개월',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2018,7 +2018,7 @@ INSERT INTO MEMBER  VALUES (
   '박지훈','코딩하는곰','0101000003','풀스택 개발자 2년차',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2026,7 +2026,7 @@ INSERT INTO MEMBER  VALUES (
   '최민재','SQL마법사','0101000004','DBA/데이터엔지니어 3년차',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2034,7 +2034,7 @@ INSERT INTO MEMBER  VALUES (
   '정윤호','디버깅중독','0101000005','백엔드 개발자 1년차(Spring)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2042,7 +2042,7 @@ INSERT INTO MEMBER  VALUES (
   '한지수','콘솔로그장인','0101000006','프론트엔드 개발자 2년차(React)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2050,14 +2050,14 @@ INSERT INTO MEMBER  VALUES (
   '오현우','에러수집가','0101000007','QA 엔지니어 1년차(테스트 자동화)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1);
+  100,0,1);
 
 INSERT INTO MEMBER  VALUES (
   SEQ_MEMBER_NO.NEXTVAL,'user08@devlog.com','$2a$10$XVUq9irjRcTuzgfvXeq9HuFdZf4RAJvcGQVj1Qzc20BD/ShnF0o7u',
   '유채원','주석요정','0101000008','웹퍼블리셔 8개월(접근성/반응형)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2065,7 +2065,7 @@ INSERT INTO MEMBER  VALUES (
   '강민수','메모리도둑','0101000009','시스템 엔지니어 4년차(Linux/네트워크)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2073,7 +2073,7 @@ INSERT INTO MEMBER  VALUES (
   '신예린','리팩터여신','0101000010','풀스택 개발자 3년차(Java+JS)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2081,7 +2081,7 @@ INSERT INTO MEMBER  VALUES (
   '임성훈','API장인','0101000011','백엔드 개발자 2년차(REST/보안)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2089,7 +2089,7 @@ INSERT INTO MEMBER  VALUES (
   '조은지','비동기요정','0101000012','프론트엔드 1년차(상태관리/성능)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2097,7 +2097,7 @@ INSERT INTO MEMBER  VALUES (
   '문태훈','배포천재','0101000013','DevOps 3년차(CI/CD, Docker)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2105,7 +2105,7 @@ INSERT INTO MEMBER  VALUES (
   '장하늘','컴파일요괴','0101000014','게임 클라이언트 2년차(Unity/C#)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2113,7 +2113,7 @@ INSERT INTO MEMBER  VALUES (
   '서지민','클린코더','0101000015','모바일 앱 1년차(Android/Kotlin)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2121,14 +2121,14 @@ INSERT INTO MEMBER  VALUES (
   '노현수','버전지배자','0101000016','인프라 5년차(K8s/모니터링)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1);
+  100,0,1);
 
 INSERT INTO MEMBER  VALUES (
   SEQ_MEMBER_NO.NEXTVAL,'user17@devlog.com','$2a$10$XVUq9irjRcTuzgfvXeq9HuFdZf4RAJvcGQVj1Qzc20BD/ShnF0o7u',
   '윤소희','테스트요괴','0101000017','QA 2년차(부하/성능 테스트)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2136,7 +2136,7 @@ INSERT INTO MEMBER  VALUES (
   '백승민','깃허브중독','0101000018','백엔드 4년차(대용량 트래픽)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2144,7 +2144,7 @@ INSERT INTO MEMBER  VALUES (
   '홍예준','알고리즘광신도','0101000019','알고리즘/백엔드 3년차(최적화)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 INSERT INTO MEMBER  VALUES (
@@ -2152,7 +2152,7 @@ INSERT INTO MEMBER  VALUES (
   '송다인','메모리관리자','0101000020','시스템 프로그래머 2년차(C/C++)',
   'N','N',NULL,'N',SYSDATE,
   0,NULL,NULL,NULL,
-  0,0,1
+  100,0,1
 );
 
 BEGIN
@@ -3615,4 +3615,133 @@ END;
 
 commit;
 
+-------------------------------------------------------------------
+--------------------- added by PYY 2026/01/10 ---------------------
+-- [추가 내용]
+-- 1. 자유게시판 게시글 & 이미지 좀더 추가 ~up to 100개
+--   여기서는 일단 SEQ_BOARD_NO.NEXT_VAL = 1 부터 자동 생성된 게시글 번호가
+--   삽입되는 게시글들은 old 게시글이 되므로 목록조회 리스트의 하위에 위치하게 되므로
+--   현 게시글 목록 조회에서 뒷페이지에 보여지는 글들이 되므로 리스트 순서에 문제없음.
+--   따라서 현재 SEQ쓰는 것이 도움이 됨. 어차피 SEQ는 다음 2번에서 reset. 
+-- 2. SEQ_COMMENT_NO, SEQ_BOARD_NO, SEQ_IMAGE_NO를 시작번호 10000으로 reset:
+--    앞에 모든 mock데이터는 PK를 생성된 SEQ를 사용하지 않고, 
+--    수동으로 PK 번호(9000 ~ 9071)을 할당한 관계로,
+--    새로 추가되는 게시글의 PK가 1부터 자동 할당되면, 글 목록 조회에서
+--    최신글이 목록의 가장 최상위가 아니라 최하위가 되는 문제발생하여 이를 해결
+-------------------------------------------------------------------
+-- 1. 자유게시판 게시글 & 이미지 좀더 추가 ~up to 100개: 
+-- q'[...]' 는 Oracle이 절대 바인드로 오해하지 않는 문자열 표기법 (ORA-17041방지)
+SET DEFINE OFF;
+SET SERVEROUTPUT ON;
+
+DECLARE
+BEGIN
+   -- 10개 세트를 10번 반복 → 총 100개 추
+   FOR repeat_cnt IN 1..9 LOOP	
+	   FOR inner_cnt IN 1..10 LOOP
+
+		  INSERT INTO BOARD (
+		     BOARD_NO,
+		     BOARD_TITLE,
+		     BOARD_CONTENT,
+		     B_CREATE_DATE,
+		     B_UPDATE_DATE,
+		     BOARD_COUNT,
+		     BOARD_DEL_FL,
+		     BOARD_CODE,
+		     MEMBER_NO,
+		     NEWS_REPORTER
+		  )
+		  VALUES (
+		     SEQ_BOARD_NO.NEXTVAL,
+
+		     /* 제목 (반복 회차 붙이기) */
+		     CASE i
+		        WHEN 1 THEN q'[요즘 개발 동기부여 어떻게 하고 계세요?]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 2 THEN q'[내가 만든 기능이 드디어 실서비스에 반영됐다!]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 3 THEN q'[개발하다가 만난 가장 황당한 버그]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 4 THEN q'[요새 핫한 신기술, 뭐 써보셨나요?]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 5 THEN q'[퇴근 후 코딩 다들 어떻게 집중하시나요?]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 6 THEN q'[개발자 블로그 개편 중인데 피드백 환영!]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 7 THEN q'[사이드 프로젝트 팀원을 모으는 게 어렵네요]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 8 THEN q'[요즘 개발하면서 배운 가장 큰 교훈]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 9 THEN q'[개발자 노트북 추천 부탁드립니다]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		        WHEN 10 THEN q'[새로운 언어 공부 어떻게 시작하세요?]'
+		        			|| ' (' || repeat_cnt || ', ' || i || ')'
+		     END,
+		     
+
+		     /* 내용 */
+		     CASE i
+		        WHEN 1 THEN q'[최근 들어 사이드 프로젝트가 예전만큼 속도가 나지 않아서 여러 가지 동기부여 방법을 시도하고 있어요. 운동을 하면서 리프레시도 해보고, 개발 공부 라이브 스트리밍을 켜놓고 따라 해보기도 했는데 꾸준한 루틴을 만드는 게 제일 어렵더라고요. 특히 퇴근 후 약간의 피로감이 몰려올 때는 ‘오늘은 그냥 쉬자’라는 유혹이 엄청 쎄요. 그래도 작은 목표라도 하나씩 달성하면 다시 동력이 생기더라고요. 여러분은 어떤 방식으로 꾸준함을 유지하고, 다시 동기부여를 얻고 계신가요? 서로의 방법을 공유하면 도움이 될 것 같아요!]'
+		        WHEN 2 THEN q'[몇 주 동안 밤늦게까지 붙잡고 있던 기능이 오늘 드디어 실서비스에 반영됐습니다. 배포 버튼을 누르는 순간 손이 떨릴 정도로 긴장됐고, 모니터링 페이지를 켜놓고 로그가 정상적으로 돌아가는지 계속 들여다보고 있어요. 사용자 반응이 어떤지 너무 궁금해서 주기적으로 댓글도 확인하게 되네요. 아직 버그가 없다고 확신할 수는 없지만, 그래도 내가 만든 것이 실제로 세상에 나왔다는 사실만으로도 정말 뿌듯합니다. 여러분은 첫 배포 때 어떤 느낌이었나요? 혹은 지금도 배포할 때마다 떨리나요?]'
+		        WHEN 3 THEN q'[오늘 코드 한 줄이 왜 돌아가지 않는지 3시간 동안 머리를 싸매고 고민했는데, 알고 보니 정말 아무것도 아닌 세미콜론 하나가 문제였어요. 그동안 복잡한 로직이나 구조적인 문제라고 생각해서 별 짓을 다 했는데, 마지막에 단순한 문법 오류였다는 걸 깨달았을 때 허탈함과 웃음이 동시에 나오더라고요. 이런 사소한 버그 때문에 시간을 날릴 때가 한두 번이 아니라서 점점 디버깅 패턴도 바뀌는 것 같아요. 여러분도 이런 황당한 경험 있으신가요? 서로 공유하면 위로가 될 것 같아요.]'
+		        WHEN 4 THEN q'[최근에는 AI와 관련된 새로운 라이브러리들을 이것저것 만져보고 있는데, 아직은 활용 범위가 애매해도 실험하는 과정 자체가 꽤 재미있더라고요. 특히 작은 기능 하나도 모델을 활용해서 자동화해보거나 실시간 분석 기능을 붙여보는 과정에서 다양한 아이디어가 떠오릅니다. 물론 실제 업무에 도입하기엔 여러 제약과 검토해야 할 부분이 많지만, 미래에는 분명히 중요한 기술이 될 거라고 느끼고 있어요. 여러분은 최근에 어떤 신기술이나 툴을 써보셨나요? 추천할 만한 것이 있으면 공유해 주세요!]'
+		        WHEN 5 THEN q'[퇴근하고 집에 오면 머리가 멍해져서 아무것도 하기 싫은데, 막상 코딩을 시작하면 또 몰입하게 되더라고요. 그래서 집중력을 끌어올리기 위한 여러 루틴을 시험해보고 있어요. 커피를 한 잔 마시거나, 좋아하는 음악을 틀어놓거나, 혹은 잠깐 산책을 하고 나서 시작하면 그나마 도움이 되더라고요. 그래도 '꾸준함'이라는 벽을 넘는 건 쉽지 않습니다. 여러분은 퇴근 후 자기계발이나 개발 공부를 할 때 어떤 방식으로 집중 모드를 만들고 유지하시나요? 팁을 공유해주시면 감사하겠습니다!.]'
+		        WHEN 6 THEN q'[최근 블로그를 전체적으로 개편하고 있는데, 디자인 감각이 뛰어난 편이 아니라 UI를 바꿀 때마다 스스로 '이게 맞나?'라는 의문이 들곤 합니다. 새로운 테마를 적용하고 색상 조합도 바꿔봤지만 마음에 들었다가도 금방 어색해 보이더라고요. 특히 모바일 환경에서 보이는 디테일들이 신경 쓰여서 이것저것 테스트하느라 시간이 꽤 걸리고 있습니다. 혹시 방문해서 어색한 부분이나 개선했으면 하는 점이 있으면 편하게 알려주세요. 실제 사용자 의견이 제일 큰 도움이 되는 것 같아요.]'
+		        WHEN 7 THEN q'[처음에는 열정 넘치는 개발자들과 함께 재미있게 진행해보려고 했는데, 막상 팀을 꾸려보니 일정 조율이나 업무 스타일 차이로 인해 쉽게 진행되지 않더라고요. 서로 좋은 의도였지만 프로젝트에 대한 기대나 목표가 조금씩 달라 조율하는 데 어려움을 겪기도 했어요. 그래도 잘 맞는 팀원을 만날 수 있다면 훨씬 재밌고 빠르게 성장할 수 있다는 생각이 들어 계속 도전하고 있습니다. 혹시 여러분은 팀원을 모집할 때 어떤 기준이나 방법을 활용하시나요? 경험담도 환영이에요!]'
+		        WHEN 8 THEN q'[최근 프로젝트를 진행하면서 기술적인 문제보다 소통의 중요성을 더 크게 느끼고 있어요. 서로 같은 내용을 이해했다고 생각했지만, 막상 결과물을 보면 완전히 다르게 구현되어 있거나, 일정에 대한 기대치가 서로 달라 오해가 생기기도 했거든요. 그래서 문서화나 회의 후 기록을 남기는 습관을 다시 강화하고 있습니다. 제대로 소통되지 않으면 기술력만으로는 해결할 수 없는 문제가 많더라고요. 여러분은 최근에 어떤 교훈을 얻으셨나요? 함께 공유하면 좋을 것 같아요!]'
+		        WHEN 9 THEN q'[노트북을 바꾸려고 알아보고 있는데, 요즘은 선택지가 너무 많아서 오히려 결정하기가 더 어려운 것 같아요. 맥북 M 시리즈는 성능과 배터리가 워낙 좋다고 들었고, 반대로 고성능 윈도우 랩탑은 개발환경을 다양하게 구성하기 좋아 보여서 계속 망설여지고 있어요. 또한 이동이 많은 편이라 무게도 신경 쓰이고, 동시에 빌드 시간이 빠른 것도 중요하다 보니 우선순위를 어디에 둘지 혼란스럽습니다. 실제로 사용해본 경험이 있다면 추천 부탁드려요. 참고하면 큰 도움이 될 것 같아요!]'
+		        WHEN 10 THEN q'[새로운 언어를 공부하고 있는데 문법만 훑어본 상태에서는 실제 프로젝트에 적용하려니 막막함이 크게 느껴지더라고요. 공식 문서를 정독하는 게 좋은지, 튜토리얼 영상을 따라가며 코드를 직접 실행해보는 게 나은지 고민 중입니다. 일단 간단한 토이 프로젝트를 만들어 보려고 하는데, 역시 익숙하지 않은 언어로 구조를 잡는 건 쉽지 않네요. 여러분은 새로운 언어를 배울 때 어떤 접근 방식을 사용하시나요? 효과적인 루틴이 있다면 꼭 공유해주세요!]'
+		     END
+		     || CHR(10) 
+			 || '사진 (' || repeat_cnt || ', ' || i || ') 첨부했습니다.',
+		     
+
+		     SYSDATE - TRUNC(DBMS_RANDOM.VALUE(10, 20)),
+		     SYSDATE - TRUNC(DBMS_RANDOM.VALUE(0, 10)),
+		     TRUNC(DBMS_RANDOM.VALUE(10, 200)),
+		     'N',
+		     3,
+		     TRUNC(DBMS_RANDOM.VALUE(1, 6)),
+		     NULL
+		  );
+
+		  INSERT INTO BOARD_IMG (
+		     IMG_NO,
+		     IMG_PATH,
+		     IMG_ORIG,
+		     IMG_RENAME,
+		     IMG_ORDER,
+		     BOARD_NO
+		  )
+		  VALUES (
+		     SEQ_IMAGE_NO.NEXTVAL,
+		     '/images/board/freeboard/',
+		     'fbList_img' || inner_cnt || '.png',
+		     'fbList_img' || inner_cnt || '.png',
+		     0,
+		     SEQ_BOARD_NO.CURRVAL
+		  );
+
+	   END LOOP;
+	   
+	END LOOP;
+	
+	COMMIT;
+END;
+/
+
+
+-------------------------------------------------------------------
+-- 2. SEQ_COMMENT_NO, SEQ_BOARD_NO, SEQ_IMAGE_NO를 시작번호 10000으로 reset:
+DROP SEQUENCE SEQ_COMMENT_NO; 
+CREATE SEQUENCE SEQ_COMMENT_NO START WITH 10000 NOCACHE;
+ 
+DROP SEQUENCE SEQ_BOARD_NO; 
+CREATE SEQUENCE SEQ_BOARD_NO START WITH 10000 NOCACHE;
+ 
+DROP SEQUENCE SEQ_IMAGE_NO; 
+CREATE SEQUENCE SEQ_IMAGE_NO START WITH 10000 NOCACHE;
+ 
+COMMIT;
 
