@@ -207,7 +207,7 @@ function endChatbotSession() {
     
     const chatbotType = document.getElementById("chatbotType")?.value;
     
-    // KONG 타입만 과금 처리
+    // 1. KONG 타입만 과금 처리
     if(chatbotType === "kong" && window.loginMemberNo) {
 
         console.log("챗봇 세션 종료 시작 - 누적 사용 커피콩:", accumulated_usedBeans);
@@ -259,6 +259,26 @@ function endChatbotSession() {
         }
     }
     
+    // 2. KONG 타입만 과금 처리 결과 COFFEE_BEANS_TRADE 테이블에 업데이트
+    //==>실제 devlog 프로젝트에서 COFFEE_BEANS_TRADE 결제 내역 삽입
+    // 1. KONG 타입만 & 로그인멤버 과금 처리(DB기록)
+    if(chatbotType === "kong" && window.loginMemberNo) {
+         if(accumulated_usedBeans > 0) { // 누적 콩사용 내역 있을때만 전송
+
+             const paymentBlob = new Blob([JSON.stringify({
+                 contentType: "CHATBOT",
+                 contentId: currentSessionId,
+                 price: accumulated_usedBeans
+             })], { type: 'application/json' });
+             
+             navigator.sendBeacon('/payment/trade', paymentBlob);
+             
+             console.log("챗봇 사용 데이터 전송 완료");
+
+         }
+    }    
+
+
     // 3. 세션 종료 (항상 실행)
     fetch(`/api/chatbot/session/end/${currentSessionId}`, {
         method: 'POST',
@@ -323,8 +343,10 @@ function updateTokenDisplay(promptTokens, completionTokens, totalTokens, accumul
     
     totalServerTokens += totalTokens;
     
-    // 커피콩이 0 이하가 되면 경고
-    if(beansAmount2update <= 0) {
+    //// 커피콩이 0 이하가 되면 경고
+    //if(beansAmount2update <= 0) {
+    // 유료형 챗봇의 경우만(KONG 타입만 과금 처리), 커피콩이 0 이하가 되면 경고
+    if(chatbotType === "kong" && data.remainingBeans <= 0) {        
         alert("커피콩이 모두 소진되었습니다. 충전 후 이용해 주세요.");
 
         // 세션 종료 전에 DB 업데이트
@@ -354,7 +376,9 @@ function updateBeansDisplay() {
                 window.beansAmount = data.remainingBeans;
                 
                 // 커피콩이 0 이하가 되면 경고
-                if(data.remainingBeans <= 0) {
+                // if(data.remainingBeans <= 0) {                
+                // 유료형 챗봇의 경우만(KONG 타입만 과금 처리), 커피콩이 0 이하가 되면 경고
+                if(chatbotType === "kong" && data.remainingBeans <= 0) {
                     alert("커피콩이 모두 소진되었습니다. 충전 후 이용해 주세요.");
                     
                     if(window.opener) {
@@ -594,12 +618,26 @@ function sendMessage() {
                 // 반드시 체크
                 console.log("##### 서버에서 받은 누적 커피콩:", serverUsedBeans);
 
-                updateTokenDisplay(
-                    prompt_tokens, 
-                    completion_tokens, 
-                    total_tokens, 
-                    serverUsedBeans || 0
-                );
+                //// 무료형 & 유료형 모두 화면에 커피콩사용 내역 업데이트
+                // updateTokenDisplay(
+                //     prompt_tokens, 
+                //     completion_tokens, 
+                //     total_tokens, 
+                //     serverUsedBeans || 0
+                // );
+
+                // 유료형 챗봇의 경우만(KONG 타입만), 화면에 token사용량 표시
+                if(chatbotType === "kong") {
+                    updateTokenDisplay(
+                        prompt_tokens, 
+                        completion_tokens, 
+                        total_tokens, 
+                        serverUsedBeans || 0
+                    );
+                }                
+
+
+
             }
 
         })
