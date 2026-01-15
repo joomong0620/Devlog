@@ -207,7 +207,7 @@ function endChatbotSession() {
     
     const chatbotType = document.getElementById("chatbotType")?.value;
     
-    // KONG 타입만 과금 처리
+    // 1. KONG 타입만 과금 처리
     if(chatbotType === "kong" && window.loginMemberNo) {
 
         console.log("챗봇 세션 종료 시작 - 누적 사용 커피콩:", accumulated_usedBeans);
@@ -259,6 +259,22 @@ function endChatbotSession() {
         }
     }
     
+    // 2. KONG 타입만 과금 처리 결과 COFFEE_BEANS_TRADE 테이블에 업데이트
+    //==>실제 devlog 프로젝트에서 COFFEE_BEANS_TRADE 결제 내역 삽입
+    // 1. KONG 타입만 & 로그인멤버 과금 처리(DB기록)
+    if(chatbotType === "kong" && window.loginMemberNo) {
+        const paymentBlob = new Blob([JSON.stringify({
+            contentType: "CHATBOT",
+            contentId: currentSessionId,
+            price: accumulated_usedBeans
+        })], { type: 'application/json' });
+        
+        navigator.sendBeacon('/payment/trade', paymentBlob);
+        
+        console.log("챗봇 사용 데이터 전송 완료");
+    }    
+
+
     // 3. 세션 종료 (항상 실행)
     fetch(`/api/chatbot/session/end/${currentSessionId}`, {
         method: 'POST',
