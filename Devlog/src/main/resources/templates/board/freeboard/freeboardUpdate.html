@@ -53,7 +53,7 @@
 
                 <!-- 제목 입력 -->
                 <p id="updateText">게시글 제목 수정</p>
-                <input type="text" id="titleInput" name="boardTitle" class="title-input" th:value="${freeboard.boardTitle}">
+                <input type="text" id="titleInput" name="boardTitle" class="title-input" th:value="${freeboard.boardTitle}" maxlength="300" required>
 
                 <!-- 사진 등록 -->
                 <div class="photo-header">

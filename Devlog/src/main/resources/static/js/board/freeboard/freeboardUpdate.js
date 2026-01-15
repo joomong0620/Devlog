@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         formData.append("boardTitle", title); // ###LKSIURI
         formData.append("boardContent", content); // ###LKSIURI
-         
+        
         // 기존 images 제거 (중복 방지)
         formData.delete("images");
 
@@ -152,94 +152,106 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("기존 이미지 번호:", existingImgNos);
 
         /** 서버 전송 **/
-        //fetch(form.action, {
-		//fetch('/board2/freeboard/update', { // ###LKSIURI
-		fetch('/board2/freeboard/insert', { // ###LKSIURI-monkeyPatch
+        ////fetch(form.action, { //  <form th:action="@{update}" method="post" enctype="multipart/form-data"></form>
+		////fetch('/board2/freeboard/update', { // ###LKSIURI - 1th (initial: redirection issue)
+		//fetch('/board2/freeboard/insert', { // ###LKSIURI-monkeyPatch - 2nd  (monkeyPatch: insert + del까지만)
+        // ##### 원래 게시글 수정으로 복귀 - 3rd (이제 유효한 update로 복귀)
+        const origBoardNo = parseInt(window.boardNo);
+        const addrUpdate3rd = '/board2/freeboard/'+ origBoardNo + '/update' ; 
+        console.log("addrUpdate3rd = ", addrUpdate3rd);
+        fetch(addrUpdate3rd, { // ##### 원래 게시글 수정으로 복귀 - 3rd (이제 유효한 update로 복귀)
             method: "POST",
             body: formData
         })
         .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                // alert(data.message);
-                // // window.location.href = data.redirectUrl;
-                // location.href = data.redirectUrl; // JSON을 JS 객체로 // ###LKSIURI
-                console.log("수정대신에 insert 성공"); // ###LKSIURI-monkeyPatch
-                console.log("data: ", data)
-                //location.href = data.redirectUrl; //  ###LKSIURI-monkeyPatch
-                console.log("insert 반환 결과 data.redirectUrl = ", data.redirectUrl); // 예1) '/board/freeboard/62', inserted된 글로
-                const insertedBoardNo = parseInt(data.redirectUrl.split("/")[3]);
+            // if (data.success) { // ###LKSIURI-monkeyPatch - 2nd  (monkeyPatch: insert + del까지만)
+            //     // alert(data.message);
+            //     // // window.location.href = data.redirectUrl;
+            //     // location.href = data.redirectUrl; // JSON을 JS 객체로 // ###LKSIURI
+            //     console.log("수정대신에 insert 성공"); // ###LKSIURI-monkeyPatch
+            //     console.log("data: ", data)
+            //     //location.href = data.redirectUrl; //  ###LKSIURI-monkeyPatch
+            //     console.log("insert 반환 결과 data.redirectUrl = ", data.redirectUrl); // 예1) '/board/freeboard/62', inserted된 글로
+            //     const insertedBoardNo = parseInt(data.redirectUrl.split("/")[3]);
+            //
+            //     /////// monkey-patch by YYP, 2026-01-08
+            //     // update -> insert + old delete으로 moneky-patch
+            //     // 수정대신 insert성공하면, 이리로 넘어옴: 여기서 [A] 해당 BoardNo글 삭제 시행 후, [B] location.href로 redirection.
+            //     // - 기존 보드넘버는 window.boardNo로 부터: oldBoardNo = window.boardNo
+            //     // - 새 보드넘버는  redirectUrl = "/board/freeboard/" + boardNo는  에서 얻어와라:
+            //     /////// [A] 기존 old boardNo게시글 삭제를 GET아니라 ajaxt POST로 수행해라
+            //     //location.href = location.pathname.replace('board/', 'board2/') + "/delete"; // -> 게시글 삭제 처리하는 controller 만들어야 한다.
+            //     // // http://localhost:8880/board2/freeboard/5/delete
+            //     // ajax 주소: location.pathname = "/board/freeboard/27"  ==> location.pathname.split('/') ==> [  "", "board", "freeboard", "27" ]
+            //     // -- 0) DELETE-POST 새주소(delPOSTaddr) 생성:
+            //     // 예시: /board/freeboard/27 ==> "/board/freeboard/15" , 여기서 oldBoardNo = 15
+            //     const oldBoardNo = parseInt(window.boardNo);
+            //     const pathArr = location.pathname.split('/'); // 
+            //     //pathArr[1] = "board2"; // 불필요. 원래 location.pathname = "/board2/freeboard/{oldBoardNo}/update"
+            //     pathArr[3] = oldBoardNo; // 15
+            //     const delPOSTaddr = pathArr.join('/') + "/deletePOST"; //  "/board2/freeboard/15" + "/deletePOST"
+            //                                                             //  /board2/freeboard/20/update/deletePOST                                                   
+            //     console.log("delPOSTaddr", delPOSTaddr); // 예1) /board2/freeboard/61/update/deletePOST
+            //     //  -- 1) body에 전달할 데이터 구성:  
+            //     // const formDataDEL = new FormData(form);
+            //     // formDataDEL.append( // 기존 이미지  PK + 순서를 추후 콘트롤러에서의 업데이트 위해(나중에...) 담아준다
+            //     //     "existingImgNos",
+            //     //     JSON.stringify(existingImgNos)
+            //     // );
+            //     // formDataDEL.append( // old boardNo (경로에서 받아도 되나?)
+            //     //     "oldBoardNo",
+            //     //     JSON.stringify(oldBoardNo)
+            //     // );                
+            //     //
+            //     // body에 넣을 JS 객체로 구성
+            //     const requestBodyData = {
+            //         oldBoardNo: oldBoardNo,
+            //         insertedBoardNo: insertedBoardNo,
+            //         existingImgNos: existingImgNos
+            //     };
+            //
+            //     fetch(delPOSTaddr, { // ###LKSIURI-monkeyPatch ==> 콘트롤러 작성해라.
+            //                          // 
+            //         method: "POST",
+            //         headers: { 'Content-Type': 'application/json' },
+            //         // body: formDataDEL
+            //         body: JSON.stringify(requestBodyData)
+            //     })
+            //     .then(res => res.json())
+            //     .then(dataDel => {
+            //         console.log("dataDel", dataDel); 
+            //         if (dataDel.success) { // data 구성은 "update" POST 콘트롤러 참여해라
+            //             console.log("dataDel.redirectUrl", dataDel.redirectUrl); // // 예1) '/board/freeboard/62'
+            //
+            //             /////// [B] 이제 location.href로 redirection.
+            //             console.log("수정대신에 insert 성공!!"); // ###LKSIURI-monkeyPatch
+            //             //alert(data.message); // 기존 "수정 성공"메시지 알림창에 출력
+            //             console.log("data.redirectUrl", data.redirectUrl); // // 예1) '/board/freeboard/62', inserted된 글로
+            //             location.href = data.redirectUrl;   //  ###LKSIURI-monkeyPatch; 
+            //                                                 //   data.redirectUrl == dataDel.redirectUrl
+            //         } else {
+            //             console.log("기존 게시글 삭제처리 실패!!"); 
+            //         }
+            //     })
+            //     .catch(err => {
+            //         console.error(err);
+            //         alert("오류가 발생했습니다."); // DELETE - POST실패
+            //     });
+            //
+            // } else {
+            //     alert(data.message);
+            // }
 
-                /////// monkey-patch by YYP, 2026-01-08
-                // update -> insert + old delete으로 moneky-patch
-                // 수정대신 insert성공하면, 이리로 넘어옴: 여기서 [A] 해당 BoardNo글 삭제 시행 후, [B] location.href로 redirection.
-                // - 기존 보드넘버는 window.boardNo로 부터: oldBoardNo = window.boardNo
-                // - 새 보드넘버는  redirectUrl = "/board/freeboard/" + boardNo는  에서 얻어와라:
-                /////// [A] 기존 old boardNo게시글 삭제를 GET아니라 ajaxt POST로 수행해라
-                //location.href = location.pathname.replace('board/', 'board2/') + "/delete"; // -> 게시글 삭제 처리하는 controller 만들어야 한다.
-                // // http://localhost:8880/board2/freeboard/5/delete
-                // ajax 주소: location.pathname = "/board/freeboard/27"  ==> location.pathname.split('/') ==> [  "", "board", "freeboard", "27" ]
-                // -- 0) DELETE-POST 새주소(delPOSTaddr) 생성:
-                // 예시: /board/freeboard/27 ==> "/board/freeboard/15" , 여기서 oldBoardNo = 15
-                const oldBoardNo = parseInt(window.boardNo);
-                const pathArr = location.pathname.split('/'); // 
-                //pathArr[1] = "board2"; // 불필요. 원래 location.pathname = "/board2/freeboard/{oldBoardNo}/update"
-                pathArr[3] = oldBoardNo; // 15
-                const delPOSTaddr = pathArr.join('/') + "/deletePOST"; //  "/board2/freeboard/15" + "/deletePOST"
-                                                                        //  /board2/freeboard/20/update/deletePOST                                                   
-                console.log("delPOSTaddr", delPOSTaddr); // 예1) /board2/freeboard/61/update/deletePOST
-                //  -- 1) body에 전달할 데이터 구성:  
-                // const formDataDEL = new FormData(form);
-                // formDataDEL.append( // 기존 이미지  PK + 순서를 추후 콘트롤러에서의 업데이트 위해(나중에...) 담아준다
-                //     "existingImgNos",
-                //     JSON.stringify(existingImgNos)
-                // );
-                // formDataDEL.append( // old boardNo (경로에서 받아도 되나?)
-                //     "oldBoardNo",
-                //     JSON.stringify(oldBoardNo)
-                // );                
-                //
-                // body에 넣을 JS 객체로 구성
-                const requestBodyData = {
-                    oldBoardNo: oldBoardNo,
-                    insertedBoardNo: insertedBoardNo,
-                    existingImgNos: existingImgNos
-                };
-
-                fetch(delPOSTaddr, { // ###LKSIURI-monkeyPatch ==> 콘트롤러 작성해라.
-                                     // 
-                    method: "POST",
-                    headers: { 'Content-Type': 'application/json' },
-                    // body: formDataDEL
-                    body: JSON.stringify(requestBodyData)
-                })
-                .then(res => res.json())
-                .then(dataDel => {
-                    console.log("dataDel", dataDel); 
-                    if (dataDel.success) { // data 구성은 "update" POST 콘트롤러 참여해라
-                        console.log("dataDel.redirectUrl", dataDel.redirectUrl); // // 예1) '/board/freeboard/62'
-
-                        /////// [B] 이제 location.href로 redirection.
-                        console.log("수정대신에 insert 성공!!"); // ###LKSIURI-monkeyPatch
-                        //alert(data.message); // 기존 "수정 성공"메시지 알림창에 출력
-                        console.log("data.redirectUrl", data.redirectUrl); // // 예1) '/board/freeboard/62', inserted된 글로
-                        location.href = data.redirectUrl;   //  ###LKSIURI-monkeyPatch; 
-                                                            //   data.redirectUrl == dataDel.redirectUrl
-                    } else {
-                        console.log("기존 게시글 삭제처리 실패!!"); 
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("오류가 발생했습니다."); // DELETE - POST실패
-                });
-                    
-
-
-
+            if (data.success) { // ##### 원래 게시글 수정으로 복귀 - 3rd (이제 유효한 update로 복귀)
+                alert(data.message);
+                //window.location.href = data.redirectUrl;
+                location.href = data.redirectUrl; // JSON을 JS 객체로 // ###LKSIURI
             } else {
                 alert(data.message);
             }
+
+
         })
         .catch(err => {
             console.error(err);

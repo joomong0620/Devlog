@@ -157,7 +157,12 @@ public class FreeboardController2 {
 
 		log.info("[ FreeboardController: Update-POST ] cp for 목록으로 버튼 선택시 :{}", cp);
 		log.info("[ FreeboardController: Update-POST ] deleteList in freeboardUpdate-POST:{}", deleteList); 		
-		log.info("[ FreeboardController: Update-POST ] images.size() in freeboardUpdate-POST:{}", images.size()); 		
+		//log.info("[ FreeboardController: Update-POST ] images.size() in freeboardUpdate-POST:{}", images.size()); 		
+		if (images != null && images.size() > 0) {	// null-방어
+			log.info("[ FreeboardController: Update-POST ] images.size() in freeboardUpdate-POST:{} for new images attached", images.size()); 					
+		} else {
+			log.info("[ FreeboardController: Update-POST ] images.size() in freeboardUpdate-POST == 0; no-new image attached"); 								
+		}		
 		log.info("[ FreeboardController: Update-POST ] existingImgNos in freeboardUpdate-POST:{}", existingImgNos); 		
 			
 		
