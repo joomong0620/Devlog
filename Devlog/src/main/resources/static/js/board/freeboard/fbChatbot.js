@@ -323,8 +323,10 @@ function updateTokenDisplay(promptTokens, completionTokens, totalTokens, accumul
     
     totalServerTokens += totalTokens;
     
-    // 커피콩이 0 이하가 되면 경고
-    if(beansAmount2update <= 0) {
+    //// 커피콩이 0 이하가 되면 경고
+    //if(beansAmount2update <= 0) {
+    // 유료형 챗봇의 경우만(KONG 타입만 과금 처리), 커피콩이 0 이하가 되면 경고
+    if(chatbotType === "kong" && data.remainingBeans <= 0) {        
         alert("커피콩이 모두 소진되었습니다. 충전 후 이용해 주세요.");
 
         // 세션 종료 전에 DB 업데이트
@@ -354,7 +356,9 @@ function updateBeansDisplay() {
                 window.beansAmount = data.remainingBeans;
                 
                 // 커피콩이 0 이하가 되면 경고
-                if(data.remainingBeans <= 0) {
+                // if(data.remainingBeans <= 0) {                
+                // 유료형 챗봇의 경우만(KONG 타입만 과금 처리), 커피콩이 0 이하가 되면 경고
+                if(chatbotType === "kong" && data.remainingBeans <= 0) {
                     alert("커피콩이 모두 소진되었습니다. 충전 후 이용해 주세요.");
                     
                     if(window.opener) {
@@ -594,12 +598,26 @@ function sendMessage() {
                 // 반드시 체크
                 console.log("##### 서버에서 받은 누적 커피콩:", serverUsedBeans);
 
-                updateTokenDisplay(
-                    prompt_tokens, 
-                    completion_tokens, 
-                    total_tokens, 
-                    serverUsedBeans || 0
-                );
+                //// 무료형 & 유료형 모두 화면에 커피콩사용 내역 업데이트
+                // updateTokenDisplay(
+                //     prompt_tokens, 
+                //     completion_tokens, 
+                //     total_tokens, 
+                //     serverUsedBeans || 0
+                // );
+
+                // 유료형 챗봇의 경우만(KONG 타입만), 화면에 token사용량 표시
+                if(chatbotType === "kong") {
+                    updateTokenDisplay(
+                        prompt_tokens, 
+                        completion_tokens, 
+                        total_tokens, 
+                        serverUsedBeans || 0
+                    );
+                }                
+
+
+
             }
 
         })
