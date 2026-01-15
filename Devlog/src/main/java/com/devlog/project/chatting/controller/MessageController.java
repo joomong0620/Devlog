@@ -313,7 +313,14 @@ public class MessageController {
 			@RequestBody Map<String, Object> paramMap
 			) {
 			
+		Long memberNo = ((Number)paramMap.get("memberNo")).longValue();
 		paramMap.put("type", "Typing");
+		Member member = memberRepository.findById(memberNo).orElseThrow();
+		
+		String memberNickname = member.getMemberNickname();
+		
+		paramMap.put("memberNickname", memberNickname);
+		
 		System.out.println(paramMap);
 		
 		templete.convertAndSend(

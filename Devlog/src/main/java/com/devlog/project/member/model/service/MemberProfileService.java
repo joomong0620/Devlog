@@ -1,5 +1,7 @@
 package com.devlog.project.member.model.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.devlog.project.member.model.dto.MemberProfileDTO;
@@ -34,5 +36,11 @@ public class MemberProfileService {
 		
 		return resp;
 	}
+	
+	// 멤버 리스트 조회
+//	public List<Member> findMemberList() {
+//		
+//		return repository.findByMemberEmail(null)l;
+//	}
 
 }

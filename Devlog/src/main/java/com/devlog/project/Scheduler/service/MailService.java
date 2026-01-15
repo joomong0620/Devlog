@@ -6,6 +6,6 @@ import com.devlog.project.Scheduler.dto.Hot3DTO;
 
 public interface MailService {
 	
-	void sendHot3Mail(String string, List<Hot3DTO> hotList);
+	void sendHot3Mail(List<String> members, List<Hot3DTO> hotList);
 
 }

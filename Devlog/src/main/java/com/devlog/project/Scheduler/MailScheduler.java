@@ -1,5 +1,6 @@
 package com.devlog.project.Scheduler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Component;
 import com.devlog.project.Scheduler.dto.Hot3DTO;
 import com.devlog.project.Scheduler.service.BoardService;
 import com.devlog.project.Scheduler.service.MailService;
+import com.devlog.project.member.model.entity.Member;
+import com.devlog.project.member.model.service.MemberProfileService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +21,7 @@ public class MailScheduler {
 	
 	private final BoardService boardService;
 	private final MailService mailService;
+	private final MemberProfileService memberService;
 	
 	
 	
@@ -40,6 +44,13 @@ public class MailScheduler {
 		        System.out.println("👉 " + dto);
 		    }
 		    
-		    mailService.sendHot3Mail("kyusik0548@naver.com", hotList);
+		    //List<Member> members = memberService.findMemberList();
+		    List<String> members = new ArrayList<>();
+		    
+		    members.add("kyusik0548@naver.com");
+		    
+		    members.add("gmlwns9863@gmail.com");
+		    
+		    mailService.sendHot3Mail(members, hotList);
 	}
 }

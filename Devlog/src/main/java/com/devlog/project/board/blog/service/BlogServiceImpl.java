@@ -153,8 +153,19 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public String uploadImage(MultipartFile image) {
         if (image == null || image.isEmpty()) return null;
+        
+        // 원본 파일명 가져오기
+        String originalName = image.getOriginalFilename();
+        
+        // [수정] 파일명 안전하게 처리 (공백 -> 언더바(_)로 변경)
+        // 예: "my photo.jpg" -> "my_photo.jpg"
+        if (originalName != null) {
+            originalName = originalName.replaceAll("\\s", "_");
+        }
 
-        String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+        // UUID와 결합하여 고유 파일명 생성
+        String fileName = UUID.randomUUID().toString() + "_" + originalName;
+        
         File folder = new File(uploadLocation);
         if (!folder.exists()) folder.mkdirs();
 

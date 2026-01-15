@@ -1591,12 +1591,11 @@ function subscribeRoom(roomNo) {
     }
 
     // 선택한 채팅방의 topic을 구독
-    // topic 이란 ? -> 여러 클라이언트가 동시에 구독할 수 있는 메세지 채널
-    // topic -> 브로드캐스트 채널 1:n
-    // queue -> 1:1
-    // 이 순간부터 해당 채팅방의 메세지만 수신
+    // topic: 여러 클라이언트가 동시에 구독하는 브로드캐스트 메시지 채널 (1:N)
+    // queue: 특정 사용자에게 전달되는 1:1 메시지 채널
+    // 이 시점부터 해당 채팅방(topic)으로 발행되는 모든 메시지를 실시간으로 수신
     currentSubscription = stompClient.subscribe(
-        '/topic/room/' + roomNo, // 채팅방 고유 주소
+        '/topic/room/' + roomNo, // 채팅방 고유 메세지 채널
         onMessageReceived // 이 채팅방으로 들어오는 모든 메세지 수신 처리기
     );
 
@@ -1725,9 +1724,6 @@ function updateUserCount(msg) {
 // 메세지 수신기
 function onMessageReceived(payload) {
     const msg = JSON.parse(payload.body);
-    
-    console.log(msg);
-
 
     if(msg.type == 'READ') {
         console.log('LastReadNo raw:', msg.LastReadNo);
@@ -1736,13 +1732,11 @@ function onMessageReceived(payload) {
         updateUnreadChange(msg);
         return;
     }
-
     if(msg.type =='LEAVE') {
         console.log(msg ,'확인');
         updateUserCount(msg);
         return;
     }
-
     if(msg.status == 'MOD' || msg.status == 'DEL'){
 
         applyMessageStatus(msg);
@@ -1750,7 +1744,6 @@ function onMessageReceived(payload) {
     } else{
 
         if(msg.type == 'Typing') {
-
             handleTyping(msg);
 
             return;
@@ -1763,17 +1756,12 @@ function onMessageReceived(payload) {
             return;
         }
 
-
-        
-        
-
         if(msg.type == 'Emoji'){
             updateEmojiUI(msg);
 
             return ;
         }
         appendMessage(msg);
-
         sendReadSignal(msg.room_no);
     }
 }
@@ -2467,7 +2455,7 @@ function sendTyping(state) {
     stompClient.send("/devtalk/chat.typing", {}, JSON.stringify({
         roomNo: currentRoomNo,
         memberNo: myNo,
-        memberNickname: myNick,
+        // memberNickname: myNick,
         typing: state
     }));
 }

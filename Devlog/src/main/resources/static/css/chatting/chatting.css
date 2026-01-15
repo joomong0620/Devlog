@@ -9,6 +9,7 @@ main {
     border-radius: 10px;
     width: 100%;
     height: calc(100vh - 64px);
+    margin-bottom: 120px;
 }
 
 .flex {
