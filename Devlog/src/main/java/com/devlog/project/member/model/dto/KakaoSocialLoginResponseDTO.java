@@ -1,7 +1,6 @@
 package com.devlog.project.member.model.dto;
 
 
-import com.devlog.project.member.model.entity.Member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +16,6 @@ import lombok.ToString;
 public class KakaoSocialLoginResponseDTO {
     private Long socialNo;
 	private String provider;
-	private String providerId;
-	//private MemberLoginResponseDTO member;
+	private String providerId; // 카카오 사용자 고유 번호
 	private Long memberNo; // memberNo = member.getMemberNo()
 }
