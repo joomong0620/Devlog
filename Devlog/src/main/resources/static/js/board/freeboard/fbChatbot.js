@@ -263,15 +263,19 @@ function endChatbotSession() {
     //==>실제 devlog 프로젝트에서 COFFEE_BEANS_TRADE 결제 내역 삽입
     // 1. KONG 타입만 & 로그인멤버 과금 처리(DB기록)
     if(chatbotType === "kong" && window.loginMemberNo) {
-        const paymentBlob = new Blob([JSON.stringify({
-            contentType: "CHATBOT",
-            contentId: currentSessionId,
-            price: accumulated_usedBeans
-        })], { type: 'application/json' });
-        
-        navigator.sendBeacon('/payment/trade', paymentBlob);
-        
-        console.log("챗봇 사용 데이터 전송 완료");
+         if(accumulated_usedBeans > 0) { // 누적 콩사용 내역 있을때만 전송
+
+             const paymentBlob = new Blob([JSON.stringify({
+                 contentType: "CHATBOT",
+                 contentId: currentSessionId,
+                 price: accumulated_usedBeans
+             })], { type: 'application/json' });
+             
+             navigator.sendBeacon('/payment/trade', paymentBlob);
+             
+             console.log("챗봇 사용 데이터 전송 완료");
+
+         }
     }    
 
 
