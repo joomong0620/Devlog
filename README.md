@@ -167,10 +167,7 @@ ZERO-BOOST는 기술 공유와 함께 **감정·경험·공감의 공간**을 �
 ## 데모 비디오
 
 
-
-https://github.com/user-attachments/assets/5fc82225-601f-4c6a-9dec-71d817b34a1d
-
-
+https://youtu.be/80qqAGLkg2U
 
 
 
